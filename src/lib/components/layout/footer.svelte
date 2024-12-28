@@ -2,8 +2,7 @@
 	import { Button } from '../ui/button';
 </script>
 
-<footer class="flex items-center justify-center gap-4 p-4">
+<footer class="flex items-center justify-center gap-4 bg-primary p-4 text-primary-foreground">
 	<p>Footer</p>
-	<Button>Click me</Button>
 </footer>
 <div></div>
