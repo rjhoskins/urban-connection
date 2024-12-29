@@ -7,9 +7,9 @@
 		class: className,
 		max = 100,
 		value,
-		barBgColor,
+		barBgColor = 'bg-primary',
 		...restProps
-	}: WithoutChildrenOrChild<ProgressPrimitive.RootProps> = $props();
+	}: any = $props();
 </script>
 
 <ProgressPrimitive.Root
@@ -17,7 +17,6 @@
 	class={cn('relative h-4 w-full overflow-hidden rounded-full bg-secondary', className)}
 	{value}
 	{max}
-	{barBgColor}
 	{...restProps}
 >
 	<div

@@ -2,10 +2,10 @@
 	const Links = [
 		{ name: 'Home', href: '/' },
 		{ name: 'Login', href: '/demo/lucia' },
-		{ name: 'Contact Us', href: '/contact-us' },
-		{ name: 'District', href: '/districts' },
-		{ name: 'School Admin', href: '/school' },
-		{ name: 'School', href: '/school' }
+		{ name: 'Contact Us', href: '/contact-us' }
+		// { name: 'District', href: '/districts' },
+		// { name: 'School Admin', href: '/school' },
+		// { name: 'School', href: '/school' }
 	];
 </script>
 

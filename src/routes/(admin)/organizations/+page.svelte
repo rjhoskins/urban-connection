@@ -23,7 +23,9 @@
 			<Card.Title>{org.name}</Card.Title>
 			<Card.Description class="flex gap-4 text-primary/50">
 				Team Members{' '}
-				{data.fetchedData.users?.filter((user) => user?.districtId === org.id).length || 0}
+				{data.fetchedData.users?.filter(
+					(user: { districtId: string }) => user?.districtId === org.id
+				).length || 0}
 			</Card.Description>
 		</Card.Header>
 		<Card.Content class="flex gap-3 p-4 ">
