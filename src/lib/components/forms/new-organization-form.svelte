@@ -37,9 +37,7 @@
 						/>
 					{/snippet}
 				</Control>
-				<Description class="-mt-2 text-sm text-primary/50"
-					>This is the name the Organization name</Description
-				>
+
 				<FieldErrors class="text-red-700" />
 			</Field>
 			<button
