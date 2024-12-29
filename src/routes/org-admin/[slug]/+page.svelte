@@ -2,19 +2,18 @@
 	import * as Card from '$lib/components/ui/card';
 	import Progress from '$lib/components/ui/progress/progress.svelte';
 
-	// import { page } from '$app/state';
+	import { page } from '$app/state';
+	import { Button } from '$lib/components/ui/button/index.js';
 
-	// let { data } = $props();
-	// const {
-	// 	data: { name, phone, email, lastName, members }
-	// } = data;
+	let { data } = $props();
+	const {
+		data: { name, phone, email, lastName, members }
+	} = data;
 </script>
 
-<h1>Dash!</h1>
-
-<!-- <div class="top flex justify-between">
-	<h1>{name || 'no name?'} | Dashboard</h1>
-	<div class="left">
+<div class="top flex justify-between">
+	<div class="left space-y-3">
+		<h1 class="my-6 text-3xl">{name || 'no name?'} | Dashboard</h1>
 		<div class="flex gap-3">
 			<p>Name:</p>
 			<p>{lastName || 'TODO'}</p>
@@ -34,12 +33,12 @@
 			<Button>Bulk Add Members</Button>
 		</div>
 	</div>
-	<div class="right">
+	<div class="right space-y-3">
 		<div class="btns">
 			<Button>Mass Send Assessments</Button>
 			<Button>Copy Assessment Link</Button>
 		</div>
-		<div class="bars">
+		<div class="bars space-y-3">
 			<div class="flex grow flex-col">
 				<p class=" whitespace-nowrap">Completed</p>
 				<Progress value={lastName?.progress || Math.random() * 100} />
@@ -57,7 +56,7 @@
 	</div>
 </div>
 
-<section class="grid-cols-orgs-fluid sizes sizes container grid max-w-7xl gap-4">
+<section class="sizes sizes container grid max-w-6xl grid-cols-orgs-fluid gap-4">
 	{#each data.members as school (school.name)}
 		{@render OrgCard(school)}
 	{/each}
@@ -72,15 +71,17 @@
 				{school.email || 'TODO'}
 			</Card.Description>
 		</Card.Header>
-		<Card.Content class="flex flex-wrap gap-3 p-4 ">
-			<Button>Send Assessment</Button>
-			<div class="flex grow flex-col">
-				<p class=" whitespace-nowrap">Assessment Progress</p>
+		<Card.Content class="flex flex-wrap items-center gap-3 p-4 ">
+			<Button class="md:grow">Send Assessment</Button>
+			<div class="flex grow flex-col gap-2">
+				<div class="flex justify-between md:grow">
+					<p class=" whitespace-nowrap">Assessment Progress</p>
+					<p class=" whitespace-nowrap">
+						{school?.progress || Math.floor(Math.random() * 100)}
+					</p>
+				</div>
 				<Progress barBgColor={'bg-green-700'} value={school?.progress || Math.random() * 100} />
 			</div>
 		</Card.Content>
 	</Card.Root>
-{/snippet} -->
-
-<!-- <pre>{JSON.stringify(page, null, 2)}</pre> -->
-<!-- <pre class="sizes">{JSON.stringify(data, null, 2)}</pre> -->
+{/snippet}

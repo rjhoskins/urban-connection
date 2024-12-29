@@ -1,12 +1,14 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import type { ActionData } from './$types';
+	import LoginOrRegisterForm from '$lib/components/forms/login-or-register-form.svelte';
 
-	let { form }: { form: ActionData } = $props();
+	/** @type {{ data: import('./$types').PageData, form: import('./$types').ActionData }} */
+
+	let { data, form } = $props();
 </script>
 
-<h1>Login/Register</h1>
-<form method="post" action="?/login" use:enhance>
+<h1>TODO: Login/Register</h1>
+<!-- <form method="post" action="?/login" use:enhance>
 	<label>
 		Username
 		<input name="username" />
@@ -18,4 +20,5 @@
 	<button>Login</button>
 	<button formaction="?/register">Register</button>
 </form>
-<p style="color: red">{form?.message ?? ''}</p>
+<p style="color: red">{form?.message ?? ''}</p> -->
+<LoginOrRegisterForm data={data.form!} />

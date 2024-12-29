@@ -4,25 +4,25 @@
 	const adminData = [
 		{
 			title: 'Create Organization',
-			url: '/admin/organizations/create',
+			url: '/districts/create',
 			description: 'Create organization and send email invitation to administrator.',
 			icon: UserRoundPlus
 		},
 		{
 			title: 'Manage Organizations',
-			url: '/admin/organizations',
+			url: '/districts',
 			description: 'Manage the details for all organizations',
 			icon: LayoutGrid
 		},
 		{
 			title: 'View Results Dashboard',
-			url: '/admin/organizations/results',
+			url: '/districts/results',
 			description: 'View completed assessment results for all organizations',
 			icon: List
 		},
 		{
 			title: 'Manage Assessments',
-			url: '/admin/organizations/manage-assessments',
+			url: '/districts/manage-assessments',
 			description: 'Edit, view, and manage assessment',
 			icon: PenTool
 		}

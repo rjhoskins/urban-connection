@@ -1,12 +1,16 @@
 import * as auth from '$lib/server/auth';
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
+import { superValidate } from 'sveltekit-superforms';
+import { zod } from 'sveltekit-superforms/adapters';
+import { createNewUserSchema } from '$lib/schema';
 
 export const load: PageServerLoad = async (event) => {
 	if (!event.locals.user) {
 		return redirect(302, '/demo/lucia/login');
 	}
-	return { user: event.locals.user };
+	const form = await superValidate(zod(createNewUserSchema));
+	return { user: event.locals.user, form };
 };
 
 export const actions: Actions = {
