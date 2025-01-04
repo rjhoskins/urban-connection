@@ -8,13 +8,13 @@ import * as table from '$lib/server/db/schema';
 import type { Actions, PageServerLoad } from './$types';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { createSchoolSchema } from '$lib/schema';
+import { createNewUserSchema } from '$lib/schema';
 
 export const load: PageServerLoad = async (event) => {
 	if (event.locals.user) {
-		return redirect(302, '/demo/lucia');
+		return redirect(302, '/auth');
 	}
-	const form = await superValidate(zod(createSchoolSchema));
+	const form = await superValidate(zod(createNewUserSchema));
 
 	// Always return { form } in load functions (sveltekit-superforms)
 	return { form };
@@ -55,7 +55,7 @@ export const actions: Actions = {
 		const session = await auth.createSession(sessionToken, existingUser.id);
 		auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
 
-		return redirect(302, '/demo/lucia');
+		return redirect(302, '/auth/login');
 	},
 	register: async (event) => {
 		const formData = await event.request.formData();
@@ -87,7 +87,7 @@ export const actions: Actions = {
 		} catch (e) {
 			return fail(500, { message: 'An error has occurred' });
 		}
-		return redirect(302, '/demo/lucia');
+		return redirect(302, '/auth/login');
 	}
 };
 

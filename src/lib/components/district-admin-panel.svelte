@@ -1,39 +1,36 @@
 <script lang="ts">
 	import * as Card from '$lib/components/ui/card';
 	import { LayoutGrid, List, PenTool, Slice, UserRoundPlus } from 'lucide-svelte';
+	import { users } from '$lib/store/users.svelte';
+
 	const adminData = [
 		{
-			title: 'Create Organization',
-			url: '/districts/create',
-			description: 'Create organization and send email invitation to administrator.',
-			icon: UserRoundPlus
-		},
-		{
-			title: 'Manage Organizations',
-			url: '/districts',
-			description: 'Manage the details for all organizations',
+			title: 'Invite School Administator',
+			url: '/schools/create',
+			description: 'Send email invitation to administrator.',
 			icon: LayoutGrid
 		},
 		{
-			title: 'View Results Dashboard',
-			url: '/districts/results',
-			description: 'View completed assessment results for all organizations',
+			title: 'View Schools Dashboard',
+			url: '/schools',
+			description: 'View completed assessment results for all Schools',
 			icon: List
-		},
-		{
-			title: 'Manage Assessments',
-			url: '/districts/manage-assessments',
-			description: 'Edit, view, and manage assessment',
-			icon: PenTool
 		}
+		// {
+		// 	title: 'Manage Assessments',
+		// 	url: '/districts/manage-assessments',
+		// 	description: 'Edit, view, and manage assessment',
+		// 	icon: PenTool
+		// }
 	];
 </script>
 
 <Card.Root class="mx-auto max-w-6xl">
 	<Card.Header>
-		<Card.Title>Main Menu</Card.Title>
-		<Card.Description>Card Description</Card.Description>
+		<Card.Title class="p-6">Hello, {users.selectedUser}</Card.Title>
+		<!-- <Card.Description>Card Description</Card.Description> -->
 	</Card.Header>
+	<hr class="bg-primary" />
 	<Card.Content>
 		{#each adminData.slice(0, 2) as item (item.title)}
 			{@render dashItem(item)}

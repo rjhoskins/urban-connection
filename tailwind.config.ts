@@ -13,7 +13,7 @@ const config: Config = {
 		},
 		extend: {
 			gridTemplateColumns: {
-				'orgs-fluid': 'repeat(auto-fit, minmax(300px, 3fr))'
+				'schools-fluid': 'repeat(auto-fit, minmax(300px, 3fr))'
 			},
 			colors: {
 				border: 'hsl(var(--border) / <alpha-value>)',

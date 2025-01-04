@@ -7,7 +7,7 @@ import { createSchoolSchema } from '$lib/schema';
 
 export const load: PageServerLoad = async (event) => {
 	if (!event.locals.user) {
-		return redirect(302, '/demo/lucia/login');
+		return redirect(302, '/auth/login');
 	}
 	const form = await superValidate(zod(createSchoolSchema));
 	return { user: event.locals.user, form };
@@ -21,6 +21,6 @@ export const actions: Actions = {
 		await auth.invalidateSession(event.locals.session.id);
 		auth.deleteSessionTokenCookie(event);
 
-		return redirect(302, '/demo/lucia/login');
+		return redirect(302, '/auth/login');
 	}
 };
