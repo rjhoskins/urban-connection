@@ -1,10 +1,18 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	/** @type {{ data: import('./$types').PageData, form: import('./$types').ActionData }} */
 
 	import NewSchoolForm from '$lib/components/forms/new-school-form.svelte';
-	let { data } = $props();
+	let { data, form } = $props();
+	const { districts } = data;
 </script>
 
-<h1 class="my-6 text-center text-3xl">UC Admin Create</h1>
+<svelte:head>
+	<title>Hello world!</title>
+	<meta name="description" content="This is where the description goes for SEO" />
+</svelte:head>
 
-<NewSchoolForm data={data.form} />
+<div class=" grid h-full place-content-center">
+	<NewSchoolForm {data} />
+	<!-- <pre>{JSON.stringify(districts, null, 2)}</pre> -->
+</div>

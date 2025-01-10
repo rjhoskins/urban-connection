@@ -6,7 +6,7 @@
 	let { data, form } = $props();
 </script>
 
-<h1 class="my-6 text-center text-3xl">TODO: Login/Register</h1>
+<h1 class="sr-only">Login/Register</h1>
 
 <!-- <form method="post" action="?/login" use:enhance>
 	<label>
@@ -24,4 +24,6 @@
 
 <hr class="my-6" /> -->
 
-<LoginOrRegisterForm {data} />
+<div class="grid h-full place-items-center">
+	<LoginOrRegisterForm {data} />
+</div>

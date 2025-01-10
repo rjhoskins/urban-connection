@@ -12,7 +12,7 @@ import { createNewUserSchema } from '$lib/schema';
 
 export const load: PageServerLoad = async (event) => {
 	if (event.locals.user) {
-		return redirect(302, '/auth');
+		return redirect(302, '/');
 	}
 	const form = await superValidate(zod(createNewUserSchema));
 
@@ -22,7 +22,7 @@ export const load: PageServerLoad = async (event) => {
 
 export const actions: Actions = {
 	login: async (event) => {
-		console.log('login ======================>');
+		console.log('login load ======================>');
 		const formData = await event.request.formData();
 		const username = formData.get('username');
 		const password = formData.get('password');
@@ -34,7 +34,10 @@ export const actions: Actions = {
 			return fail(400, { message: 'Invalid password' });
 		}
 
-		const results = await db.select().from(table.user).where(eq(table.user.username, username));
+		const results = await db
+			.select()
+			.from(table.usersTable)
+			.where(eq(table.usersTable.username, username));
 
 		const existingUser = results.at(0);
 		if (!existingUser) {
@@ -79,7 +82,7 @@ export const actions: Actions = {
 		});
 
 		try {
-			await db.insert(table.user).values({ id: userId, username, passwordHash });
+			await db.insert(table.usersTable).values({ id: userId, username, passwordHash });
 
 			const sessionToken = auth.generateSessionToken();
 			const session = await auth.createSession(sessionToken, userId);

@@ -8,23 +8,29 @@
 	import { superForm } from 'sveltekit-superforms';
 	import SuperDebug from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { districts } from '$lib/data/data';
 
 	let { data } = $props();
+	const { districts } = data;
 	let selectedDistrict = $state(0);
 
-	const form = superForm(data, {
-		validators: zodClient(createSchoolSchema),
-		// clearOnSubmit: 'errors',
-		resetOnSubmit: false
+	const form = superForm(data.form, {
+		validators: zodClient(createSchoolSchema)
+
+		// onResult({ result }) {
+		// 	if (result.status === 200) {
+		// 		form.reset();
+		// 		console.log('onResult => ', result);
+		// 		$formData.districtId = 0;
+		// 	}
+		// }
 	});
 	const { form: formData, enhance, message } = form;
 </script>
 
 <Card.Root class="mx-auto max-w-6xl">
 	<Card.Header>
-		<Card.Title>Create School</Card.Title>
-		<Card.Description>Create a new Schools</Card.Description>
+		<Card.Title class="text-3xl">Create School</Card.Title>
+		<Card.Description class="text-sm text-primary/75">Create a new School</Card.Description>
 	</Card.Header>
 	<Card.Content>
 		<form class="flex flex-col gap-3" method="POST" use:enhance>
@@ -46,15 +52,18 @@
 				<FieldErrors class="text-red-700" />
 			</Field>
 			<!-- district -->
-			<Field {form} name="district">
+			<Field {form} name="districtId">
 				<Control>
 					{#snippet children({ props })}
 						<Label>District Name</Label>
 						<Select.Root
 							type="single"
-							selected={selectedDistrict}
+							selected={$formData.districtId}
 							onSelectedChange={(s) => {
-								$formData.district = s.value;
+								console.log('selected district => ', s);
+								if (s) {
+									$formData.districtId = s.value;
+								}
 							}}
 						>
 							<Select.Trigger>
@@ -64,13 +73,13 @@
 								<Select.Group>
 									<!-- <Select.Label>Fruits</Select.Label> -->
 									{#each districts as district}
-										<Select.Item value={district.name} label={district.name}
+										<Select.Item value={district.id} label={district.name}
 											>{district.name}</Select.Item
 										>
 									{/each}
 								</Select.Group>
 							</Select.Content>
-							<Select.Input name="district" />
+							<Select.Input class="sizes" name="districtId" /><!-- must match! -->
 						</Select.Root>
 					{/snippet}
 				</Control>
@@ -87,11 +96,12 @@
 							type="text"
 							name="adminName"
 							class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-							placeholder="Enter School AdminName"
+							placeholder="Enter School Admin Name"
 							bind:value={$formData.adminName}
 						/>
 					{/snippet}
 				</Control>
+				<Description class="text-sm text-primary/50">Name to be used in admin invite</Description>
 				<FieldErrors class="text-red-700" />
 			</Field>
 			<!-- adminEmail -->
@@ -104,11 +114,14 @@
 							type="text"
 							name="adminEmail"
 							class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-							placeholder="Enter School AdminEmail"
+							placeholder="Enter School Admin Email"
 							bind:value={$formData.adminEmail}
 						/>
 					{/snippet}
 				</Control>
+				<Description class="text-sm text-primary/50"
+					>Email to be used in admin invite: should be their school email</Description
+				>
 				<FieldErrors class="text-red-700" />
 			</Field>
 			<button
@@ -129,6 +142,6 @@
 <Card.Root class="container mx-auto mt-20 max-w-4xl p-4">
 	<SuperDebug data={$formData} />
 
-	<pre>{JSON.stringify(data, null, 2)}</pre>
+	<pre>{JSON.stringify(data.districts, null, 2)}</pre>
 	<pre class="sizes">{JSON.stringify($formData, null, 2)}</pre>
 </Card.Root>

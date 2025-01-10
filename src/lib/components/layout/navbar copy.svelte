@@ -1,13 +1,33 @@
 <script lang="ts">
 	let { data } = $props();
+	// let data = $state({
+	// 	user: {
+	// 		name: 'rob',
+	// 		email: ''
+	// 	}
+	// });
+
+	import * as Select from '$lib/components/ui/select/index.js';
 	import { page } from '$app/state';
 
+	const fruits = [
+		{ value: 'apple', label: 'Apple' },
+		{ value: 'banana', label: 'Banana' },
+		{ value: 'blueberry', label: 'Blueberry' },
+		{ value: 'grapes', label: 'Grapes' },
+		{ value: 'pineapple', label: 'Pineapple' }
+	];
 	const Links = [
 		{ name: 'Home', href: '/' },
 		{ name: 'Contact Us', href: '/contact-us' }
+
+		// { name: 'District', href: '/districts' },
+		// { name: 'School Admin', href: '/school' },
+		// { name: 'School', href: '/school' }
 	];
 
 	import { users } from '$lib/store/users.svelte';
+	import { json } from 'stream/consumers';
 	import Button from '../ui/button/button.svelte';
 	import { enhance } from '$app/forms';
 	$effect(() => {
@@ -16,6 +36,7 @@
 </script>
 
 <header class="bg-secondary">
+	\
 	<nav class="mx-auto flex max-w-7xl items-center gap-4 p-4">
 		<p class="mr-auto text-3xl font-semibold">The Urban Connection Project</p>
 		<div class="">
@@ -28,7 +49,7 @@
 		</div>
 		{#if page.url.pathname === '/'}
 			<div>
-				<label for="users" class="sr-only block text-sm/6 font-medium text-gray-900"></label>
+				<label for="users" class="sr-only block text-sm/6 font-medium text-gray-900">Hello, </label>
 				<div class="grid grid-cols-1">
 					<select
 						id="location"

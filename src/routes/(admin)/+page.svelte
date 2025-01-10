@@ -1,13 +1,18 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 
-	let { data }: { data: PageData } = $props();
+	// let { data }: { data: PageData } = $props();
 	import { users } from '$lib/store/users.svelte';
 	import UCAdminPanel from '$lib/components/uc-admin-panel.svelte';
 	import DistrictAdminPanel from '$lib/components/district-admin-panel.svelte';
 	import SchooladminAdminPanelcopy from '$lib/components/schooladmin-admin-panel copy.svelte';
 </script>
 
+<svelte:head>
+	<title>Hello world!</title>
+	<meta name="description" content="This is where the description goes for SEO" />
+</svelte:head>
+<h1 class="sr-only">admin {users.selectedUser}</h1>
 <div class="hi grid h-full place-content-center">
 	{#if users.selectedUser == 'UC'}
 		<h1 class="my-6 text-center text-3xl">Urban Connection Admin Panel</h1>

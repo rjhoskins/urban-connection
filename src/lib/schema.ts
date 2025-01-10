@@ -1,29 +1,50 @@
-import { z } from 'zod';
+import { number, z } from 'zod';
 import { districts } from './data/data';
 
 export const createNewUserSchema = z.object({
 	username: z
 		.string()
-		.nonempty({ message: 'name is required' })
-		.min(4, { message: 'name should be at least four characters ' })
-		.max(50, { message: 'name should be less than 50 characters ' }),
+		.nonempty({ message: 'user name is required' })
+		.min(4, { message: 'user name should be at least four characters ' })
+		.max(50, { message: 'user name should be less than 50 characters ' }),
 	password: z
 		.string()
 		.nonempty({ message: 'password is required' })
 		.min(4, { message: 'password should be at least four characters ' })
 		.max(50, { message: 'password should be less than 50 characters ' })
 });
+export const registerNewUserSchema = z
+	.object({
+		email: z.string(),
+		username: z
+			.string()
+			.nonempty({ message: 'name is required' })
+			.min(4, { message: 'name should be at least four characters ' })
+			.max(50, { message: 'name should be less than 50 characters ' }),
+		password: z
+			.string()
+			.nonempty({ message: 'password is required' })
+			.min(4, { message: 'password should be at least four characters ' })
+			.max(50, { message: 'password should be less than 50 characters ' })
+			.max(50, { message: 'name should be less than 50 characters ' }),
+		confirm: z
+			.string()
+			.nonempty({ message: 'password is required' })
+			.min(4, { message: 'password should be at least four characters ' })
+			.max(50, { message: 'password should be less than 50 characters ' })
+	})
+	.refine((data) => data.password === data.confirm, {
+		message: "Passwords don't match",
+		path: ['confirm'] // path of error);
+	});
+
 export const createSchoolSchema = z.object({
 	name: z
 		.string()
 		.nonempty({ message: 'school name is required' })
 		.min(4, { message: 'school name should be at least four characters ' })
 		.max(50, { message: 'school name should be less than 50 characters ' }),
-	district: z
-		.enum(districts.map((d) => d.name) as [string, ...string[]], {
-			message: 'must select a district.'
-		})
-		.default(''),
+	districtId: z.number().min(1, { message: 'district is required' }).default(0), //gets it done
 	adminName: z
 		.string()
 		.nonempty({ message: 'admin name is required' })
@@ -44,7 +65,11 @@ type UserRole = z.infer<typeof UserRoleSchema>;
 
 export const themes = ['light', 'dark'] as const;
 export const languages = ['en', 'es', 'fr'] as const;
-export const allergies = ['peanuts', 'dairy', 'gluten', 'soy', 'shellfish'] as const;
+export const errorPageList = [
+	"I promise not to peek at surveys I'm not supposed to see",
+	'I understand that some surveys are double top secret',
+	"I'll be patient and wait for surveys I'm authorized to take"
+] as const;
 export const colors = {
 	blu: 'Blue',
 	red: 'Red',
@@ -54,17 +79,17 @@ export const colors = {
 } as const;
 
 export const schema = z.object({
-	email: z.string().email('Please enter a valid email.'),
-	bio: z.string().optional(),
-	fruit: z.string().optional(),
-	theme: z.enum(themes).default('light'),
-	language: z.enum(languages).default('en'),
-	district: z.enum(districts.map((d) => d.name) as [string, ...string[]]).default(''),
-	marketingEmails: z.boolean().default(true),
-	allergies: z.array(z.enum(allergies)),
-	colors: z
-		.array(z.enum(Object.keys(colors) as [Color, ...Color[]]))
-		.min(1, 'Please select at least one color.')
+	// email: z.string().email('Please enter a valid email.'),
+	// bio: z.string().optional(),
+	// fruit: z.string().optional(),
+	// theme: z.enum(themes).default('light'),
+	// language: z.enum(languages).default('en'),
+	// district: z.enum(districts.map((d) => d.name) as [string, ...string[]]).default(''),
+	// marketingEmails: z.boolean().default(true),
+	errorPageList: z.array(z.enum(errorPageList))
+	// colors: z
+	// 	.array(z.enum(Object.keys(colors) as [Color, ...Color[]]))
+	// 	.min(1, 'Please select at least one color.')
 });
 
 type Color = keyof typeof colors;
