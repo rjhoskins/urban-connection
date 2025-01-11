@@ -70,6 +70,7 @@ export const errorPageList = [
 	'I understand that some surveys are double top secret',
 	"I'll be patient and wait for surveys I'm authorized to take"
 ] as const;
+export const allergies = ['peanuts', 'dairy', 'gluten', 'soy', 'shellfish'] as const;
 export const colors = {
 	blu: 'Blue',
 	red: 'Red',
