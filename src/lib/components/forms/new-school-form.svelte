@@ -57,7 +57,6 @@
 					{#snippet children({ props })}
 						<Label>District Name</Label>
 						<Select.Root
-							type="single"
 							selected={$formData.districtId}
 							onSelectedChange={(s) => {
 								console.log('selected district => ', s);
@@ -137,11 +136,5 @@
 			{/if}
 		</form>
 	</Card.Content>
-</Card.Root>
-
-<Card.Root class="container mx-auto mt-20 max-w-4xl p-4">
 	<SuperDebug data={$formData} />
-
-	<pre>{JSON.stringify(data.districts, null, 2)}</pre>
-	<pre class="sizes">{JSON.stringify($formData, null, 2)}</pre>
 </Card.Root>

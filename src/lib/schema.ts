@@ -1,6 +1,6 @@
 import { number, z } from 'zod';
 import { districts } from './data/data';
-
+// keep for register form until deprecated
 export const createNewUserSchema = z.object({
 	username: z
 		.string()
@@ -13,14 +13,11 @@ export const createNewUserSchema = z.object({
 		.min(4, { message: 'password should be at least four characters ' })
 		.max(50, { message: 'password should be less than 50 characters ' })
 });
-export const registerNewUserSchema = z
+
+export const createNewUserFromInviteSchema = z
 	.object({
+		name: z.string(),
 		email: z.string(),
-		username: z
-			.string()
-			.nonempty({ message: 'name is required' })
-			.min(4, { message: 'name should be at least four characters ' })
-			.max(50, { message: 'name should be less than 50 characters ' }),
 		password: z
 			.string()
 			.nonempty({ message: 'password is required' })
@@ -38,13 +35,18 @@ export const registerNewUserSchema = z
 		path: ['confirm'] // path of error);
 	});
 
+export const inviteNewUserSchema = z.object({
+	name: z.string(),
+	email: z.string()
+});
+
 export const createSchoolSchema = z.object({
 	name: z
 		.string()
 		.nonempty({ message: 'school name is required' })
 		.min(4, { message: 'school name should be at least four characters ' })
 		.max(50, { message: 'school name should be less than 50 characters ' }),
-	districtId: z.number().min(1, { message: 'district is required' }).default(0), //gets it done
+	districtId: z.number().min(1, { message: 'district is required' }).default(0), //TODO IN OTHER SCHEMASS WHEN DISTRICTS ARE IMPLEMENTED
 	adminName: z
 		.string()
 		.nonempty({ message: 'admin name is required' })

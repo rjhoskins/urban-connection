@@ -3,16 +3,8 @@ import { is, sql } from 'drizzle-orm';
 
 import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 import { pgEnum, uniqueIndex } from 'drizzle-orm/pg-core';
-import {
-	pgTable,
-	serial,
-	varchar,
-	text,
-	integer,
-	timestamp,
-	interval,
-	boolean
-} from 'drizzle-orm/pg-core';
+import { pgTable, varchar, text, integer, timestamp, boolean } from 'drizzle-orm/pg-core';
+
 export const rolesEnum = pgEnum('roles', ['super_admin', 'district_admin', 'school_admin']);
 
 export const usersTable = pgTable('users', {
@@ -51,19 +43,20 @@ export const districtsTable = pgTable('districts', {
 	isActive: boolean('is_active').default(true)
 });
 
-export const userInvites = pgTable('user_invites', {
+export const userInvitesTable = pgTable('user_invites', {
 	id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
 	name: varchar('name').notNull(), // from the invite form
 	email: varchar('email').notNull(),
+
 	invitee: text('invitee').references((): AnyPgColumn => usersTable.id), // user who received the invite (if they sign up, this is their id)
-	inviter: text('inviter')
-		.references((): AnyPgColumn => usersTable.id)
-		.notNull(), // user who created the invite
+	inviter: text('inviter').references((): AnyPgColumn => usersTable.id),
+	//	.notNull(), // user who created the invite
 	expiration: timestamp('expiration')
 		.notNull()
 		.default(sql`NOW() + INTERVAL '72 hours'`),
-	used: integer('used').default(0),
+	used: boolean('used').default(false),
 	role: rolesEnum('role').default('school_admin'),
+
 	createdAt: timestamp('created_at').defaultNow().notNull(),
 	updatedAt: timestamp('updated_at')
 });

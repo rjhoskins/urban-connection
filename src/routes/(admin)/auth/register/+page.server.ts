@@ -9,20 +9,15 @@ import { createInviteToken } from '$lib/utils';
 
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { createNewUserSchema } from '$lib/schema';
+import { createNewUserFromInviteSchema } from '$lib/schema';
 import type { Actions, PageServerLoad } from '../$types';
 
-const emailTokens = ['bobjohn@gmail.com', 'non@email.com'];
+// const emailTokens = ['bobjohn@gmail.com', 'non@email.com'];
 
 export const load: PageServerLoad = async ({ url }) => {
-	console.log('register page url ======================>', url);
-	for (const [key, value] of url.searchParams.entries()) {
-		console.log(key, value);
-	}
-
 	const token = url.searchParams.get('inviteToken');
 
-	const form = await superValidate(zod(createNewUserSchema));
+	const form = await superValidate(zod(createNewUserFromInviteSchema));
 
 	// Always return { form } in load functions (sveltekit-superforms)
 	return { form, token };

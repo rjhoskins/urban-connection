@@ -22,7 +22,7 @@ export const load: PageServerLoad = async (event) => {
 
 export const actions: Actions = {
 	login: async (event) => {
-		console.log('login load ======================>');
+		// console.log('login load ======================>');
 		const formData = await event.request.formData();
 		const username = formData.get('username');
 		const password = formData.get('password');

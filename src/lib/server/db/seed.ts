@@ -5,11 +5,13 @@ import postgres from 'postgres';
 
 async function main() {
 	console.log('Seeding database...');
+	// const queryClient = postgres(process.env.DATABASE_URL!);
 	const queryClient = postgres(process.env.DATABASE_URL!);
 	let db = drizzle({ client: queryClient });
 	const result = await db.execute('select 1');
 
-	db = drizzle(process.env.DATABASE_URL!);
+	// db = drizzle(process.env.DATABASE_URL!);
+	db = drizzle(process.env.LOCAL_DATABASE_URL!);
 
 	// await reset(db, schema.districtsTable);
 	await seed(db, schema.districtsTable);

@@ -7,8 +7,12 @@ import { fail } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { districts } from '$lib/data/data.js';
+import { redirect } from '@sveltejs/kit';
+import { createInviteToken } from '$lib/utils';
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async (event) => {
+	if (!event.locals.user) return redirect(302, '/auth/login');
+
 	async function getDistricts() {
 		return await db.select().from(table.districtsTable);
 	}
@@ -25,8 +29,10 @@ export const load: PageServerLoad = async ({ params }) => {
 	};
 };
 export const actions: Actions = {
-	default: async ({ request }) => {
-		const form = await superValidate(request, zod(createSchoolSchema));
+	default: async (event) => {
+		if (!event.locals.user) return redirect(302, '/auth/login');
+
+		const form = await superValidate(event, zod(createSchoolSchema));
 
 		if (!form.valid) {
 			return fail(400, { form });
@@ -34,10 +40,32 @@ export const actions: Actions = {
 		console.log('create form => ', form);
 
 		// TODO: Do something with the validated form.data
-		// await db
-		// 	.insert(table.schoolsTable)
-		// 	// TODO: Use the form data to insert User data into the database
-		// 	.values({ name: form.data.name, districtID: Number(form.data.districtId), createdBy: '1' });
+		const schoolResult = await db
+			.insert(table.schoolsTable)
+			// TODO: Use the form data to insert User data into the database
+			.values({
+				name: form.data.name,
+				districtID: Number(form.data.districtId),
+				createdBy: event.locals.user.id
+			})
+			.returning();
+		const inviteResult = await db
+			.insert(table.userInvitesTable)
+			// TODO: Use the form data to insert User data into the database
+			.values({
+				name: form.data.adminName,
+				email: form.data.adminEmail
+			})
+			.returning();
+
+		if (!schoolResult || !inviteResult) return fail(400, { form });
+		redirect(
+			303,
+			`/schools/invite?inviteToken=${createInviteToken(form.data.adminName, form.data.adminEmail)}`
+		);
+
+		console.log('schoolResult => ', schoolResult);
+		console.log('inviteResult => ', inviteResult);
 
 		// Display a success status message
 		return message(form, 'Form posted successfully!');

@@ -2,12 +2,18 @@
 	/** @type {{ data: import('./$types').PageData, form: import('./$types').ActionData }} */
 	import RegisterForm from '$lib/components/forms/register-form.svelte';
 	import { page } from '$app/state';
+	import { decodeInviteToken } from '$lib/utils.js';
 
 	let { data } = $props();
 	const { token } = data;
+	const { name, email } = decodeInviteToken(token || '');
+	$effect(() => {
+		data.form.name = name;
+		data.form.email = email;
+	});
 </script>
 
-<h1 class="my-6 text-center text-3xl">Register Token => {token || 'TODO'}</h1>
+<h1 class="my-6 text-center text-3xl">Invite Token => {token || 'TODO'}</h1>
 
 <!-- <form method="post" action="?/register" use:enhance>
 	<label>
@@ -25,7 +31,9 @@
 
 <hr class="my-6" /> -->
 
-<RegisterForm {data} {token} />
+<div class=" grid h-full place-content-center">
+	<RegisterForm {data} {token} />
+</div>
 <!-- <pre>{JSON.stringify(form, null, 2)}</pre> -->
 <!-- <pre>{JSON.stringify(page, null, 2)}</pre> -->
 <!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->
