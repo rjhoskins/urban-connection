@@ -19,9 +19,9 @@
 	<nav class="mx-auto flex max-w-7xl items-center gap-4 p-4">
 		<p class="mr-auto text-3xl font-semibold">The Urban Connection Project</p>
 		<div class="">
-			{#if data?.user?.username}
+			{#if data?.user?.name}
 				hello,
-				{data?.user?.username}
+				{data?.user?.name}
 			{:else}
 				visitor
 			{/if}

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { page } from '$app/state';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import { createNewUserFromInviteSchema } from '$lib/schema.js';
@@ -12,6 +11,7 @@
 
 	let { data, token } = $props();
 	const { name, email } = decodeInviteToken(token);
+
 	const form = superForm(data.form, {
 		validators: zodClient(createNewUserFromInviteSchema)
 	});
@@ -43,7 +43,7 @@
 				</Control>
 			</Field>
 
-			<!-- email -->
+			<!-- username -->
 			<Field {form} name="email">
 				<Control>
 					{#snippet children({ props }: { props: any })}
@@ -99,5 +99,8 @@
 			</div>
 		</form>
 	</Card.Content>
+	{#if $message}
+		<div class="message text-red-700">{$message}</div>
+	{/if}
 	<SuperDebug data={$formData} />
 </Card.Root>

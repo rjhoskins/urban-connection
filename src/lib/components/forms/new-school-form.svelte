@@ -1,10 +1,11 @@
 <script lang="ts">
-	import { Button } from '$lib/components/ui/button';
+	import * as Form from '$lib/components/ui/form/index.js';
+	import { Input } from '$lib/components/ui/input/index.js';
 	import * as Select from '$lib/components/ui/select/index.js';
 	import * as Card from '$lib/components/ui/card';
 	import { createSchoolSchema } from '$lib/schema.js';
 	/** @type {{ data: import('./$types').PageData, form: import('./$types').ActionData }} */
-	import { Field, Control, Label, FieldErrors, Description } from 'formsnap';
+
 	import { superForm } from 'sveltekit-superforms';
 	import SuperDebug from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
@@ -35,101 +36,65 @@
 	<Card.Content>
 		<form class="flex flex-col gap-3" method="POST" use:enhance>
 			<!-- name -->
-			<Field {form} name="name">
-				<Control>
-					{#snippet children({ props }: { props: any })}
-						<Label>School Name</Label>
-						<input
-							{...props}
-							type="text"
-							name="name"
-							class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-							placeholder="Enter School Name"
-							bind:value={$formData.name}
-						/>
-					{/snippet}
-				</Control>
-				<FieldErrors class="text-red-700" />
-			</Field>
-			<!-- district -->
-			<Field {form} name="districtId">
-				<Control>
+			<Form.Field {form} name="name">
+				<Form.Control>
 					{#snippet children({ props })}
-						<Label>District Name</Label>
-						<Select.Root
-							selected={$formData.districtId}
-							onSelectedChange={(s) => {
-								console.log('selected district => ', s);
-								if (s) {
-									$formData.districtId = s.value;
-								}
-							}}
-						>
-							<Select.Trigger>
-								<Select.Value placeholder="Select a district" />
+						<Form.Label>School Name</Form.Label>
+						<Input {...props} bind:value={$formData.name} />
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
+
+			<Form.Field {form} name="districtId">
+				<Form.Control>
+					{#snippet children({ props }: { props: any })}
+						<Form.Label>District</Form.Label>
+						<Select.Root type="single" name={props.name} bind:value={$formData.districtId}>
+							<Select.Trigger class="">
+								{$formData.district === 0 ? $formData.district : 'Select a district'}
 							</Select.Trigger>
-							<Select.Content>
-								<Select.Group>
-									<!-- <Select.Label>Fruits</Select.Label> -->
-									{#each districts as district}
-										<Select.Item value={district.id} label={district.name}
-											>{district.name}</Select.Item
-										>
-									{/each}
-								</Select.Group>
+							<Select.Content class="">
+								{#each districts as district}
+									<Select.Item class="" value={district.id} label={district.name}
+										>{district.name}</Select.Item
+									>
+								{/each}
 							</Select.Content>
-							<Select.Input class="sizes" name="districtId" /><!-- must match! -->
 						</Select.Root>
 					{/snippet}
-				</Control>
-				<FieldErrors class="text-red-700" />
-			</Field>
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
 
 			<!-- adminName -->
-			<Field {form} name="adminName">
-				<Control>
-					{#snippet children({ props }: { props: any })}
-						<Label>School Admin Name</Label>
-						<input
-							{...props}
-							type="text"
-							name="adminName"
-							class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-							placeholder="Enter School Admin Name"
-							bind:value={$formData.adminName}
-						/>
+			<Form.Field {form} name="adminName">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label>Admin Name</Form.Label>
+						<Input {...props} bind:value={$formData.adminName} />
 					{/snippet}
-				</Control>
-				<Description class="text-sm text-primary/50">Name to be used in admin invite</Description>
-				<FieldErrors class="text-red-700" />
-			</Field>
-			<!-- adminEmail -->
-			<Field {form} name="adminEmail">
-				<Control>
-					{#snippet children({ props }: { props: any })}
-						<Label>School Admin Email</Label>
-						<input
-							{...props}
-							type="text"
-							name="adminEmail"
-							class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-							placeholder="Enter School Admin Email"
-							bind:value={$formData.adminEmail}
-						/>
+				</Form.Control>
+				<Form.Description>Name to be used in admin invite</Form.Description>
+				<Form.FieldErrors />
+			</Form.Field>
+
+			<!-- adminName -->
+			<Form.Field {form} name="adminEmail">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label>Admin Email</Form.Label>
+						<Input type="email" {...props} bind:value={$formData.adminEmail} />
 					{/snippet}
-				</Control>
-				<Description class="text-sm text-primary/50"
-					>Email to be used in admin invite: should be their school email</Description
+				</Form.Control>
+
+				<Form.Description
+					>Email to be used in admin invite: should be their school email</Form.Description
 				>
-				<FieldErrors class="text-red-700" />
-			</Field>
-			<button
-				type="submit"
-				tabindex="0"
-				class="inline-flex h-10 items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
-			>
-				Submit
-			</button>
+				<Form.FieldErrors />
+			</Form.Field>
+
+			<Form.Button>Submit</Form.Button>
 
 			{#if $message}
 				<div class="message text-green-700">{$message}</div>

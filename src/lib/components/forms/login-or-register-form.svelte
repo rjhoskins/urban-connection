@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
-	import { createNewUserSchema } from '$lib/schema.js';
+	import { createNewUserOrLoginSchema } from '$lib/schema.js';
 	/** @type {{ data: import('./$types').PageData, form: import('./$types').ActionData }} */
 	import { Field, Control, Label, FieldErrors, Description } from 'formsnap';
 	import { superForm } from 'sveltekit-superforms';
@@ -11,7 +11,7 @@
 	let { data } = $props();
 
 	const form = superForm(data.form, {
-		validators: zodClient(createNewUserSchema)
+		validators: zodClient(createNewUserOrLoginSchema)
 	});
 	const { form: formData, enhance, message } = form;
 </script>
@@ -60,14 +60,14 @@
 				<FieldErrors class="text-red-700" />
 			</Field>
 			<div class="flex gap-4">
-				<Button class="grow" type="submit" variant="default">Submit</Button>
+				<Button class="grow" type="submit" variant="default">Login</Button>
 				<Button class="grow" type="submit" formaction="?/register" variant="outline"
 					>Register</Button
 				>
 			</div>
 			<SuperDebug data={$formData} />
 			{#if $message}
-				<div class="">{$message}</div>
+				<div class="message text-red-700">{$message}</div>
 			{/if}
 		</form>
 	</Card.Content>

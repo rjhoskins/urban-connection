@@ -1,17 +1,18 @@
 import { number, z } from 'zod';
 import { districts } from './data/data';
 // keep for register form until deprecated
-export const createNewUserSchema = z.object({
+export const createNewUserOrLoginSchema = z.object({
 	username: z
 		.string()
+		// .email({ message: 'invalid email, should be your school email' })
 		.nonempty({ message: 'user name is required' })
-		.min(4, { message: 'user name should be at least four characters ' })
-		.max(50, { message: 'user name should be less than 50 characters ' }),
+		.min(4, { message: 'user name should be at least four characters' })
+		.max(50, { message: 'user name should be less than 50 characters' }),
 	password: z
 		.string()
 		.nonempty({ message: 'password is required' })
-		.min(4, { message: 'password should be at least four characters ' })
-		.max(50, { message: 'password should be less than 50 characters ' })
+		.min(4, { message: 'password should be at least four characters' })
+		.max(50, { message: 'password should be less than 50 characters' })
 });
 
 export const createNewUserFromInviteSchema = z
@@ -21,14 +22,14 @@ export const createNewUserFromInviteSchema = z
 		password: z
 			.string()
 			.nonempty({ message: 'password is required' })
-			.min(4, { message: 'password should be at least four characters ' })
-			.max(50, { message: 'password should be less than 50 characters ' })
-			.max(50, { message: 'name should be less than 50 characters ' }),
+			.min(4, { message: 'password should be at least four characters' })
+			.max(50, { message: 'password should be less than 50 characters' })
+			.max(50, { message: 'name should be less than 50 characters' }),
 		confirm: z
 			.string()
 			.nonempty({ message: 'password is required' })
-			.min(4, { message: 'password should be at least four characters ' })
-			.max(50, { message: 'password should be less than 50 characters ' })
+			.min(4, { message: 'password should be at least four characters' })
+			.max(50, { message: 'password should be less than 50 characters' })
 	})
 	.refine((data) => data.password === data.confirm, {
 		message: "Passwords don't match",
@@ -37,27 +38,28 @@ export const createNewUserFromInviteSchema = z
 
 export const inviteNewUserSchema = z.object({
 	name: z.string(),
-	email: z.string()
+	email: z.string(),
+	inviteText: z.string()
 });
 
 export const createSchoolSchema = z.object({
 	name: z
 		.string()
 		.nonempty({ message: 'school name is required' })
-		.min(4, { message: 'school name should be at least four characters ' })
-		.max(50, { message: 'school name should be less than 50 characters ' }),
+		.min(4, { message: 'school name should be at least four characters' })
+		.max(50, { message: 'school name should be less than 50 characters' }),
 	districtId: z.number().min(1, { message: 'district is required' }).default(0), //TODO IN OTHER SCHEMASS WHEN DISTRICTS ARE IMPLEMENTED
 	adminName: z
 		.string()
 		.nonempty({ message: 'admin name is required' })
-		.min(4, { message: 'admin name should be at least four characters ' })
-		.max(50, { message: 'admin name should be less than 50 characters ' }),
+		.min(4, { message: 'admin name should be at least four characters' })
+		.max(50, { message: 'admin name should be less than 50 characters' }),
 	adminEmail: z
 		.string()
 		.email({ message: 'invalid email' })
-		.nonempty({ message: 'admin email is required' })
-		.min(4, { message: 'admin email should be at least four characters ' })
-		.max(50, { message: 'admin email should be less than 50 characters ' })
+		.nonempty({ message: 'admin email is required, should be a school email' })
+		.min(4, { message: 'admin email should be at least four characters' })
+		.max(50, { message: 'admin email should be less than 50 characters' })
 });
 const UserRoleSchema = z.enum(['Master', 'District', 'School_Admin']);
 

@@ -34,7 +34,10 @@ export const actions: Actions = {
 			return fail(400, { message: 'Invalid password' });
 		}
 
-		const results = await db.select().from(table.user).where(eq(table.user.username, username));
+		const results = await db
+			.select()
+			.from(table.usersTable)
+			.where(eq(table.usersTable.username, username));
 
 		const existingUser = results.at(0);
 		if (!existingUser) {

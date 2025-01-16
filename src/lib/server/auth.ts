@@ -5,9 +5,14 @@ import { encodeBase64url, encodeHexLowerCase } from '@oslojs/encoding';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 
+// Constants
 const DAY_IN_MS = 1000 * 60 * 60 * 24;
-
 export const sessionCookieName = 'auth-session';
+
+// Helper function to get ISO timestamp
+function getISOTimestamp(offsetDays: number = 0): string {
+	return new Date(Date.now() + DAY_IN_MS * offsetDays).toISOString();
+}
 
 export function generateSessionToken() {
 	const bytes = crypto.getRandomValues(new Uint8Array(18));
@@ -20,7 +25,7 @@ export async function createSession(token: string, userId: string) {
 	const session: table.Session = {
 		id: sessionId,
 		userId,
-		expiresAt: new Date(Date.now() + DAY_IN_MS * 30)
+		expiresAt: getISOTimestamp(30)
 	};
 	await db.insert(table.sessionsTable).values(session);
 	return session;
@@ -30,8 +35,11 @@ export async function validateSessionToken(token: string) {
 	const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
 	const [result] = await db
 		.select({
-			// Adjust user table here to tweak returned data
-			user: { id: table.usersTable.id, username: table.usersTable.username },
+			user: {
+				id: table.usersTable.id,
+				username: table.usersTable.username,
+				name: table.usersTable.name
+			},
 			session: table.sessionsTable
 		})
 		.from(table.sessionsTable)
@@ -41,20 +49,26 @@ export async function validateSessionToken(token: string) {
 	if (!result) {
 		return { session: null, user: null };
 	}
-	const { session, user } = result;
 
-	const sessionExpired = Date.now() >= session.expiresAt.getTime();
-	if (sessionExpired) {
+	const { session, user } = result;
+	const currentTime = new Date().toISOString();
+
+	// Check if session has expired
+	if (currentTime >= session.expiresAt) {
 		await db.delete(table.sessionsTable).where(eq(table.sessionsTable.id, session.id));
 		return { session: null, user: null };
 	}
 
-	const renewSession = Date.now() >= session.expiresAt.getTime() - DAY_IN_MS * 15;
-	if (renewSession) {
-		session.expiresAt = new Date(Date.now() + DAY_IN_MS * 30);
+	// Calculate renewal threshold (15 days before expiration)
+	const renewalThreshold = new Date(Date.parse(session.expiresAt) - DAY_IN_MS * 15).toISOString();
+
+	// Check if session needs renewal
+	if (currentTime >= renewalThreshold) {
+		const newExpiresAt = getISOTimestamp(30);
+		session.expiresAt = newExpiresAt;
 		await db
 			.update(table.sessionsTable)
-			.set({ expiresAt: session.expiresAt })
+			.set({ expiresAt: newExpiresAt })
 			.where(eq(table.sessionsTable.id, session.id));
 	}
 
@@ -67,9 +81,9 @@ export async function invalidateSession(sessionId: string) {
 	await db.delete(table.sessionsTable).where(eq(table.sessionsTable.id, sessionId));
 }
 
-export function setSessionTokenCookie(event: RequestEvent, token: string, expiresAt: Date) {
+export function setSessionTokenCookie(event: RequestEvent, token: string, expiresAt: string) {
 	event.cookies.set(sessionCookieName, token, {
-		expires: expiresAt,
+		expires: new Date(expiresAt),
 		path: '/'
 	});
 }

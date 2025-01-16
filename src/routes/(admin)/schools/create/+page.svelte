@@ -3,8 +3,7 @@
 	/** @type {{ data: import('./$types').PageData, form: import('./$types').ActionData }} */
 
 	import NewSchoolForm from '$lib/components/forms/new-school-form.svelte';
-	let { data, form } = $props();
-	const { districts } = data;
+	let { data } = $props();
 </script>
 
 <svelte:head>
@@ -12,7 +11,6 @@
 	<meta name="description" content="This is where the description goes for SEO" />
 </svelte:head>
 
-<div class=" grid h-full place-content-center">
+<div class="grid h-full place-content-center">
 	<NewSchoolForm {data} />
-	<!-- <pre>{JSON.stringify(districts, null, 2)}</pre> -->
 </div>

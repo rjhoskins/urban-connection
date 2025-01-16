@@ -8,20 +8,13 @@ import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { districts } from '$lib/data/data.js';
 import { redirect } from '@sveltejs/kit';
-import { createInviteToken } from '$lib/utils';
+import { createInviteToken, decodeInviteToken } from '$lib/utils';
+import { eq } from 'drizzle-orm';
 
 export const load: PageServerLoad = async ({ url }) => {
-	// console.log('url => ', url);
 	const token = url.searchParams.get('inviteToken');
-	// async function getDistricts() {
-	// 	return await db.select().from(table.districtsTable);
-	// }
-	// console.log('PageServerLoad ======================================================>');
 
 	const form = await superValidate(zod(inviteNewUserSchema));
-	// console.log('form => ', form);
-
-	// Always return { form } in load functions https://superforms.rocks/faq#why-do-i-need-to-call-supervalidate-in-the-load-function
 
 	return {
 		token,
@@ -31,25 +24,31 @@ export const load: PageServerLoad = async ({ url }) => {
 export const actions: Actions = {
 	default: async (event) => {
 		if (!event.locals.user) return redirect(302, '/auth/login');
+		const token = event.url.searchParams.get('inviteToken');
+		const { name, email } = decodeInviteToken(token);
 
 		const form = await superValidate(event, zod(inviteNewUserSchema));
 
 		if (!form.valid) {
-			return fail(400, { form });
+			return message(form, 'Invalid form'); // Will return fail(400, { form }) since form isn't valid
+		}
+
+		try {
+			// update invite - all invites should be marked as used
+			const [inviteRes] = await db
+				.update(table.userInvitesTable)
+				.set({ inviteText: form.data.inviteText })
+				.where(eq(table.userInvitesTable.email, form.data.email))
+				.returning();
+		} catch (error) {
+			return message(form, '"Failed to create the resource due to an internal error.', {
+				status: 400
+			});
 		}
 
 		console.log('invite  form => ', form);
 
-		return redirect(
-			303,
-			`/auth/register?inviteToken=${createInviteToken(form.data.name, form.data.email)}`
-		);
-
-		// TODO: Do something with the validated form.data
-		// await db
-		// 	.insert(table.schoolsTable)
-		// 	// TODO: Use the form data to insert User data into the database
-		// 	.values({ name: form.data.name, districtID: Number(form.data.districtId), createdBy: '1' });
+		return redirect(303, `/auth/register?inviteToken=${createInviteToken(name, email)}`);
 
 		// Display a success status message
 		return message(form, 'Form posted successfully!');

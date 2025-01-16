@@ -3,7 +3,7 @@
 	import { enhance } from '$app/forms';
 	import LoginOrRegisterForm from '$lib/components/forms/login-or-register-form.svelte';
 
-	let { data, form } = $props();
+	let { data } = $props();
 </script>
 
 <h1 class="sr-only">Login/Register</h1>

@@ -5,53 +5,92 @@ import { eq } from 'drizzle-orm';
 import * as auth from '$lib/server/auth';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
-import { createInviteToken } from '$lib/utils';
-
-import { superValidate } from 'sveltekit-superforms';
+import { message, superValidate } from 'sveltekit-superforms/server';
 import { zod } from 'sveltekit-superforms/adapters';
 import { createNewUserFromInviteSchema } from '$lib/schema';
 import type { Actions, PageServerLoad } from '../$types';
-
-// const emailTokens = ['bobjohn@gmail.com', 'non@email.com'];
 
 export const load: PageServerLoad = async ({ url }) => {
 	const token = url.searchParams.get('inviteToken');
 
 	const form = await superValidate(zod(createNewUserFromInviteSchema));
 
-	// Always return { form } in load functions (sveltekit-superforms)
 	return { form, token };
 };
 
 export const actions: Actions = {
-	// register: async (event) => {
-	// 	const formData = await event.request.formData();
-	// 	const username = formData.get('username');
-	// 	const password = formData.get('password');
-	// 	if (!validateUsername(username)) {
-	// 		return fail(400, { message: 'Invalid username' });
-	// 	}
-	// 	if (!validatePassword(password)) {
-	// 		return fail(400, { message: 'Invalid password' });
-	// 	}
-	// 	const userId = generateUserId();
-	// 	const passwordHash = await hash(password, {
-	// 		// recommended minimum parameters
-	// 		memoryCost: 19456,
-	// 		timeCost: 2,
-	// 		outputLen: 32,
-	// 		parallelism: 1
-	// 	});
-	// 	try {
-	// 		await db.insert(table.user).values({ id: userId, username, passwordHash });
-	// 		const sessionToken = auth.generateSessionToken();
-	// 		const session = await auth.createSession(sessionToken, userId);
-	// 		auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
-	// 	} catch (e) {
-	// 		return fail(500, { message: 'An error has occurred' });
-	// 	}
-	// 	return redirect(302, '/auth/login');
-	// }
+	register: async (event) => {
+		console.log('register event => ');
+		const form = await superValidate(event, zod(createNewUserFromInviteSchema));
+		let newUserId = generateUserId();
+		const passwordHash = await hash(form.data.password, {
+			memoryCost: 19456,
+			timeCost: 2,
+			outputLen: 32,
+			parallelism: 1
+		}); // gotta
+
+		if (!form.valid) {
+			// return fail(400, { form });
+			return message(form, 'Invalid form'); // Will return fail(400, { form }) since form isn't valid
+		}
+
+		try {
+			await db.transaction(async (trx) => {
+				// user already exists?
+				const [existingUser] = await db
+					.select()
+					.from(table.usersTable)
+					.where(eq(table.usersTable.username, form.data.email));
+
+				if (existingUser) {
+					return message(form, 'User already exists, please contact your administrator');
+				}
+
+				// update invite - all invites should be marked as used
+				const [inviteRes] = await trx
+					.update(table.userInvitesTable)
+					.set({ used: true, invitee: newUserId })
+					.where(eq(table.userInvitesTable.email, form.data.email))
+					.returning();
+
+				if (!inviteRes) {
+					trx.rollback();
+					return message(form, 'Check your info and try again.', { status: 400 });
+				}
+				//
+				const [userRes] = await trx
+					.insert(table.usersTable)
+					.values({
+						id: newUserId,
+						username: form.data.email,
+						passwordHash,
+						name: form.data.name
+					})
+					.returning();
+
+				if (!userRes) {
+					trx.rollback();
+					return message(form, 'unable to register you, please contact your administrator', {
+						status: 400
+					});
+				}
+			});
+
+			console.log('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ => ');
+			// all good - cookie time nom nom
+			const sessionToken = auth.generateSessionToken();
+			console.log('sessionToken => ', sessionToken);
+
+			const session = await auth.createSession(sessionToken, newUserId);
+			auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
+			// return redirect(302, '/');
+		} catch (error) {
+			return message(form, 'unexpected error registering user: ' + error.message, {
+				status: 500
+			});
+		}
+	}
 };
 
 function generateUserId() {

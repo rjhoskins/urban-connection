@@ -10,12 +10,12 @@
 <h1 class="my-6 text-center text-3xl">{users.selectedUser}Manage All Schools</h1>
 
 <section class=" grid-cols-schools-fluid container grid max-w-6xl gap-4">
-	{#each data.data as school (school.name)}
+	<!-- {#each data.data as school (school.name)}
 		{@render ScholschoolCard(school)}
-	{/each}
+	{/each} -->
 </section>
 
-{#snippet ScholschoolCard(school: any)}
+<!-- {#snippet ScholschoolCard(school: any)}
 	<Card.Root>
 		<Card.Header>
 			<Card.Title>{school.name}</Card.Title>
@@ -37,7 +37,7 @@
 			</div>
 		</Card.Content>
 	</Card.Root>
-{/snippet}
+{/snippet} -->
 
 <!-- <pre>{JSON.stringify(page, null, 2)}</pre> -->
-<pre class="sizes">{JSON.stringify(data, null, 2)}</pre>
+<!-- <pre class="sizes">{JSON.stringify(data, null, 2)}</pre> -->
