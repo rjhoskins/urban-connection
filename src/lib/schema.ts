@@ -18,7 +18,7 @@ export const createNewUserOrLoginSchema = z.object({
 export const createNewUserFromInviteSchema = z
 	.object({
 		name: z.string(),
-		email: z.string(),
+		email: z.string().email({ message: 'invalid email' }),
 		password: z
 			.string()
 			.nonempty({ message: 'password is required' })
@@ -36,6 +36,10 @@ export const createNewUserFromInviteSchema = z
 		path: ['confirm'] // path of error);
 	});
 
+export const newUserTokenSchema = z.object({
+	name: z.string(),
+	email: z.string().email({ message: 'invalid token' })
+});
 export const inviteNewUserSchema = z.object({
 	name: z.string(),
 	email: z.string(),

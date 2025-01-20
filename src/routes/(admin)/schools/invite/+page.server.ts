@@ -1,5 +1,5 @@
 import { superValidate } from 'sveltekit-superforms';
-import { inviteNewUserSchema } from '$lib/schema';
+import { inviteNewUserSchema, newUserTokenSchema } from '$lib/schema';
 import { zod } from 'sveltekit-superforms/adapters';
 import { message } from 'sveltekit-superforms';
 import type { PageServerLoad, Actions } from './$types.js';
@@ -25,6 +25,9 @@ export const actions: Actions = {
 	default: async (event) => {
 		if (!event.locals.user) return redirect(302, '/auth/login');
 		const token = event.url.searchParams.get('inviteToken');
+		if (!token || !newUserTokenSchema.safeParse(decodeInviteToken(token)).success) {
+			return message(form, 'Invalid token', { status: 400 });
+		}
 		const { name, email } = decodeInviteToken(token);
 
 		const form = await superValidate(event, zod(inviteNewUserSchema));
@@ -38,17 +41,16 @@ export const actions: Actions = {
 			const [inviteRes] = await db
 				.update(table.userInvitesTable)
 				.set({ inviteText: form.data.inviteText })
-				.where(eq(table.userInvitesTable.email, form.data.email))
-				.returning();
+				.where(eq(table.userInvitesTable.email, form.data.email));
 		} catch (error) {
 			return message(form, '"Failed to create the resource due to an internal error.', {
 				status: 400
 			});
 		}
 
-		console.log('invite  form => ', form);
-
-		return redirect(303, `/auth/register?inviteToken=${createInviteToken(name, email)}`);
+		console.log('invite form => ', form);
+		console.log('invite link => ', `/auth/register?inviteToken=${createInviteToken(name, email)}`);
+		redirect(302, '/');
 
 		// Display a success status message
 		return message(form, 'Form posted successfully!');

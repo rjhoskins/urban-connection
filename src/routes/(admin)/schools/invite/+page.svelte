@@ -5,6 +5,7 @@
 	import type { PageData } from './$types';
 	import * as Card from '$lib/components/ui/card';
 	import { decodeInviteToken, createInviteToken } from '$lib/utils';
+	import Dialog from '$lib/components/dialog.svelte';
 
 	let { data } = $props();
 	const { token } = data;
@@ -54,3 +55,5 @@
 		</div>
 	</div>
 </div>
+
+<Dialog />

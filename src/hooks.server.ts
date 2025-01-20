@@ -2,7 +2,7 @@ import type { Handle } from '@sveltejs/kit';
 import * as auth from '$lib/server/auth.js';
 
 const handleAuth: Handle = async ({ event, resolve }) => {
-	console.log('middleware event');
+	// console.log('middleware event');
 	// console.log('middleware event', event);
 	const sessionToken = event.cookies.get(auth.sessionCookieName);
 	if (!sessionToken) {

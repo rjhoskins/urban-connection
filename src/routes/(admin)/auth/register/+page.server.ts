@@ -1,7 +1,7 @@
 import { hash, verify } from '@node-rs/argon2';
 import { encodeBase32LowerCase } from '@oslojs/encoding';
 import { fail, redirect } from '@sveltejs/kit';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import * as auth from '$lib/server/auth';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
@@ -20,76 +20,83 @@ export const load: PageServerLoad = async ({ url }) => {
 
 export const actions: Actions = {
 	register: async (event) => {
-		console.log('register event => ');
 		const form = await superValidate(event, zod(createNewUserFromInviteSchema));
-		let newUserId = generateUserId();
+		if (!form.valid) {
+			return message(form, 'Invalid form');
+		}
+
+		const newUserId = generateUserId();
 		const passwordHash = await hash(form.data.password, {
 			memoryCost: 19456,
 			timeCost: 2,
 			outputLen: 32,
 			parallelism: 1
-		}); // gotta
+		});
 
-		if (!form.valid) {
-			// return fail(400, { form });
-			return message(form, 'Invalid form'); // Will return fail(400, { form }) since form isn't valid
+		const userEmail = form.data.email;
+
+		const [existingUnusedInvite] = await db
+			.select()
+			.from(table.userInvitesTable)
+			.where(
+				and(eq(table.userInvitesTable.email, userEmail), eq(table.userInvitesTable.used, false))
+			);
+
+		if (!existingUnusedInvite) {
+			return message(form, 'Invalid invite, please contact your administrator');
+		}
+		console.log('existingUnusedInvite => ', existingUnusedInvite);
+
+		const [existingUser] = await db
+			.select()
+			.from(table.usersTable)
+			.where(eq(table.usersTable.username, userEmail));
+
+		if (existingUser) {
+			return message(form, 'User already exists, please contact your administrator');
 		}
 
 		try {
-			await db.transaction(async (trx) => {
-				// user already exists?
-				const [existingUser] = await db
-					.select()
-					.from(table.usersTable)
-					.where(eq(table.usersTable.username, form.data.email));
+			const result = await db.transaction(async (trx) => {
+				const [newUser] = await trx
+					.insert(table.usersTable)
+					.values({ id: newUserId, username: userEmail, passwordHash, name: form.data.name })
+					.returning({ id: table.usersTable.id });
 
-				if (existingUser) {
-					return message(form, 'User already exists, please contact your administrator');
-				}
+				if (!newUser) throw new Error('Failed to create user');
 
-				// update invite - all invites should be marked as used
 				const [inviteRes] = await trx
 					.update(table.userInvitesTable)
-					.set({ used: true, invitee: newUserId })
-					.where(eq(table.userInvitesTable.email, form.data.email))
+					.set({ used: true, invitee: newUser.id })
+					.where(eq(table.userInvitesTable.email, userEmail))
 					.returning();
 
-				if (!inviteRes) {
-					trx.rollback();
-					return message(form, 'Check your info and try again.', { status: 400 });
-				}
-				//
-				const [userRes] = await trx
-					.insert(table.usersTable)
-					.values({
-						id: newUserId,
-						username: form.data.email,
-						passwordHash,
-						name: form.data.name
-					})
-					.returning();
+				if (!inviteRes) throw new Error('Invite update failed');
 
-				if (!userRes) {
-					trx.rollback();
-					return message(form, 'unable to register you, please contact your administrator', {
-						status: 400
-					});
+				//associate user with school/district
+				if (inviteRes.inviteType === 'school') {
+					await trx
+						.insert(table.schoolAdminsTable)
+						.values({ userId: newUser.id, schoolId: inviteRes.schoolId! });
+				} else if (inviteRes.inviteType === 'district') {
+					await trx
+						.insert(table.districtAdminsTable)
+						.values({ userId: newUser.id, districtId: inviteRes.districtId! });
 				}
+
+				return newUser;
 			});
 
-			console.log('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ => ');
-			// all good - cookie time nom nom
+			// Create session and set cookie
 			const sessionToken = auth.generateSessionToken();
-			console.log('sessionToken => ', sessionToken);
-
-			const session = await auth.createSession(sessionToken, newUserId);
+			const session = await auth.createSession(sessionToken, result.id);
 			auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
-			// return redirect(302, '/');
 		} catch (error) {
-			return message(form, 'unexpected error registering user: ' + error.message, {
-				status: 500
-			});
+			const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
+			return message(form, 'Unexpected error: ' + errorMessage, { status: 500 });
 		}
+
+		return redirect(302, '/');
 	}
 };
 
@@ -98,17 +105,4 @@ function generateUserId() {
 	const bytes = crypto.getRandomValues(new Uint8Array(15));
 	const id = encodeBase32LowerCase(bytes);
 	return id;
-}
-
-function validateUsername(username: unknown): username is string {
-	return (
-		typeof username === 'string' &&
-		username.length >= 3 &&
-		username.length <= 31 &&
-		/^[a-z0-9_-]+$/.test(username)
-	);
-}
-
-function validatePassword(password: unknown): password is string {
-	return typeof password === 'string' && password.length >= 6 && password.length <= 255;
 }

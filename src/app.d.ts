@@ -3,13 +3,12 @@
 declare global {
 	namespace App {
 		// interface Error {}
-		// interface PageData {}
+		interface PageData {
+			flash?: { type: 'success' | 'error'; message: string };
+		}
 		// interface Platform {}
 		namespace Superforms {
-			type Message = {
-				type: 'error' | 'success';
-				text: string;
-			};
+			type Message = { status: 'error' | 'success' | 'warning'; text: string };
 		}
 		interface Locals {
 			user: import('$lib/server/auth').SessionValidationResult['user'];

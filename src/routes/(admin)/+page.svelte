@@ -15,13 +15,13 @@
 </svelte:head>
 <h1 class="sr-only">admin {data.user?.name}</h1>
 <div class="hi grid h-full place-content-center">
-	{#if data.role == 'super_admin'}
+	{#if data.user.role == 'super_admin'}
 		<h1 class="my-6 text-center text-3xl">{data.user?.name} Admin Panel</h1>
 		<UCAdminPanel />
-	{:else if data.role == 'district_admin'}
+	{:else if data.user.role == 'district_admin'}
 		<h1 class="my-6 text-center text-3xl">{data.user?.name} Admin Panel</h1>
 		<DistrictAdminPanel />
-	{:else if data.role == 'school_admin'}
+	{:else if data.user.role == 'school_admin'}
 		<h1 class="my-6 text-center text-3xl">{data.user?.name} Admin Panel</h1>
 		<SchooladminAdminPanelcopy />
 	{/if}

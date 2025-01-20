@@ -41,7 +41,7 @@ export const schoolAdminsTable = pgTable('school_admins', {
 	userId: text('user_id')
 		.notNull()
 		.references(() => usersTable.id)
-		.unique(), // Ensures one school per admin
+		.unique(), // one school per admin
 	schoolId: integer('school_id')
 		.notNull()
 		.references(() => schoolsTable.id),
