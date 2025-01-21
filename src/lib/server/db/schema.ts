@@ -1,4 +1,4 @@
-import { is, sql } from 'drizzle-orm';
+import { sql } from 'drizzle-orm';
 import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 import { check, pgEnum, uniqueIndex } from 'drizzle-orm/pg-core';
 import { pgTable, varchar, text, integer, timestamp, boolean } from 'drizzle-orm/pg-core';
@@ -34,6 +34,30 @@ export const schoolsTable = pgTable('schools', {
 	isActive: boolean('is_active').default(true),
 	createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
 	createdBy: text('created_by').references((): AnyPgColumn => usersTable.id)
+});
+
+export const assessmentInvitesTable = pgTable('assessment_invites', {
+	id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
+	schoolId: integer('school_id')
+		.notNull()
+		.references(() => schoolsTable.id),
+	email: varchar('email').notNull(),
+	inviteText: text('invite_text'),
+	createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
+	createdBy: text('created_by').references((): AnyPgColumn => usersTable.id)
+});
+
+export const schoolAssessmentsTable = pgTable('school_assessments', {
+	id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
+	schoolId: integer('school_id')
+		.notNull()
+		.references(() => schoolsTable.id),
+	assessmentInviteId: text('assessment_invite_id')
+		.notNull()
+		.references(() => assessmentInvitesTable.id),
+	isCompleted: boolean('is_completed').default(false),
+	completedAt: timestamp('completed_at', { mode: 'string' }),
+	createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull()
 });
 
 export const schoolAdminsTable = pgTable('school_admins', {
@@ -81,7 +105,7 @@ export const userInvitesTable = pgTable(
 		expiration: timestamp('expiration', { mode: 'string' })
 			.notNull()
 			.default(sql`NOW() + INTERVAL '72 hours'`),
-		used: boolean('used').default(false),
+		isUsed: boolean('is_used').default(false),
 		role: rolesEnum('role').default('school_admin'),
 
 		inviteType: invitesEnum('invite_type').default('school'),
@@ -105,89 +129,3 @@ export const userInvitesTable = pgTable(
 export type Session = typeof sessionsTable.$inferSelect;
 
 export type User = typeof usersTable.$inferSelect;
-
-// import exp from 'constants';
-// import { sql } from 'drizzle-orm';
-// import type { AnyPgColumn } from 'drizzle-orm/pg-core';
-// import { pgEnum, uniqueIndex } from 'drizzle-orm/pg-core';
-// import { pgTable, serial, varchar, text, integer, timestamp, interval } from 'drizzle-orm/pg-core';
-// export const rolesEnum = pgEnum('roles', ['super_admin', 'district_admin', 'school_admin']);
-
-// export const users = pgTable(
-// 	'user',
-// 	{
-// 		id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-// 		username: text('username').notNull().unique(),
-// 		passwordHash: text('password_hash').notNull(),
-// 		firstName: varchar('first_name', { length: 256 }),
-// 		lastName: varchar('last_name', { length: 256 }),
-// 		email: varchar('email').notNull().unique(),
-// 		invitee: integer('invitee').references((): AnyPgColumn => users.id),
-// 		role: rolesEnum('role').default('school_admin')
-// 	},
-// 	(table) => {
-// 		return {
-// 			emailIndex: uniqueIndex('email_idx').on(table.email)
-// 		};
-// 	}
-// );
-// export const userInvites = pgTable('user_invite', {
-// 	id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-// 	name: varchar('name').notNull(),
-// 	email: varchar('email').notNull(),
-// 	invitee: integer('invitee').references((): AnyPgColumn => users.id), // user who received the invite (if they sign up, this is their id)
-// 	inviter: integer('inviter')
-// 		.references((): AnyPgColumn => users.id)
-// 		.notNull(), // user who created the invite
-// 	expiration: timestamp('expiration')
-// 		.notNull()
-// 		.default(sql`NOW() + INTERVAL '72 hours'`),
-// 	used: integer('used').default(0),
-// 	role: rolesEnum('role').default('school_admin'),
-// 	school: integer('school')
-// 		.references((): AnyPgColumn => schools.id)
-// 		.notNull(),
-// 	district: integer('district')
-// 		.references((): AnyPgColumn => districts.id)
-// 		.notNull()
-// });
-// export const districts = pgTable('district', {
-// 	id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-// 	name: varchar('name').notNull()
-// });
-// export const schools = pgTable('school', {
-// 	id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-// 	name: varchar('name').notNull(),
-// 	district: integer('district')
-// 		.references((): AnyPgColumn => districts.id)
-// 		.notNull()
-// });
-// export const admins = pgTable('admin', {
-// 	id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-// 	user: integer('user')
-// 		.references((): AnyPgColumn => users.id)
-// 		.notNull(),
-// 	type: rolesEnum('role').notNull(),
-// 	school: integer('school').references((): AnyPgColumn => schools.id), // Nullable, only for school admins
-// 	district: integer('district').references((): AnyPgColumn => districts.id) // Nullable, only for district admins
-// });
-
-// export const sessions = pgTable('session', {
-// 	id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-// 	user: integer('user')
-// 		.references((): AnyPgColumn => users.id)
-// 		.notNull(),
-// 	expiresAt: timestamp('expires_at')
-// 		.notNull()
-// 		.default(
-// 			sql`CASE
-//         WHEN "role" = 'school_admin' THEN CURRENT_TIMESTAMP + INTERVAL '7 days'
-//         WHEN "role" = 'district_admin' THEN CURRENT_TIMESTAMP + INTERVAL '14 days'
-//         ELSE CURRENT_TIMESTAMP + INTERVAL '7 days'
-//       END`
-// 		)
-// });
-
-// export type Session = typeof sessions.$inferSelect;
-
-// export type User = typeof users.$inferSelect;

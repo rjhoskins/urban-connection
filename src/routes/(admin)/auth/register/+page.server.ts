@@ -39,7 +39,7 @@ export const actions: Actions = {
 			.select()
 			.from(table.userInvitesTable)
 			.where(
-				and(eq(table.userInvitesTable.email, userEmail), eq(table.userInvitesTable.used, false))
+				and(eq(table.userInvitesTable.email, userEmail), eq(table.userInvitesTable.isUsed, false))
 			);
 
 		if (!existingUnusedInvite) {
@@ -67,7 +67,7 @@ export const actions: Actions = {
 
 				const [inviteRes] = await trx
 					.update(table.userInvitesTable)
-					.set({ used: true, invitee: newUser.id })
+					.set({ isUsed: true, invitee: newUser.id })
 					.where(eq(table.userInvitesTable.email, userEmail))
 					.returning();
 

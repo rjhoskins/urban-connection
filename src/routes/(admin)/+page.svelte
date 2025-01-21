@@ -15,7 +15,9 @@
 </svelte:head>
 <h1 class="sr-only">admin {data.user?.name}</h1>
 <div class="hi grid h-full place-content-center">
-	{#if data.user.role == 'super_admin'}
+	{#if !data.user}
+		<p class="my-6 text-center text-3xl">Please sign in</p>
+	{:else if data.user.role == 'super_admin'}
 		<h1 class="my-6 text-center text-3xl">{data.user?.name} Admin Panel</h1>
 		<UCAdminPanel />
 	{:else if data.user.role == 'district_admin'}
@@ -24,7 +26,7 @@
 	{:else if data.user.role == 'school_admin'}
 		<h1 class="my-6 text-center text-3xl">{data.user?.name} Admin Panel</h1>
 		<SchooladminAdminPanelcopy />
-	{/if}
+	{:else}{/if}
 	<!-- {#if users.selectedUser == 'UC'}
 		<h1 class="my-6 text-center text-3xl">{data.user?.name} Admin Panel</h1>
 		<UCAdminPanel />
