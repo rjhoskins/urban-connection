@@ -52,7 +52,9 @@
 						<Form.Label>District</Form.Label>
 						<Select.Root type="single" name={props.name} bind:value={$formData.districtId}>
 							<Select.Trigger class="">
-								{$formData.district === 0 ? $formData.district : 'Select a district'}
+								{$formData.districtId == 0
+									? 'Select a district'
+									: districts.find((el) => el.id == $formData.districtId).name}
 							</Select.Trigger>
 							<Select.Content class="">
 								{#each districts as district}
@@ -102,4 +104,5 @@
 		</form>
 	</Card.Content>
 	<SuperDebug data={$formData} />
+	<pre>{JSON.stringify(districts, null, 2)}</pre>
 </Card.Root>
