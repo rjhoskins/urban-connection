@@ -15,7 +15,6 @@ export const load = async (event) => {
 	let adminDataFunc: () => Promise<any> = async () => {
 		return null;
 	};
-	let adminData = {};
 	if (event.locals.user && event.locals.user.role === 'school_admin') {
 		const userId = event.locals.user.id;
 		if (userId) {
@@ -31,13 +30,13 @@ export const load = async (event) => {
 	if (event.locals.user && event.locals.user.role === 'super_admin') {
 		console.log('super_admin user =======================> ');
 		dataFunc = () => getSchoolForSuperAdmin(Number(event.params.schoolId));
+		adminDataFunc = async () => getSchoolAdmin(Number(event.params.schoolId));
 		// adminDataFunc = async () => {
 		// 	if (event.locals.user) {
 		// 		return { adminName: event.locals.user.name, adminEmail: event.locals.user.username };
 		// 	}
 		// 	return null;
 		// };
-		adminDataFunc = () => getSchoolAdmin(Number(event.params.schoolId));
 	}
 
 	return {
@@ -75,7 +74,6 @@ const getSchoolForSuperAdmin = async (schoolId: number) => {
 		.select({
 			id: table.schoolsTable.id,
 			name: table.schoolsTable.name,
-			// createdAt: table.schoolsTable.createdAt,
 			createdBy: table.schoolsTable.createdBy
 		})
 		.from(table.schoolsTable)

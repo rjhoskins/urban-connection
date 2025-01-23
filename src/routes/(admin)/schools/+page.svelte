@@ -10,7 +10,7 @@
 
 <h1 class="sr-only my-6 text-center text-3xl">Manage All Schools</h1>
 
-<section class=" grid-cols-schools-fluid container grid max-w-6xl gap-4">
+<section class=" container grid max-w-6xl grid-cols-schools-fluid gap-4 py-8">
 	{#each data.schools as school (school.id)}
 		{@render ScholschoolCard(school)}
 	{/each}
@@ -38,4 +38,4 @@
 {/snippet}
 
 <!-- <pre>{JSON.stringify(page, null, 2)}</pre> -->
-<pre class="sizes">{JSON.stringify(data, null, 2)}</pre>
+<!-- <pre class="sizes">{JSON.stringify(data, null, 2)}</pre> -->

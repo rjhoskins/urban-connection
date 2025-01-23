@@ -17,56 +17,6 @@ export const load: PageServerLoad = async (event) => {
 		form
 	};
 };
-export const actions: Actions = {
-	// default: async (event) => {
-	// 	if (!event.locals.user) return redirect(302, '/auth/login');
-	// 	const form = await superValidate(event, zod(createSchoolSchema));
-	// 	if (!form.valid) {
-	// 		// return fail(400, { form });
-	// 		return message(form, 'Invalid form'); // Will return fail(400, { form }) since form isn't valid
-	// 	}
-	// 	console.log('create form => ', form);
-	// 	let schoolResult: any;
-	// 	let inviteResult: any;
-	// 	try {
-	// 		schoolResult = await db
-	// 			.insert(table.schoolsTable)
-	// 			.values({
-	// 				name: form.data.name,
-	// 				districtID: Number(form.data.districtId),
-	// 				createdBy: event.locals.user.id
-	// 			})
-	// 			.returning();
-	// 		console.log('schoolResult => ', schoolResult);
-	// 		// create invite here, use it in invite page to...
-	// 		inviteResult = await db
-	// 			.insert(table.userInvitesTable)
-	// 			.values({
-	// 				name: form.data.adminName,
-	// 				email: form.data.adminEmail,
-	// 				schoolId: schoolResult[0].id as number,
-	// 				role: 'school_admin', // default role
-	// 				inviter: event.locals.user.id,
-	// 				inviteType: 'school' // default invite type
-	// 			})
-	// 			.returning();
-	// 		console.log('inviteResult => ', inviteResult);
-	// 	} catch (error) {
-	// 		return message(form, SERVER_ERROR_MESSAGES[400], {
-	// 			status: 400
-	// 		});
-	// 	}
-	// 	if (!schoolResult || !inviteResult)
-	// 		return message(form, SERVER_ERROR_MESSAGES[400], {
-	// 			status: 400
-	// 		});
-	// 	redirect(
-	// 		303,
-	// 		`/schools/invite?inviteToken=${createInviteToken(form.data.adminName, form.data.adminEmail)}`
-	// 	);
-	// 	console.log('schoolResult => ', schoolResult);
-	// 	console.log('inviteResult => ', inviteResult);
-	// 	// Display a success status message
-	// 	return message(form, 'Form posted successfully!');
-	// }
-};
+// export const actions: Actions = {
+
+// };

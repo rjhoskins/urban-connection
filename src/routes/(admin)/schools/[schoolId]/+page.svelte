@@ -13,11 +13,13 @@
 	} = data;
 
 	let adminPhone;
+	// let adminName;
+	// let adminEmail;
 </script>
 
 <h1 class="sr-only">Manage {name} School</h1>
 
-<section class=" mx-auto grid max-w-7xl gap-4">
+<section class=" mx-auto grid max-w-7xl gap-4 p-2 lg:p-8">
 	<Card.Root class=" p-4">
 		<div class="top flex justify-between">
 			<div class="left">
@@ -41,5 +43,5 @@
 		</div>
 	</Card.Root>
 </section>
-
-<pre class="">{JSON.stringify(data, null, 2)}</pre>
+<!-- 
+<pre class="">{JSON.stringify(data, null, 2)}</pre> -->

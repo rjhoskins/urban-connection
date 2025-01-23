@@ -12,7 +12,7 @@
 	import { zodClient } from 'sveltekit-superforms/adapters';
 
 	let { inviteText = $bindable(), data, token } = $props();
-	// const { name, email } = decodeInviteToken(token);
+	// const { name, email, inviteId } = decodeInviteToken(token);
 	const form = superForm(data.form, {
 		validators: zodClient(inviteNewUserSchema)
 	});

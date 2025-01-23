@@ -19,6 +19,7 @@ export const createNewUserFromInviteSchema = z
 	.object({
 		name: z.string(),
 		email: z.string().email({ message: 'invalid email' }),
+		inviteId: z.string(),
 		password: z
 			.string()
 			.nonempty({ message: 'password is required' })
@@ -38,6 +39,7 @@ export const createNewUserFromInviteSchema = z
 
 export const newUserTokenSchema = z.object({
 	name: z.string(),
+	inviteId: z.string(),
 	email: z.string().email({ message: 'invalid token' })
 });
 export const inviteNewUserSchema = z.object({

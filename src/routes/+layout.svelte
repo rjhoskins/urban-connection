@@ -1,7 +1,21 @@
 <script lang="ts">
+	import toast, { Toaster } from 'svelte-french-toast';
 	import '../app.css';
 	import Footer from '$lib/components/layout/footer.svelte';
 	import Navbar from '$lib/components/layout/navbar.svelte';
+	import { page } from '$app/state';
+	import { initFlash } from 'sveltekit-flash-message';
+
+	const flash = initFlash(page, {
+		clearAfterMs: 5000
+	});
+	$effect(() => {
+		if ($flash) {
+			toast[$flash.type]($flash.message);
+		}
+	});
+
+	// const flash = getFlash(page);
 	let { children, data } = $props();
 </script>
 
@@ -14,4 +28,5 @@
 		{@render children()}
 	</main>
 	<Footer />
+	<Toaster />
 </div>

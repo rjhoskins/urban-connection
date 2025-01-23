@@ -10,7 +10,7 @@
 	import { zodClient } from 'sveltekit-superforms/adapters';
 
 	let { data, token } = $props();
-	const { name, email } = decodeInviteToken(token);
+	const { name, email, inviteId } = decodeInviteToken(token);
 
 	const form = superForm(data.form, {
 		validators: zodClient(createNewUserFromInviteSchema)
@@ -19,6 +19,7 @@
 	$effect(() => {
 		$formData.name = name;
 		$formData.email = email;
+		$formData.inviteId = inviteId;
 	});
 </script>
 
@@ -54,6 +55,22 @@
 							hidden
 							class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
 							bind:value={$formData.email}
+						/>
+					{/snippet}
+				</Control>
+			</Field>
+
+			<!-- username -->
+			<Field {form} name="inviteId">
+				<Control>
+					{#snippet children({ props }: { props: any })}
+						<input
+							{...props}
+							type="hidden"
+							name="inviteId"
+							hidden
+							class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+							bind:value={$formData.inviteId}
 						/>
 					{/snippet}
 				</Control>

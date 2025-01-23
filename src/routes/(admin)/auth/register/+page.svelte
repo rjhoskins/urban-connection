@@ -6,7 +6,7 @@
 
 	let { data } = $props();
 	const { token } = data;
-	const { name, email } = decodeInviteToken(token || '');
+	const { name, email, inviteId } = decodeInviteToken(token || '');
 </script>
 
 <h1 class="my-6 text-center text-3xl">Register Token => {token || 'TODO'}</h1>

@@ -40,6 +40,7 @@
 		"formsnap": "^2.0.0",
 		"globals": "^15.0.0",
 		"lucide-svelte": "^0.469.0",
+		"mode-watcher": "^0.5.0",
 		"prettier": "^3.3.2",
 		"prettier-plugin-svelte": "^3.2.6",
 		"prettier-plugin-tailwindcss": "^0.6.5",
@@ -60,6 +61,7 @@
 		"zod": "^3.24.1"
 	},
 	"dependencies": {
+		"@friendofsvelte/tipex": "0.0.7-fix-0",
 		"@node-rs/argon2": "^1.1.0",
 		"@oslojs/crypto": "^1.0.1",
 		"@oslojs/encoding": "^1.1.0",
@@ -67,10 +69,18 @@
 		"@tailwindcss/container-queries": "^0.1.1",
 		"@tailwindcss/forms": "^0.5.9",
 		"@tailwindcss/typography": "^0.5.15",
+		"@tiptap/core": "^2.11.3",
+		"@tiptap/extension-color": "^2.11.3",
+		"@tiptap/extension-list-item": "^2.11.3",
+		"@tiptap/extension-text-style": "^2.11.3",
+		"@tiptap/pm": "^2.11.3",
+		"@tiptap/starter-kit": "^2.11.3",
 		"@types/node": "^22.10.2",
 		"drizzle-orm": "^0.38.3",
 		"drizzle-seed": "^0.3.0",
+		"nanoid": "^5.0.9",
 		"pg": "^8.13.1",
-		"postgres": "^3.4.5"
+		"postgres": "^3.4.5",
+		"svelte-french-toast": "^1.2.0"
 	}
 }

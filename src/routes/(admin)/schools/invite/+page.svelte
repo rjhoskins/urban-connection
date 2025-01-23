@@ -9,7 +9,7 @@
 
 	let { data } = $props();
 	const { token } = data;
-	const { name, email } = decodeInviteToken(token || '');
+	const { name, email, inviteId } = decodeInviteToken(token || '');
 	let text = $state('');
 </script>
 
@@ -47,7 +47,8 @@
 					<p>
 						Please register to access your organization <a
 							class=" text-lg text-blue-700 underline"
-							href={`/auth/register?inviteToken=${createInviteToken(name, email)}`}>here</a
+							href={`/auth/register?inviteToken=${createInviteToken(name, email, inviteId)}`}
+							>here</a
 						>
 					</p>
 				</Card.Content>

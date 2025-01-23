@@ -1,7 +1,7 @@
 <script lang="ts">
 	import * as Card from '$lib/components/ui/card';
 	import { LayoutGrid, List, PenTool, Slice, UserRoundPlus } from 'lucide-svelte';
-	import { users } from '$lib/store/users.svelte';
+
 	const adminData = [
 		{
 			title: 'Create School',
@@ -28,11 +28,13 @@
 		// 	icon: PenTool
 		// }
 	];
+
+	let { displayName } = $props();
 </script>
 
 <Card.Root class="mx-auto max-w-6xl">
 	<Card.Header>
-		<Card.Title class="p-6">Hello, {users.selectedUser}</Card.Title>
+		<Card.Title class="p-6">Hello, {displayName ? displayName : 'TODO'}</Card.Title>
 		<!-- <Card.Description>Card Description</Card.Description> -->
 	</Card.Header>
 	<hr class="bg-primary" />

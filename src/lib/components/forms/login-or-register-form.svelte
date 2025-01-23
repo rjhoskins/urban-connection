@@ -16,7 +16,7 @@
 	const { form: formData, enhance, message } = form;
 </script>
 
-<Card.Root class="mx-auto max-w-6xl">
+<Card.Root class="mx-auto min-w-96 max-w-6xl">
 	<Card.Header>
 		<Card.Title>Account Access</Card.Title>
 		<Card.Description>Log In or Sign Up</Card.Description>
@@ -38,7 +38,7 @@
 						/>
 					{/snippet}
 				</Control>
-				<Description>This is your case-sensitive public display name.</Description>
+				<Description>Should be your email address</Description>
 				<FieldErrors class="text-red-700" />
 			</Field>
 

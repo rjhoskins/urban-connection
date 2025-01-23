@@ -1,32 +1,24 @@
-import { hash, verify } from '@node-rs/argon2';
-import { fail, redirect } from '@sveltejs/kit';
-import { eq, and, isNotNull } from 'drizzle-orm';
+import { createNewUserFromInviteSchema } from '$lib/schema';
 import * as auth from '$lib/server/auth';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
-import { message, superValidate } from 'sveltekit-superforms/server';
+import { hash } from '@node-rs/argon2';
+import { redirect } from '@sveltejs/kit';
+import { and, eq } from 'drizzle-orm';
+import { superValidate, message } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { createNewUserFromInviteSchema } from '$lib/schema';
-import type { Actions, PageServerLoad } from '../$types';
+import type { Actions } from '../$types';
+import { generateUserId } from './+page.server';
 import { setFlash } from 'sveltekit-flash-message/server';
-import { generateUserId } from '$lib/utils';
-
-export const load: PageServerLoad = async ({ url }) => {
-	const token = url.searchParams.get('inviteToken');
-
-	const form = await superValidate(zod(createNewUserFromInviteSchema));
-
-	return { form, token };
-};
 
 export const actions: Actions = {
 	register: async (event) => {
 		const form = await superValidate(event, zod(createNewUserFromInviteSchema));
 		if (!form.valid) {
-			setFlash({ type: 'error', message: 'Invalid form' }, event.cookies);
 			return message(form, 'Invalid form');
 		}
 
+		const newUserId = generateUserId();
 		const passwordHash = await hash(form.data.password, {
 			memoryCost: 19456,
 			timeCost: 2,
@@ -40,10 +32,7 @@ export const actions: Actions = {
 			.select()
 			.from(table.userInvitesTable)
 			.where(
-				and(
-					eq(table.userInvitesTable.id, form.data.inviteId),
-					eq(table.userInvitesTable.isUsed, false)
-				)
+				and(eq(table.userInvitesTable.email, userEmail), eq(table.userInvitesTable.isUsed, false))
 			);
 
 		if (!existingUnusedInvite) {
@@ -53,14 +42,8 @@ export const actions: Actions = {
 
 		const [existingUser] = await db
 			.select()
-			.from(table.usersTable) // existing user will have pw & be active
-			.where(
-				and(
-					eq(table.usersTable.username, userEmail),
-					eq(table.usersTable.isActive, false),
-					isNotNull(table.usersTable.passwordHash)
-				)
-			);
+			.from(table.usersTable)
+			.where(eq(table.usersTable.username, userEmail));
 
 		if (existingUser) {
 			return message(form, 'User already exists, please contact your administrator');
@@ -68,23 +51,33 @@ export const actions: Actions = {
 
 		try {
 			const result = await db.transaction(async (trx) => {
-				const [updatedUserWithPW] = await trx
-					.update(table.usersTable)
-					.set({ isActive: true, passwordHash })
-					.where(eq(table.usersTable.username, userEmail))
-					.returning();
+				const [newUser] = await trx
+					.insert(table.usersTable)
+					.values({ id: newUserId, username: userEmail, passwordHash, name: form.data.name })
+					.returning({ id: table.usersTable.id });
 
-				if (!updatedUserWithPW) throw new Error('Failed to register user');
+				if (!newUser) throw new Error('Failed to create user');
 
 				const [inviteRes] = await trx
 					.update(table.userInvitesTable)
-					.set({ isUsed: true, invitee: updatedUserWithPW.id })
+					.set({ isUsed: true, invitee: newUser.id })
 					.where(eq(table.userInvitesTable.email, userEmail))
 					.returning();
 
 				if (!inviteRes) throw new Error('Invite update failed');
 
-				return updatedUserWithPW;
+				//associate user with school/district
+				if (inviteRes.inviteType === 'school') {
+					await trx
+						.insert(table.schoolAdminsTable)
+						.values({ userId: newUser.id, schoolId: inviteRes.schoolId! });
+				} else if (inviteRes.inviteType === 'district') {
+					await trx
+						.insert(table.districtAdminsTable)
+						.values({ userId: newUser.id, districtId: inviteRes.districtId! });
+				}
+
+				return newUser;
 			});
 
 			// Create session and set cookie
@@ -96,8 +89,6 @@ export const actions: Actions = {
 			setFlash({ type: 'error', message: errorMessage }, event.cookies);
 			return message(form, 'Unexpected error: ' + errorMessage, { status: 500 });
 		}
-
-		setFlash({ type: 'success', message: 'Sucessfully Registered!' }, event.cookies);
 
 		return redirect(302, '/');
 	}

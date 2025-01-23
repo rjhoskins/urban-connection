@@ -1,7 +1,7 @@
 import { hash, verify } from '@node-rs/argon2';
 import { encodeBase32LowerCase } from '@oslojs/encoding';
 import { fail, redirect } from '@sveltejs/kit';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import * as auth from '$lib/server/auth';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
@@ -10,6 +10,7 @@ import { message, superValidate } from 'sveltekit-superforms/server';
 import { zod } from 'sveltekit-superforms/adapters';
 import { createNewUserOrLoginSchema } from '$lib/schema';
 import { SERVER_ERROR_MESSAGES } from '$lib/constants';
+import { setFlash } from 'sveltekit-flash-message/server';
 
 export const load: PageServerLoad = async (event) => {
 	if (event.locals.user) {
@@ -33,12 +34,18 @@ export const actions: Actions = {
 		const results = await db
 			.select()
 			.from(table.usersTable)
-			.where(eq(table.usersTable.username, form.data.username));
+			.where(
+				and(eq(table.usersTable.username, form.data.username), eq(table.usersTable.isActive, true))
+			);
 
 		const existingUser = results.at(0);
 		if (!existingUser) {
 			console.log('user not found');
-			return message(form, 'invalid username or password', {
+			setFlash(
+				{ type: 'error', message: 'invalid username, password, or user not found' },
+				event.cookies
+			);
+			return message(form, '', {
 				status: 404
 			});
 		}
@@ -90,13 +97,17 @@ export const actions: Actions = {
 			const session = await auth.createSession(sessionToken, userId);
 			auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
 		} catch (e) {
+			setFlash(
+				{ type: 'error', message: 'A user with this email address already exists.' },
+				event.cookies
+			);
 			return message(form, 'A user with this email address already exists.', {
 				status: 409
 			});
 		} finally {
 		}
-
-		return redirect(302, '/auth/login');
+		setFlash({ type: 'success', message: 'Account created successfully!' }, event.cookies);
+		return redirect(302, '/');
 	}
 };
 

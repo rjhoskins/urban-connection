@@ -10,7 +10,7 @@
 
 	let { data } = $props();
 	// const { token } = data;
-	// const { name, email } = decodeInviteToken(token || '');
+	// const  { name, email, inviteId } = decodeInviteToken(token || '');
 	let text = $state('');
 	let token;
 	let email = 'hi@example.com';

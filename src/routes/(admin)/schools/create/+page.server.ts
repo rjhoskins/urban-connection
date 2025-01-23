@@ -7,11 +7,16 @@ import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { districts } from '$lib/data/data.js';
 import { redirect } from '@sveltejs/kit';
-import { createInviteToken } from '$lib/utils';
+import { createInviteToken, generateUserId } from '$lib/utils';
 import { SERVER_ERROR_MESSAGES } from '$lib/constants.js';
+import { nanoid } from 'nanoid';
+import { setFlash } from 'sveltekit-flash-message/server';
+import { eq } from 'drizzle-orm';
 
 export const load: PageServerLoad = async (event) => {
 	if (!event.locals.user) return redirect(302, '/auth/login');
+	const user = event.locals.user;
+	if (!user) return fail(400, { message: 'User not authenticated' });
 
 	async function getDistricts() {
 		return await db.select().from(table.districtsTable);
@@ -39,52 +44,84 @@ export const actions: Actions = {
 			return message(form, 'Invalid form'); // Will return fail(400, { form }) since form isn't valid
 		}
 
-		console.log('create form => ', form);
-		let schoolResult: any;
-		let inviteResult: any;
-		try {
-			schoolResult = await db
-				.insert(table.schoolsTable)
-				.values({
-					name: form.data.name,
-					districtID: Number(form.data.districtId),
-					createdBy: event.locals.user.id
-				})
-				.returning();
-			console.log('schoolResult => ', schoolResult);
-			// create invite here, use it in invite page to...
-			inviteResult = await db
-				.insert(table.userInvitesTable)
-				.values({
-					name: form.data.adminName,
-					email: form.data.adminEmail,
-					schoolId: schoolResult[0].id as number,
-					role: 'school_admin', // default role
-					inviter: event.locals.user.id,
-					inviteType: 'school' // default invite type
-				})
-				.returning();
+		const [existingUser] = await db
+			.select()
+			.from(table.usersTable)
+			.where(eq(table.usersTable.username, form.data.adminEmail));
 
-			console.log('inviteResult => ', inviteResult);
-		} catch (error) {
-			return message(form, SERVER_ERROR_MESSAGES[400], {
-				status: 400
-			});
+		if (existingUser) {
+			setFlash(
+				{ type: 'error', message: 'An admin already exists under this email, please check again.' },
+				event.cookies
+			);
+			return message(form, 'User already exists, please contact your administrator');
 		}
 
-		if (!schoolResult || !inviteResult)
-			return message(form, SERVER_ERROR_MESSAGES[400], {
-				status: 400
+		let inviteToken: string;
+
+		try {
+			console.log('create form trying... => ', form);
+			const result = await db.transaction(async (trx) => {
+				const [schoolResult] = await trx
+					.insert(table.schoolsTable)
+					.values({
+						name: form.data.name,
+						districtID: form.data.districtId,
+						createdBy: event.locals.user?.id ?? ''
+					})
+					.returning();
+				console.log('schoolResult => ', schoolResult);
+
+				// create invite here, use it in invite page to...
+				const [inviteRes] = await trx
+					.insert(table.userInvitesTable)
+					.values({
+						id: nanoid(),
+						name: form.data.adminName,
+						email: form.data.adminEmail,
+						schoolId: schoolResult.id as number,
+						inviter: event.locals.user?.id ?? ''
+					})
+					.returning();
+				console.log('inviteRes => ', inviteRes);
+				inviteToken = createInviteToken(form.data.adminName, form.data.adminEmail, inviteRes.id);
+
+				if (!inviteRes) throw new Error('Failed to create invite');
+
+				const [newUser] = await trx
+					.insert(table.usersTable)
+					.values({
+						id: generateUserId(),
+						username: form.data.adminEmail,
+						name: form.data.adminName
+					})
+					.returning({ id: table.usersTable.id });
+
+				if (!newUser) throw new Error('Failed to create user');
+
+				//associate user with school/district
+				if (inviteRes.inviteType === 'school') {
+					await trx
+						.insert(table.schoolAdminsTable)
+						.values({ userId: newUser.id, schoolId: inviteRes.schoolId! });
+				} else if (inviteRes.inviteType === 'district') {
+					await trx
+						.insert(table.districtAdminsTable)
+						.values({ userId: newUser.id, districtId: inviteRes.districtId! });
+				}
+
+				return newUser;
 			});
-		redirect(
-			303,
-			`/schools/invite?inviteToken=${createInviteToken(form.data.adminName, form.data.adminEmail)}`
-		);
+		} catch (error) {
+			const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
+			setFlash({ type: 'error', message: errorMessage }, event.cookies);
+			return message(form, 'Unexpected error: ' + errorMessage, { status: 500 });
+		}
 
-		console.log('schoolResult => ', schoolResult);
-		console.log('inviteResult => ', inviteResult);
+		setFlash({ type: 'success', message: 'School successfully created' }, event.cookies);
+		console.log('inviteToken => ', inviteToken);
 
-		// Display a success status message
-		return message(form, 'Form posted successfully!');
+		redirect(303, `/schools/invite?inviteToken=${inviteToken}`);
+		return redirect(302, '/');
 	}
 };

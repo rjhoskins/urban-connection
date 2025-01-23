@@ -1,4 +1,4 @@
-import { sql } from 'drizzle-orm';
+import { is, sql } from 'drizzle-orm';
 import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 import { check, pgEnum, uniqueIndex } from 'drizzle-orm/pg-core';
 import { pgTable, varchar, text, integer, timestamp, boolean } from 'drizzle-orm/pg-core';
@@ -6,16 +6,28 @@ import { pgTable, varchar, text, integer, timestamp, boolean } from 'drizzle-orm
 export const rolesEnum = pgEnum('roles', ['super_admin', 'district_admin', 'school_admin']);
 export const invitesEnum = pgEnum('invite_type', ['school', 'district']);
 
-export const usersTable = pgTable('users', {
-	id: text('id').primaryKey().notNull(),
-	age: integer('age'),
-	name: varchar('name'), // user supplied name
-	username: text('username').notNull().unique(), // email-based username
-	passwordHash: text('password_hash').notNull(),
-	// email: varchar('email').notNull().unique(),
-	role: rolesEnum('role').default('school_admin'),
-	createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull()
-});
+export const usersTable = pgTable(
+	'users',
+	{
+		id: text('id').primaryKey().notNull(),
+		// age: integer('age'),
+		name: text('name'), // user supplied name
+		username: text('username').notNull().unique(), // email-based username
+		passwordHash: text('password_hash'),
+		// email: varchar('email').notNull().unique(),
+		role: rolesEnum('role').default('school_admin'),
+		isActive: boolean('is_active').default(false),
+		createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull()
+	},
+	(table) => [
+		{
+			checkConstraint: check(
+				'has_password_check',
+				sql`(${table.isActive} = true AND ${table.passwordHash} IS NOT NULL)`
+			)
+		}
+	]
+);
 
 export const sessionsTable = pgTable('sessions', {
 	id: text('id').primaryKey(),
@@ -52,7 +64,7 @@ export const schoolAssessmentsTable = pgTable('school_assessments', {
 	schoolId: integer('school_id')
 		.notNull()
 		.references(() => schoolsTable.id),
-	assessmentInviteId: text('assessment_invite_id')
+	assessmentInviteId: integer('assessment_invite_id')
 		.notNull()
 		.references(() => assessmentInvitesTable.id),
 	isCompleted: boolean('is_completed').default(false),
@@ -95,9 +107,10 @@ export const districtAdminsTable = pgTable('district_admins', {
 export const userInvitesTable = pgTable(
 	'user_invites',
 	{
-		id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
+		id: text('id').primaryKey(),
 		name: varchar('name').notNull(), // from the invite form
 		email: varchar('email').notNull(),
+		isSent: boolean('is_sent').default(false),
 
 		invitee: text('invitee').references((): AnyPgColumn => usersTable.id), // user who received the invite (if they sign up, this is their id)
 		inviter: text('inviter').references((): AnyPgColumn => usersTable.id),

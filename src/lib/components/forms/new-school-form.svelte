@@ -97,12 +97,7 @@
 			</Form.Field>
 
 			<Form.Button>Submit</Form.Button>
-
-			{#if $message}
-				<div class="message text-green-700">{$message}</div>
-			{/if}
 		</form>
 	</Card.Content>
 	<SuperDebug data={$formData} />
-	<pre>{JSON.stringify(districts, null, 2)}</pre>
 </Card.Root>

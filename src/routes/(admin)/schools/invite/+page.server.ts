@@ -9,7 +9,8 @@ import * as table from '$lib/server/db/schema';
 import { districts } from '$lib/data/data.js';
 import { redirect } from '@sveltejs/kit';
 import { createInviteToken, decodeInviteToken } from '$lib/utils';
-import { eq } from 'drizzle-orm';
+import { eq, or } from 'drizzle-orm';
+import { setFlash } from 'sveltekit-flash-message/server';
 
 export const load: PageServerLoad = async ({ url }) => {
 	const token = url.searchParams.get('inviteToken');
@@ -28,31 +29,42 @@ export const actions: Actions = {
 		if (!token || !newUserTokenSchema.safeParse(decodeInviteToken(token)).success) {
 			return message(form, 'Invalid token', { status: 400 });
 		}
-		const { name, email } = decodeInviteToken(token);
+		const { name, email, inviteId } = decodeInviteToken(token);
 
 		const form = await superValidate(event, zod(inviteNewUserSchema));
 
 		if (!form.valid) {
-			return message(form, 'Invalid form'); // Will return fail(400, { form }) since form isn't valid
+			return message(form, 'Invalid form');
 		}
 
 		try {
-			// update invite - all invites should be marked as used
 			const [inviteRes] = await db
 				.update(table.userInvitesTable)
-				.set({ inviteText: form.data.inviteText })
-				.where(eq(table.userInvitesTable.email, form.data.email));
+				.set({ inviteText: form.data.inviteText, isSent: true })
+				.where(
+					or(
+						// update specific invite but all past invites should be marked as used too
+						eq(table.userInvitesTable.id, inviteId),
+						eq(table.userInvitesTable.email, form.data.email)
+					)
+				);
 		} catch (error) {
-			return message(form, '"Failed to create the resource due to an internal error.', {
-				status: 400
-			});
+			const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
+			setFlash({ type: 'error', message: errorMessage }, event.cookies);
+			return message(form, 'Unexpected error: ' + errorMessage, { status: 500 });
 		}
 
 		console.log('invite form => ', form);
-		console.log('invite link => ', `/auth/register?inviteToken=${createInviteToken(name, email)}`);
+		console.log(
+			'invite link => ',
+			`/auth/register?inviteToken=${createInviteToken(name, email, inviteId)}`
+		);
+		// TODO????
+		// redirect(302,
+		// 	`/=${createInviteToken(name, email, inviteId)}`);
+		setFlash({ type: 'success', message: 'Invite sent!' }, event.cookies);
 		redirect(302, '/');
 
 		// Display a success status message
-		return message(form, 'Form posted successfully!');
 	}
 };
