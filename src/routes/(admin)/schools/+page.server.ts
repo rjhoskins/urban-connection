@@ -7,20 +7,28 @@ import { schools } from '$lib/data/data';
 
 export const load = async (event) => {
 	const { parent } = event;
-	if (!event.locals.user) {
+	if (!event.locals.user?.id) {
 		return redirect(302, '/auth/login');
 	}
 
 	let data: any = [];
-
-	if (event.locals.user.role === 'school_admin') {
-		const schoolId = await getSchoolIDForSchoolAdmin(event.locals.user.id);
-
-		console.log('school_admin user REDIRECT => ', event.locals.user);
-		return redirect(302, `/schools/${schoolId}`);
-	}
-	if (event.locals.user.role === 'super_admin') {
-		data = await getSchoolsForSuperAdmin();
+	switch (event.locals.user.role) {
+		case 'school_admin': {
+			const schoolId = await getSchoolIDForSchoolAdmin(event.locals.user.id);
+			console.log('school_admin user REDIRECT => ', event.locals.user);
+			return redirect(302, `/schools/${schoolId}`);
+		}
+		case 'super_admin': {
+			data = await getSchoolsForSuperAdmin();
+			break;
+		}
+		case 'district_admin': {
+			data = await getSchoolsForDistrictAdmin(event.locals.user.id);
+			break;
+		}
+		default:
+			console.log('Unhandled role:', event.locals.user.role);
+			break;
 	}
 
 	const parentData = await parent();
@@ -63,4 +71,27 @@ const getSchoolsForSuperAdmin = async () => {
 	// .where(is(table.schoolAdminsTable.userId, userId));
 
 	// const result = await db.select().from(users).innerJoin(pets, eq(users.id, pets.ownerId))
+};
+const getSchoolsForDistrictAdmin = async (userId: string) => {
+	try {
+		const res = await db
+			.select({
+				id: table.schoolsTable.id,
+				name: table.schoolsTable.name,
+				districtId: table.schoolsTable.districtId
+			})
+			.from(table.schoolsTable)
+			.leftJoin(table.districtsTable, eq(table.districtsTable.id, table.schoolsTable.districtId))
+			.leftJoin(
+				table.districtAdminsTable,
+				eq(table.districtAdminsTable.districtId, table.schoolsTable.districtId)
+			)
+			.where(eq(table.districtAdminsTable.userId, userId)); // Use static value here to debug if needed.
+
+		console.log('getSchoolsForDistrictAdmin res => ', res);
+		return res;
+	} catch (error) {
+		const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
+		console.log('getSchoolsForDistrictAdmin error => ', errorMessage);
+	}
 };

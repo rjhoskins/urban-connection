@@ -17,7 +17,8 @@ export const usersTable = pgTable(
 		// email: varchar('email').notNull().unique(),
 		role: rolesEnum('role').default('school_admin'),
 		isActive: boolean('is_active').default(false),
-		createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull()
+		createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
+		updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().notNull()
 	},
 	(table) => [
 		{
@@ -40,7 +41,7 @@ export const sessionsTable = pgTable('sessions', {
 export const schoolsTable = pgTable('schools', {
 	id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
 	name: varchar('name').notNull(),
-	districtID: integer('district_id')
+	districtId: integer('district_id')
 		.references((): AnyPgColumn => districtsTable.id)
 		.notNull(),
 	isActive: boolean('is_active').default(true),
@@ -88,8 +89,8 @@ export const districtsTable = pgTable('districts', {
 	id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
 	name: varchar('name').notNull(),
 	isActive: boolean('is_active').default(true),
-
-	createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull()
+	createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
+	createdBy: text('created_by').references((): AnyPgColumn => usersTable.id)
 });
 
 export const districtAdminsTable = pgTable('district_admins', {
@@ -98,7 +99,7 @@ export const districtAdminsTable = pgTable('district_admins', {
 		.notNull()
 		.references(() => usersTable.id)
 		.unique(), // Ensures one school per admin
-	districtId: integer('school_id')
+	districtId: integer('district_id')
 		.notNull()
 		.references(() => districtsTable.id),
 	createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull()

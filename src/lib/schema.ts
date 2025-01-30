@@ -1,4 +1,4 @@
-import { number, z } from 'zod';
+import { number, z, ZodIssueCode } from 'zod';
 import { districts } from './data/data';
 // keep for register form until deprecated
 export const createNewUserOrLoginSchema = z.object({
@@ -30,8 +30,10 @@ export const createNewUserFromInviteSchema = z
 			.string()
 			.nonempty({ message: 'password is required' })
 			.min(4, { message: 'password should be at least four characters' })
-			.max(50, { message: 'password should be less than 50 characters' })
+			.max(50, { message: 'password should be less than 50 characters' }),
+		emailTemplateJSON: z.string().optional()
 	})
+
 	.refine((data) => data.password === data.confirm, {
 		message: "Passwords don't match",
 		path: ['confirm'] // path of error);
@@ -45,28 +47,103 @@ export const newUserTokenSchema = z.object({
 export const inviteNewUserSchema = z.object({
 	name: z.string(),
 	email: z.string(),
-	inviteText: z.string()
+	// inviteText: z.string(),
+	emailTemplateData: z
+		.object({
+			greeting: z.string(),
+			definition: z.string(),
+			keyPoints: z.array(z.string()),
+			closing: z.string(),
+			callToAction: z.string(),
+			registrationLink: z.object({
+				text: z.string(),
+				url: z.string().url()
+			})
+		})
+		.optional()
 });
 
-export const createSchoolSchema = z.object({
-	name: z
-		.string()
-		.nonempty({ message: 'school name is required' })
-		.min(4, { message: 'school name should be at least four characters' })
-		.max(50, { message: 'school name should be less than 50 characters' }),
-	districtId: z.number().min(1, { message: 'district is required' }).default(0), //TODO IN OTHER SCHEMASS WHEN DISTRICTS ARE IMPLEMENTED
-	adminName: z
-		.string()
-		.nonempty({ message: 'admin name is required' })
-		.min(4, { message: 'admin name should be at least four characters' })
-		.max(50, { message: 'admin name should be less than 50 characters' }),
-	adminEmail: z
-		.string()
-		.email({ message: 'invalid email' })
-		.nonempty({ message: 'admin email is required, should be a school email' })
-		.min(4, { message: 'admin email should be at least four characters' })
-		.max(50, { message: 'admin email should be less than 50 characters' })
-});
+export const createSchoolSchema = z
+	.object({
+		isDistrict: z.boolean().default(false).optional(), // hack until zod can handle optional fields
+		name: z.string().optional(), //implemented below in superRefine
+		// .nonempty({ message: 'school name is required' })
+		// .min(4, { message: 'school name should be at least four characters' })
+		// .max(50, { message: 'school name should be less than 50 characters' }),
+		districtId: z.number().min(1, { message: 'district is required' }).default(0), //TODO IN OTHER SCHEMASS WHEN DISTRICTS ARE IMPLEMENTED
+		adminName: z
+			.string()
+			.nonempty({ message: 'admin name is required' })
+			.min(4, { message: 'admin name should be at least four characters' })
+			.max(50, { message: 'admin name should be less than 50 characters' }),
+		adminEmail: z
+			.string()
+			.email({ message: 'invalid email' })
+			.nonempty({ message: 'admin email is required, should be a school email' })
+			.min(4, { message: 'admin email should be at least four characters' })
+			.max(50, { message: 'admin email should be less than 50 characters' })
+	})
+	.superRefine((data, ctx) => {
+		if (data.isDistrict && !data.name) {
+			//happy path
+			// console.log('happy happy joy joy????');
+			return;
+		} else if (data.isDistrict && data.name) {
+			// console.log('both????');
+			// ctx.addIssue({
+			// 	code: ZodIssueCode.custom,
+			// 	path: ['isDistrict'],
+			// 	message: 'A District name already exists, if you want to create a school, select school.'
+			// });
+			return;
+		} else {
+			// console.log('school=> ');
+			if (data.name == '' || data.name == undefined) {
+				// .nonempty({ message: 'school name is required' })
+				console.log('school name is required', data.name);
+				ctx.addIssue({
+					code: ZodIssueCode.invalid_type,
+					expected: 'string',
+					received: typeof data.name,
+					path: ['name'],
+					message: 'school name is required'
+				});
+				ctx.addIssue({
+					code: ZodIssueCode.too_small,
+					minimum: 4,
+					path: ['name'],
+					type: 'string',
+					inclusive: true,
+					message: 'school name should be at least four characters'
+				});
+			}
+			if (data.name && data.name.length < 4) {
+				// .min(4, { message: 'school name should be at least four characters' })
+				console.log('school name should be at least four characters', data.name);
+				ctx.addIssue({
+					code: ZodIssueCode.too_small,
+					minimum: 4,
+					path: ['name'],
+					type: 'string',
+					inclusive: true,
+					message: 'school name should be at least four characters'
+				});
+			}
+			if (data.name && data.name.length > 50) {
+				// .max(50, { message: 'school name should be less than 50 characters' })
+				console.log('school name should be less than 50 characters', data.name);
+				ctx.addIssue({
+					code: ZodIssueCode.too_big,
+					maximum: 50,
+					path: ['name'],
+					type: 'string',
+					inclusive: true,
+					message: 'school name should be less than 50 characters'
+				});
+			}
+		}
+	});
+
 const UserRoleSchema = z.enum(['Master', 'District', 'School_Admin']);
 
 type UserRole = z.infer<typeof UserRoleSchema>;

@@ -9,8 +9,10 @@
 	import { superForm } from 'sveltekit-superforms';
 	import SuperDebug from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { Switch } from '../ui/switch';
+	import { onMount } from 'svelte';
 
-	let { data } = $props();
+	let { isDistrict = $bindable(), data } = $props();
 	const { districts } = data;
 	let selectedDistrict = $state(0);
 
@@ -26,25 +28,64 @@
 		// }
 	});
 	const { form: formData, enhance, message } = form;
+	onMount(() => {
+		$formData.name = '';
+	});
+	$effect(() => {
+		$formData.isDistrict = isDistrict;
+		// if ($formData.isDistrict) {
+		// 	$formData.name = '';
+		// }
+	});
 </script>
 
-<Card.Root class="mx-auto max-w-6xl">
+<Card.Root class="mx-auto max-w-md">
 	<Card.Header>
-		<Card.Title class="text-3xl">Create School</Card.Title>
-		<Card.Description class="text-sm text-primary/75">Create a new School</Card.Description>
+		<Card.Title class="text-3xl"
+			>Create
+			{#if $formData.isDistrict}
+				District Admin
+			{:else}
+				School
+			{/if}
+		</Card.Title>
+		<Card.Description class="text-sm text-primary/75">
+			{#if $formData.isDistrict}
+				Add a District Admin to a district
+			{:else}
+				Create a new School
+			{/if}
+		</Card.Description>
 	</Card.Header>
 	<Card.Content>
 		<form class="flex flex-col gap-3" method="POST" use:enhance>
-			<!-- name -->
-			<Form.Field {form} name="name">
-				<Form.Control>
-					{#snippet children({ props })}
-						<Form.Label>School Name</Form.Label>
-						<Input {...props} bind:value={$formData.name} />
-					{/snippet}
-				</Form.Control>
+			<Form.Field {form} name="isDistrict">
+				<div class="flex flex-row items-center justify-between gap-4">
+					<Form.Control>
+						{#snippet children({ props })}
+							<Switch {...props} bind:checked={$formData.isDistrict} />
+							<div class="space-y-0.5">
+								<Form.Label>Create District</Form.Label>
+								<Form.Description>Create a distrct admin for the selected district</Form.Description
+								>
+							</div>
+						{/snippet}
+					</Form.Control>
+				</div>
 				<Form.FieldErrors />
 			</Form.Field>
+			{#if !$formData.isDistrict}
+				<!-- name -->
+				<Form.Field {form} name="name">
+					<Form.Control>
+						{#snippet children({ props })}
+							<Form.Label>School Name</Form.Label>
+							<Input {...props} bind:value={$formData.name} />
+						{/snippet}
+					</Form.Control>
+					<Form.FieldErrors />
+				</Form.Field>
+			{/if}
 
 			<Form.Field {form} name="districtId">
 				<Form.Control>

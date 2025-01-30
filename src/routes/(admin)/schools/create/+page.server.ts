@@ -43,6 +43,15 @@ export const actions: Actions = {
 			// return fail(400, { form });
 			return message(form, 'Invalid form'); // Will return fail(400, { form }) since form isn't valid
 		}
+		// if (form.valid) {
+		// 	// return fail(400, { form });
+		// 	if (form.data.isDistrict) {
+		// 		console.log('district form => ', form);
+		// 		return message(form, 'District form');
+		// 	}
+		// 	console.log('school form => ', form);
+		// 	return message(form, 'valid form'); // Will return fail(400, { form }) since form isn't valid
+		// }
 
 		const [existingUser] = await db
 			.select()
@@ -62,15 +71,18 @@ export const actions: Actions = {
 		try {
 			console.log('create form trying... => ', form);
 			const result = await db.transaction(async (trx) => {
-				const [schoolResult] = await trx
-					.insert(table.schoolsTable)
-					.values({
-						name: form.data.name,
-						districtID: form.data.districtId,
-						createdBy: event.locals.user?.id ?? ''
-					})
-					.returning();
-				console.log('schoolResult => ', schoolResult);
+				let schoolResult;
+				if (!form.data.isDistrict) {
+					schoolResult = await trx
+						.insert(table.schoolsTable)
+						.values({
+							name: form.data.name ?? '',
+							districtId: form.data.districtId,
+							createdBy: event.locals.user?.id ?? ''
+						})
+						.returning();
+					console.log('schoolResult => ', schoolResult);
+				}
 
 				// create invite here, use it in invite page to...
 				const [inviteRes] = await trx
@@ -79,8 +91,11 @@ export const actions: Actions = {
 						id: nanoid(),
 						name: form.data.adminName,
 						email: form.data.adminEmail,
-						schoolId: schoolResult.id as number,
-						inviter: event.locals.user?.id ?? ''
+						inviteType: form.data.isDistrict ? 'district' : 'school',
+						inviter: event.locals.user?.id ?? '',
+						...(form.data.isDistrict && schoolResult
+							? { schoolId: schoolResult[0].id as number }
+							: { districtId: form.data.districtId })
 					})
 					.returning();
 				console.log('inviteRes => ', inviteRes);
@@ -93,7 +108,8 @@ export const actions: Actions = {
 					.values({
 						id: generateUserId(),
 						username: form.data.adminEmail,
-						name: form.data.adminName
+						name: form.data.adminName,
+						role: form.data.isDistrict ? 'district_admin' : 'school_admin'
 					})
 					.returning({ id: table.usersTable.id });
 
