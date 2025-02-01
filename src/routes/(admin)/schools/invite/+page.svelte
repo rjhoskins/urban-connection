@@ -12,7 +12,7 @@
 	const { token } = data;
 	const { name, email, inviteId } = decodeInviteToken(token || '');
 	let pageHTMLEmail = $state();
-	let pageIsEditing = $state(true);
+	let pageIsEditing = $state(false);
 </script>
 
 <svelte:head>
