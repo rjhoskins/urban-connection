@@ -46,21 +46,19 @@ export const newUserTokenSchema = z.object({
 });
 export const inviteNewUserSchema = z.object({
 	name: z.string(),
-	email: z.string(),
+	email: z.string()
 	// inviteText: z.string(),
-	emailTemplateData: z
-		.object({
-			greeting: z.string(),
-			definition: z.string(),
-			keyPoints: z.array(z.string()),
-			closing: z.string(),
-			callToAction: z.string(),
-			registrationLink: z.object({
-				text: z.string(),
-				url: z.string().url()
-			})
-		})
-		.optional()
+});
+export const userInviteHTMLEmailTemplateSchema = z.object({
+	greeting: z.string(),
+	definition: z.string(),
+	keyPoints: z
+		.array(z.string())
+		.min(2, { message: 'at least two key point(s) are required' })
+		.max(8, { message: 'no more than eight key points are allowed' }),
+	closing: z.string(),
+	callToAction: z.string(),
+	registrationLinkText: z.string()
 });
 
 export const createSchoolSchema = z

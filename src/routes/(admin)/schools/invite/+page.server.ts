@@ -1,5 +1,9 @@
 import { superValidate } from 'sveltekit-superforms';
-import { inviteNewUserSchema, newUserTokenSchema } from '$lib/schema';
+import {
+	inviteNewUserSchema,
+	newUserTokenSchema,
+	userInviteHTMLEmailTemplateSchema
+} from '$lib/schema';
 import { zod } from 'sveltekit-superforms/adapters';
 import { message } from 'sveltekit-superforms';
 import type { PageServerLoad, Actions } from './$types.js';
@@ -12,14 +16,31 @@ import { createInviteToken, decodeInviteToken } from '$lib/utils';
 import { eq, or } from 'drizzle-orm';
 import { setFlash } from 'sveltekit-flash-message/server';
 
+const initialHTMLData = {
+	greeting: 'Dear Administrator,',
+	definition:
+		'The Urban Connection Project defines Cultural Responsiveness as the bridge between people built by the infusion of cultural experiences necessary to:',
+	keyPoints: [
+		'implement systems of accountability',
+		'cultivate necessary relationships',
+		'ensure content acquisition (education)'
+	],
+	closing: 'We are happy to partner with you!',
+	callToAction: 'Please register to access your organization',
+	registrationLinkText: 'here'
+};
+
 export const load: PageServerLoad = async ({ url }) => {
+	console.log('url ===========================================> ');
 	const token = url.searchParams.get('inviteToken');
 
-	const form = await superValidate(zod(inviteNewUserSchema));
+	const inviteForm = await superValidate(zod(inviteNewUserSchema));
+	const emailForm = await superValidate(initialHTMLData, zod(userInviteHTMLEmailTemplateSchema));
 
 	return {
 		token,
-		form
+		inviteForm,
+		emailForm
 	};
 };
 export const actions: Actions = {
@@ -66,5 +87,13 @@ export const actions: Actions = {
 		redirect(302, '/');
 
 		// Display a success status message
+	},
+	email: async (event) => {
+		const form = await superValidate(event, zod(userInviteHTMLEmailTemplateSchema));
+		if (!form.valid) {
+			return message(form, 'Invalid form');
+		}
+		console.log('form => ', form);
+		// return form;
 	}
 };

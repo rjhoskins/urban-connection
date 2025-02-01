@@ -1,0 +1,30 @@
+<script lang="ts">
+	import * as Card from '$lib/components/ui/card';
+	let { data, page, token } = $props();
+</script>
+
+{#if data}
+	<Card.Header class="Header">
+		<pre>{JSON.stringify(data, null, 2)}</pre>
+		<Card.Title>Invite Administrator Text Preview</Card.Title>
+	</Card.Header>
+	<Card.Content class="space-y-3">
+		<p>{data.greeting}</p>
+		<p>
+			{data.definition}
+		</p>
+		<ul class="list-inside list-disc">
+			{#each data.keyPoints as keyPoint (keyPoint)}
+				<li>{keyPoint}</li>
+			{/each}
+		</ul>
+
+		<p>
+			{data.callToAction}
+			<a
+				href={`${page.url}/auth/register?inviteToken=${token}`}
+				class=" text-lg text-blue-700 underline">{data.registrationLinkText}</a
+			>
+		</p>
+	</Card.Content>
+{/if}
