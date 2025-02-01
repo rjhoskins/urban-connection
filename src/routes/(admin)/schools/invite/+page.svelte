@@ -24,9 +24,9 @@
 <p class="hidden">Invite Token => {token || 'TODO'}</p>
 <div class="grid h-full place-content-center">
 	<!-- <pre class="sizes">{JSON.stringify(pageIsEditing, null, 2)}</pre> -->
-	<Card.Root>
+	<Card.Root class="m-6 max-w-prose">
 		<!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->
-		<Card.Content class="max-w-2xl">
+		<Card.Content>
 			<HtmlEmailUserInviteForm bind:formisEditing={pageIsEditing} {data} {token} {page} />
 			{#if !pageIsEditing}
 				<InviteUserByEmailForm {data} {token} {page} />
