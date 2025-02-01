@@ -5,7 +5,7 @@
 
 {#if data}
 	<Card.Header class="Header">
-		<pre>{JSON.stringify(data, null, 2)}</pre>
+		<!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->
 		<Card.Title>Invite Administrator Text Preview</Card.Title>
 	</Card.Header>
 	<Card.Content class="space-y-3">

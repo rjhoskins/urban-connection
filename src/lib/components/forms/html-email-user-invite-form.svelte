@@ -33,6 +33,7 @@
 	} = thisForm;
 
 	let newKeyPoint = $state('');
+	formisEditing = false;
 </script>
 
 <Card.Root class="max-w-2xl">
@@ -58,7 +59,7 @@
 		</Card.Header>
 		<Card.Content>
 			<form class="flex flex-col gap-3" method="POST" action="?/email" use:emailEnhance>
-				<input bind:value={formisEditing} />
+				<input type="hidden" bind:value={formisEditing} />
 				<!-- greeting -->
 				<Form.Field class="space-y-1" name="greeting" form={thisForm}>
 					<Form.Control>

@@ -23,7 +23,7 @@
 <h1 class="sr-only">Invite Administrator</h1>
 <p class="hidden">Invite Token => {token || 'TODO'}</p>
 <div class="grid h-full place-content-center">
-	<pre class="sizes">{JSON.stringify(pageIsEditing, null, 2)}</pre>
+	<!-- <pre class="sizes">{JSON.stringify(pageIsEditing, null, 2)}</pre> -->
 	<Card.Root>
 		<!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->
 		<Card.Content class="max-w-2xl">
