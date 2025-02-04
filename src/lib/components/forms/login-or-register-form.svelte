@@ -66,9 +66,6 @@
 				>
 			</div>
 			<SuperDebug data={$formData} />
-			{#if $message}
-				<div class="message text-red-700">{$message}</div>
-			{/if}
 		</form>
 	</Card.Content>
 </Card.Root>

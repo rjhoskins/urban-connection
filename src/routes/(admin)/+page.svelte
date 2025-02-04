@@ -12,7 +12,7 @@
 	import { users } from '$lib/store/users.svelte';
 	import UCAdminPanel from '$lib/components/uc-admin-panel.svelte';
 	import DistrictAdminPanel from '$lib/components/district-admin-panel.svelte';
-	import SchooladminAdminPanelcopy from '$lib/components/schooladmin-admin-panel copy.svelte';
+	import SchooladminAdminPanel from '$lib/components/schooladmin-admin-panel.svelte';
 </script>
 
 <svelte:head>
@@ -32,7 +32,7 @@
 		<DistrictAdminPanel />
 	{:else if data.user.role == 'school_admin'}
 		<h1 class="my-6 text-center text-3xl">{data.user?.name} Admin Panel</h1>
-		<SchooladminAdminPanelcopy />
+		<SchooladminAdminPanel />
 	{:else}{/if}
 	<!-- {#if users.selectedUser == 'UC'}
 		<h1 class="my-6 text-center text-3xl">{data.user?.name} Admin Panel</h1>

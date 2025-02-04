@@ -12,6 +12,7 @@ import { SERVER_ERROR_MESSAGES } from '$lib/constants.js';
 import { nanoid } from 'nanoid';
 import { setFlash } from 'sveltekit-flash-message/server';
 import { eq } from 'drizzle-orm';
+import { log } from 'console';
 
 export const load: PageServerLoad = async (event) => {
 	if (!event.locals.user) return redirect(302, '/auth/login');
@@ -69,7 +70,7 @@ export const actions: Actions = {
 		let inviteToken: string;
 
 		try {
-			console.log('create form trying... => ', form);
+			console.log('create form trying... ======================> ', form);
 			const result = await db.transaction(async (trx) => {
 				let schoolResult;
 				if (!form.data.isDistrict) {
@@ -84,22 +85,38 @@ export const actions: Actions = {
 					console.log('schoolResult => ', schoolResult);
 				}
 
+				let inviteData: {
+					id: string;
+					name: string;
+					email: string;
+					inviteType: 'district' | 'school';
+					inviter: string;
+					schoolId?: number;
+					districtId?: number;
+				} = {
+					id: nanoid(),
+					name: form.data.adminName,
+					email: form.data.adminEmail,
+					inviteType: form.data.isDistrict ? 'district' : 'school',
+					inviter: event.locals.user?.id ?? ''
+				};
 				// create invite here, use it in invite page to...
-				const [inviteRes] = await trx
-					.insert(table.userInvitesTable)
-					.values({
-						id: nanoid(),
-						name: form.data.adminName,
-						email: form.data.adminEmail,
-						inviteType: form.data.isDistrict ? 'district' : 'school',
-						inviter: event.locals.user?.id ?? '',
-						...(form.data.isDistrict && schoolResult
-							? { schoolId: schoolResult[0].id as number }
-							: { districtId: form.data.districtId })
-					})
-					.returning();
+				let inviteRes;
+				if (!form.data.isDistrict && schoolResult && schoolResult.length > 0) {
+					inviteRes = await trx
+						.insert(table.userInvitesTable)
+						.values({ ...inviteData, schoolId: schoolResult[0].id })
+						.returning();
+					inviteData.schoolId = schoolResult[0].id;
+				} else {
+					inviteRes = await trx
+						.insert(table.userInvitesTable)
+						.values({ ...inviteData, districtId: form.data.districtId })
+						.returning();
+					inviteData.districtId = form.data.districtId;
+				}
 				console.log('inviteRes => ', inviteRes);
-				inviteToken = createInviteToken(form.data.adminName, form.data.adminEmail, inviteRes.id);
+				inviteToken = createInviteToken(form.data.adminName, form.data.adminEmail, inviteRes[0].id);
 
 				if (!inviteRes) throw new Error('Failed to create invite');
 
@@ -112,18 +129,25 @@ export const actions: Actions = {
 						role: form.data.isDistrict ? 'district_admin' : 'school_admin'
 					})
 					.returning({ id: table.usersTable.id });
+				console.log('newUser => ', newUser);
 
 				if (!newUser) throw new Error('Failed to create user');
 
 				//associate user with school/district
+				let adminRes;
 				if (inviteRes.inviteType === 'school') {
-					await trx
+					console.log('adminRes school =============> ');
+
+					adminRes = await trx
 						.insert(table.schoolAdminsTable)
 						.values({ userId: newUser.id, schoolId: inviteRes.schoolId! });
+					console.log('adminRes => ', adminRes);
 				} else if (inviteRes.inviteType === 'district') {
-					await trx
+					console.log('adminRes district =============> ');
+					adminRes = await trx
 						.insert(table.districtAdminsTable)
 						.values({ userId: newUser.id, districtId: inviteRes.districtId! });
+					console.log('adminRes => ', adminRes);
 				}
 
 				return newUser;

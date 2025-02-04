@@ -2,7 +2,7 @@
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { eq, is } from 'drizzle-orm';
-import { redirect } from '@sveltejs/kit';
+import { redirect, type Actions } from '@sveltejs/kit';
 import { schools } from '$lib/data/data';
 
 export const load = async (event) => {
@@ -93,5 +93,16 @@ const getSchoolsForDistrictAdmin = async (userId: string) => {
 	} catch (error) {
 		const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
 		console.log('getSchoolsForDistrictAdmin error => ', errorMessage);
+	}
+};
+
+export const actions: Actions = {
+	default: async (event) => {
+		console.log('default event => ', event);
+		// if (!form.valid) {
+		// 	return message(form, 'Invalid form');
+		// }
+		console.log('form => ');
+		// return form;
 	}
 };

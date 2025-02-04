@@ -2,12 +2,12 @@
 	import * as Card from '$lib/components/ui/card';
 	import { LayoutGrid, List, PenTool, UserRoundPlus } from 'lucide-svelte';
 	const schoolAdminPanelAdminData = [
-		// {
-		// 	title: 'Create Organization',
-		// 	url: '/districts/create',
-		// 	description: 'Create organization and send email invitation to administrator.',
-		// 	icon: UserRoundPlus
-		// },
+		{
+			title: 'Invite a Co-Admin for your School',
+			url: '/schools/invite-coadmin',
+			description: 'Invite another admin to join your school.',
+			icon: UserRoundPlus
+		},
 		{
 			title: 'View Schools Dashboard',
 			url: '/schools',

@@ -1,7 +1,7 @@
 <script lang="ts">
 	/** @type {{ data: PageData }} */
 	import { page } from '$app/state';
-	import InviteUserByEmailForm from '$lib/components/forms/invite-user-by-email-form.svelte';
+	import InviteUserByEmailForm from '$lib/components/forms/super-invite-user-by-email-form.svelte';
 	import type { PageData } from './$types';
 	import * as Card from '$lib/components/ui/card';
 	import { decodeInviteToken, createInviteToken } from '$lib/utils';
@@ -24,7 +24,7 @@
 <p class="hidden">Invite Token => {token || 'TODO'}</p>
 <div class="grid h-full place-content-center">
 	<!-- <pre class="sizes">{JSON.stringify(pageIsEditing, null, 2)}</pre> -->
-	<Card.Root class="m-6 max-w-prose">
+	<Card.Root class="m-6 lg:lg:w-[65ch]">
 		<!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->
 		<Card.Content>
 			<HtmlEmailUserInviteForm bind:formisEditing={pageIsEditing} {data} {token} {page} />

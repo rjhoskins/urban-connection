@@ -17,6 +17,7 @@
 	let { formisEditing = $bindable(), data, token, page } = $props();
 
 	const thisForm = superForm(data.emailForm, {
+		dataType: 'json',
 		validators: zodClient(userInviteHTMLEmailTemplateSchema),
 		invalidateAll: false,
 		onSubmit: async ({ formData, cancel }) => {
@@ -56,7 +57,7 @@
 		<Card.Title>Edit Administrator Text</Card.Title>
 	</Card.Header>
 	<Card.Content>
-		<form class="flex flex-col gap-3" method="POST" action="?/email" use:emailEnhance>
+		<form class=" min-w-prose flex flex-col gap-3" method="POST" action="?/email" use:emailEnhance>
 			<!-- greeting -->
 			<Form.Field class="space-y-1" name="greeting" form={thisForm}>
 				<Form.Control>
@@ -94,7 +95,13 @@
 			</ul>
 
 			<!-- keyPoints -->
-			<Form.Field class=" space-y-1" form={thisForm} name="keyPoints">
+
+			<Form.Field class=" space-y-1" form={thisForm} name="keyPoints[]">
+				<input type="hidden" name="keyPoints[]" value={$emailForm.keyPoints} />
+
+				<Form.FieldErrors />
+			</Form.Field>
+			<Form.Field class=" space-y-1" form={thisForm} name="newKeyPoint">
 				<Form.Control>
 					{#snippet children({ props })}
 						<Form.Label class="">KeyPoints</Form.Label>
@@ -103,7 +110,6 @@
 							<Button
 								onclick={() => {
 									$emailForm.keyPoints = [...$emailForm.keyPoints, newKeyPoint];
-
 									newKeyPoint = '';
 								}}>Add</Button
 							>
@@ -135,14 +141,11 @@
 				<Form.FieldErrors />
 			</Form.Field>
 
-			<Form.Button>Save Email Changes</Form.Button>
+			<Form.Button type="submit" disabled={!$emailTainted}>Save Email Changes</Form.Button>
 
-			{#if $emailMessage}
-				<div class="message text-red-700">{$emailMessage}</div>
-			{/if}
-			{#if emailTainted}
-				<div class="message text-red-700">Form is dirty</div>
-			{/if}
+			<!-- {#if $emailTainted}
+				<div class="message text-red-700">Form has changed</div>
+			{/if} -->
 			<SuperDebug data={$emailForm} />
 		</form>
 

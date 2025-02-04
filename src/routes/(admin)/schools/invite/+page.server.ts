@@ -44,15 +44,14 @@ export const load: PageServerLoad = async ({ url }) => {
 	};
 };
 export const actions: Actions = {
-	default: async (event) => {
+	invite: async (event) => {
 		if (!event.locals.user) return redirect(302, '/auth/login');
 		const token = event.url.searchParams.get('inviteToken');
+		const form = await superValidate(event, zod(inviteNewUserSchema));
 		if (!token || !newUserTokenSchema.safeParse(decodeInviteToken(token)).success) {
 			return message(form, 'Invalid token', { status: 400 });
 		}
 		const { name, email, inviteId } = decodeInviteToken(token);
-
-		const form = await superValidate(event, zod(inviteNewUserSchema));
 
 		if (!form.valid) {
 			return message(form, 'Invalid form');

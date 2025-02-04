@@ -16,6 +16,7 @@
 	let { page, data, token } = $props();
 	const { name, email, inviteId } = decodeInviteToken(token);
 	const form = superForm(data.inviteForm, {
+		dataType: 'json',
 		validators: zodClient(inviteNewUserSchema)
 	});
 	const { form: formData, enhance, message } = form;
@@ -26,7 +27,7 @@
 	});
 </script>
 
-<form class="flex flex-col gap-3" method="POST" use:enhance>
+<form class="flex flex-col gap-3" method="POST" action="?/invite" use:enhance>
 	<!-- name -->
 	<Form.Field class="hidden space-y-0" {form} name="name">
 		<Form.Control>
@@ -49,7 +50,7 @@
 		<Form.FieldErrors />
 	</Form.Field>
 
-	<Form.Button class="m-2 ml-auto w-fit">Send Invite</Form.Button>
+	<Form.Button type="submit" class="m-2 ml-auto w-fit">Send Invite</Form.Button>
 
 	<SuperDebug data={$formData} />
 	{#if $message}

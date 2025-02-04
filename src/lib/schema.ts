@@ -72,7 +72,7 @@ export const createSchoolSchema = z
 		adminName: z
 			.string()
 			.nonempty({ message: 'admin name is required' })
-			.min(4, { message: 'admin name should be at least four characters' })
+			.min(3, { message: 'admin name should be at least three characters' })
 			.max(50, { message: 'admin name should be less than 50 characters' }),
 		adminEmail: z
 			.string()
