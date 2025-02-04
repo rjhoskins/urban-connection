@@ -1,6 +1,6 @@
 import { is, sql } from 'drizzle-orm';
 import type { AnyPgColumn } from 'drizzle-orm/pg-core';
-import { check, pgEnum, uniqueIndex } from 'drizzle-orm/pg-core';
+import { check, jsonb, pgEnum, uniqueIndex } from 'drizzle-orm/pg-core';
 import { pgTable, varchar, text, integer, timestamp, boolean } from 'drizzle-orm/pg-core';
 
 export const rolesEnum = pgEnum('roles', ['super_admin', 'district_admin', 'school_admin']);
@@ -18,7 +18,7 @@ export const usersTable = pgTable(
 		role: rolesEnum('role').default('school_admin'),
 		isActive: boolean('is_active').default(false),
 		createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
-		updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().notNull()
+		updatedAt: timestamp('updated_at', { mode: 'string' })
 	},
 	(table) => [
 		{
@@ -128,7 +128,7 @@ export const userInvitesTable = pgTable(
 		inviteText: text('invite_text'),
 
 		createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
-		updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().notNull()
+		updatedAt: timestamp('updated_at', { mode: 'string' })
 	},
 	(table) => [
 		{
@@ -140,6 +140,13 @@ export const userInvitesTable = pgTable(
 		}
 	]
 );
+
+export const htmlEmailTemplatesTable = pgTable('html_email_templates', {
+	id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
+	template: jsonb('template').notNull(), // html email template data
+	createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull()
+});
+
 export type Session = typeof sessionsTable.$inferSelect;
 
 export type User = typeof usersTable.$inferSelect;

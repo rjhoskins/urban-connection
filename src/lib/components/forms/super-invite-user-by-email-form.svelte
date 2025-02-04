@@ -24,6 +24,7 @@
 	$effect(() => {
 		$formData.name = name;
 		$formData.email = email;
+		$formData.inviteId = inviteId;
 	});
 </script>
 
@@ -45,6 +46,16 @@
 			{#snippet children({ props })}
 				<Form.Label class="sr-only">Admin Email</Form.Label>
 				<Input type="hidden" {...props} bind:value={$formData.email} />
+			{/snippet}
+		</Form.Control>
+		<Form.FieldErrors />
+	</Form.Field>
+	<!-- inviteId -->
+	<Form.Field class="hidden space-y-0" {form} name="inviteId">
+		<Form.Control>
+			{#snippet children({ props })}
+				<Form.Label class="sr-only">Admin InviteId</Form.Label>
+				<Input type="hidden" {...props} bind:value={$formData.inviteId} />
 			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />

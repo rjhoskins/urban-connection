@@ -1,6 +1,7 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { nanoid } from 'nanoid';
+import type { UserInviteHTMLEmailTemplateType } from './schema';
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -25,7 +26,7 @@ export function handleTypeSafeError(error: unknown, message: any, form: any) {
 export function generateUserId() {
 	return nanoid(16);
 }
-export function generateNewUserInviteEmail(emailJSON) {
+export function generateNewUserInviteEmail(htmlEmailContent: UserInviteHTMLEmailTemplateType) {
 	return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -57,27 +58,25 @@ export function generateNewUserInviteEmail(emailJSON) {
                 <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);">
                     <tr>
                         <td class="content-block" style="padding: 24px;">
-                            <p style="margin-bottom: 16px;">Dear Administrator,</p>
+                            <p style="margin-bottom: 16px;">${htmlEmailContent.greeting}</p>
                             
-                            <p style="margin-bottom: 16px;">The Urban Connection Project defines Cultural Responsiveness as the bridge between people built by the infusion of cultural experiences necessary to:</p>
+                            <p style="margin-bottom: 16px;">${htmlEmailContent.definition}</p>
                             
                             <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
-                                <tr>
-                                    <td style="padding: 0 0 8px 24px;">• implement systems of accountability</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 0 0 8px 24px;">• cultivate necessary relationships</td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 0 0 16px 24px;">• ensure content acquisition (education)</td>
-                                </tr>
+                                ${htmlEmailContent.keyPoints
+																	.map(
+																		(point) => `     <tr>
+                                    <td style="padding: 0 0 8px 24px;">• ${point}</td>
+                                </tr>`
+																	)
+																	.join('')} 
                             </table>
                             
-                            <p style="margin-bottom: 16px;">We are happy to partner with you!</p>
+                            <p style="margin-bottom: 16px;">${htmlEmailContent.closing}</p>
                             
-                            <p style="margin-bottom: 16px;">Please register to access your organization 
+                            <p style="margin-bottom: 16px;">${htmlEmailContent.callToAction}
                                 <a href="/auth/register?inviteToken=TXIgYm9ifGV4YW1wbGVAZXhhbXBsZS5jb3x1bmRlZmluZWQ=" 
-                                   style="color: #1d4ed8; text-decoration: underline; font-size: 18px;">here</a>
+                                   style="color: #1d4ed8; text-decoration: underline; font-size: 18px;">${htmlEmailContent.registrationLinkText}</a>
                             </p>
                         </td>
                     </tr>

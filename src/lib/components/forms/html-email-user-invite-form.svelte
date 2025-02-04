@@ -5,7 +5,6 @@
 	import * as Form from '$lib/components/ui/form/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
-
 	import * as Card from '$lib/components/ui/card';
 	import { userInviteHTMLEmailTemplateSchema } from '$lib/schema.js';
 	import { decodeInviteToken } from '$lib/utils';
@@ -14,7 +13,7 @@
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import HtmlEmailTextPreview from '../html-email-text-preview.svelte';
 
-	let { formisEditing = $bindable(), data, token, page } = $props();
+	let { formisEditing = $bindable(), data, token, page, initialTemplateData } = $props();
 
 	const thisForm = superForm(data.emailForm, {
 		dataType: 'json',
@@ -129,6 +128,16 @@
 				</Form.Control>
 				<Form.FieldErrors />
 			</Form.Field>
+			<!-- closing -->
+			<Form.Field class=" space-y-1" form={thisForm} name="callToAction">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label class="">Call To Action</Form.Label>
+						<Input type="text" {...props} bind:value={$emailForm.callToAction} />
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
 
 			<!-- registrationLink -->
 			<Form.Field class="space-y-1" form={thisForm} name="registrationLinkText">
@@ -146,7 +155,7 @@
 			<!-- {#if $emailTainted}
 				<div class="message text-red-700">Form has changed</div>
 			{/if} -->
-			<SuperDebug data={$emailForm} />
+			<!-- <SuperDebug data={$emailForm} /> -->
 		</form>
 
 		<!-- END editor -->

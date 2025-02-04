@@ -1,9 +1,10 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import * as Card from '$lib/components/ui/card';
 	let { data, page, token } = $props();
 </script>
 
-{#if data}
+{#if data && browser}
 	<Card.Header class="Header">
 		<!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->
 		<Card.Title>Invite Administrator Text Preview</Card.Title>
@@ -18,11 +19,12 @@
 				<li>{keyPoint}</li>
 			{/each}
 		</ul>
+		<p>{data.closing}</p>
 
 		<p>
 			{data.callToAction}
 			<a
-				href={`${page.url}/auth/register?inviteToken=${token}`}
+				href={`${window.location.origin}/auth/register?inviteToken=${token}`}
 				class=" text-lg text-blue-700 underline">{data.registrationLinkText}</a
 			>
 		</p>

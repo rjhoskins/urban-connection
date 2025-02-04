@@ -30,8 +30,7 @@ export const createNewUserFromInviteSchema = z
 			.string()
 			.nonempty({ message: 'password is required' })
 			.min(4, { message: 'password should be at least four characters' })
-			.max(50, { message: 'password should be less than 50 characters' }),
-		emailTemplateJSON: z.string().optional()
+			.max(50, { message: 'password should be less than 50 characters' })
 	})
 
 	.refine((data) => data.password === data.confirm, {
@@ -46,19 +45,19 @@ export const newUserTokenSchema = z.object({
 });
 export const inviteNewUserSchema = z.object({
 	name: z.string(),
-	email: z.string()
-	// inviteText: z.string(),
+	inviteId: z.string(),
+	email: z.string().email({ message: 'invalid email' })
 });
 export const userInviteHTMLEmailTemplateSchema = z.object({
-	greeting: z.string(),
-	definition: z.string(),
+	greeting: z.string().nonempty({ message: 'Greeting text is required' }),
+	definition: z.string().nonempty({ message: 'Definition text is required' }),
 	keyPoints: z
 		.array(z.string())
-		.min(2, { message: 'at least two key point(s) are required' })
-		.max(8, { message: 'no more than eight key points are allowed' }),
-	closing: z.string(),
-	callToAction: z.string(),
-	registrationLinkText: z.string()
+		.min(2, { message: 'At least two key point(s) are required' })
+		.max(8, { message: 'No more than eight key points are allowed' }),
+	closing: z.string().nonempty({ message: 'Closingtext is required' }),
+	callToAction: z.string().nonempty({ message: 'call To Action text is required' }),
+	registrationLinkText: z.string().nonempty({ message: 'Link text text is required' })
 });
 
 export const createSchoolSchema = z
@@ -145,7 +144,8 @@ export const createSchoolSchema = z
 const UserRoleSchema = z.enum(['Master', 'District', 'School_Admin']);
 
 type UserRole = z.infer<typeof UserRoleSchema>;
-// type CreateSchoolSchemaFormSchema = z.infer<typeof createSchoolSchema>;
+export type UserInviteHTMLEmailTemplateType = z.infer<typeof userInviteHTMLEmailTemplateSchema>;
+// export type CreateSchoolSchemaFormSchema = typeof createSchoolSchema;
 // export type CreateSchoolSchemaFormSchema = typeof createSchoolSchema;
 
 export const themes = ['light', 'dark'] as const;

@@ -11,7 +11,7 @@ import { createInviteToken, generateUserId } from '$lib/utils';
 import { SERVER_ERROR_MESSAGES } from '$lib/constants.js';
 import { nanoid } from 'nanoid';
 import { setFlash } from 'sveltekit-flash-message/server';
-import { eq } from 'drizzle-orm';
+import { desc, eq } from 'drizzle-orm';
 
 export const load: PageServerLoad = async (event) => {
 	if (!event.locals.user) return redirect(302, '/auth/login');
@@ -21,10 +21,8 @@ export const load: PageServerLoad = async (event) => {
 	async function getDistricts() {
 		return await db.select().from(table.districtsTable);
 	}
-	// console.log('PageServerLoad ======================================================>');
 
 	const form = await superValidate(zod(createSchoolSchema));
-	// console.log('form => ', form);
 
 	// Always return { form } in load functions https://superforms.rocks/faq#why-do-i-need-to-call-supervalidate-in-the-load-function
 
