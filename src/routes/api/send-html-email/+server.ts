@@ -22,24 +22,22 @@ export const POST: RequestHandler = async () => {
 		}
 	});
 
-	async function main() {
-		const [htmlTemplate] = await getLatestHtmlTemplateData();
-		// send mail with defined transport object
-		const info = await transporter.sendMail({
-			from: '"Maddison Foo Koch 👻" <maddison53@ethereal.email>', // sender address
-			to: 'bar@example.com, baz@example.com', // list of receivers
-			subject: 'Hello ✔', // Subject line
-			text: 'Hello world?', // plain text body
-			html: generateNewUserInviteEmail(htmlTemplate.template) // html body
-		});
-
-		console.log('Message sent: %s', info.messageId);
-		// Message sent: <d786aa62-4e0a-070a-47ed-0b0666549519@ethereal.email>
-	}
-
-	main().catch(console.error);
-
-	return new Response();
+	const sendEmail = async (to: string, subject: string, text: string) => {
+		try {
+			const [htmlTemplate] = await getLatestHtmlTemplateData();
+			const info = await transporter.sendMail({
+				from: '"Maddison Foo Koch 👻" <maddison53@ethereal.email>', // sender address
+				to: 'bar@example.com, baz@example.com', // list of receivers
+				subject: 'Hello ✔', // Subject line
+				text: 'Hello world?', // plain text body
+				html: generateNewUserInviteEmail(htmlTemplate.template) // html body
+			});
+			console.log('Email sent: ' + info.response);
+		} catch (error) {
+			console.error('Error sending email: ', error);
+		}
+	};
+	await sendEmail();
 };
 async function getLatestHtmlTemplateData() {
 	return await db
