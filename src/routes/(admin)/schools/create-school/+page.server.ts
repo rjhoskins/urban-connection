@@ -12,7 +12,6 @@ import { SERVER_ERROR_MESSAGES } from '$lib/constants.js';
 import { nanoid } from 'nanoid';
 import { setFlash } from 'sveltekit-flash-message/server';
 import { eq } from 'drizzle-orm';
-import { log } from 'console';
 
 export const load: PageServerLoad = async (event) => {
 	if (!event.locals.user) return redirect(302, '/auth/login');
@@ -67,7 +66,7 @@ export const actions: Actions = {
 			return message(form, 'User already exists, please contact your administrator');
 		}
 
-		let inviteToken: string;
+		let inviteToken: string = '';
 
 		try {
 			console.log('create form trying... ======================> ', form);
@@ -162,6 +161,5 @@ export const actions: Actions = {
 		console.log('inviteToken => ', inviteToken);
 
 		redirect(303, `/schools/invite?inviteToken=${inviteToken}`);
-		return redirect(302, '/');
 	}
 };

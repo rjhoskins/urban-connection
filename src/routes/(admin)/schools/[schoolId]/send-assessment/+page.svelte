@@ -1,8 +1,5 @@
 <script lang="ts">
 	/** @type {{ data: PageData }} */
-	import { page } from '$app/state';
-	import InviteUserByEmailForm from '$lib/components/forms/invite-user-by-email-form.svelte';
-	import type { PageData } from './$types';
 	import * as Card from '$lib/components/ui/card';
 	import { decodeInviteToken, createInviteToken } from '$lib/utils';
 	import Dialog from '$lib/components/dialog.svelte';

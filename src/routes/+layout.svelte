@@ -7,7 +7,7 @@
 	import { initFlash } from 'sveltekit-flash-message';
 
 	const flash = initFlash(page, {
-		clearAfterMs: 5000
+		clearAfterMs: 10000
 	});
 	$effect(() => {
 		if ($flash) {

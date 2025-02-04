@@ -124,8 +124,16 @@ export const actions: Actions = {
 			console.log('error => ', form, 'Unexpected error: ' + errorMessage);
 		}
 
-		setFlash({ type: 'success', message: 'Invite successfully created' }, event.cookies);
-		console.log('register => ', `/auth/register?inviteToken=${inviteToken}`);
+		const registerLink = `/auth/register?inviteToken=${inviteToken}`;
+		setFlash(
+			{
+				type: 'success',
+				message: `Invite successfully created \n  ${registerLink}`
+			},
+			event.cookies
+		);
+
+		console.log('register =>', `/auth/register?inviteToken=${inviteToken}`);
 
 		return redirect(302, '/');
 	}
