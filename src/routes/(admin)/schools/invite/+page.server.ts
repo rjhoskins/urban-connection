@@ -18,7 +18,6 @@ import { setFlash } from 'sveltekit-flash-message/server';
 import { INITIAL_HTML_DATA } from '$lib/constants.js';
 
 export const load: PageServerLoad = async ({ url }) => {
-	console.log('url ===========================================> ');
 	const token = url.searchParams.get('inviteToken');
 	console.log('token => ', token);
 	async function getLatestHtmlTemplateData() {
@@ -58,6 +57,15 @@ export const actions: Actions = {
 		}
 
 		try {
+			const [htmlTemplate] = await db
+				.select({ template: table.htmlEmailTemplatesTable.template })
+				.from(table.htmlEmailTemplatesTable)
+				.orderBy(
+					desc(table.htmlEmailTemplatesTable.createdAt),
+					desc(table.htmlEmailTemplatesTable.id)
+				)
+				.limit(1);
+
 			// const [inviteRes] = await db
 			// 	.update(table.userInvitesTable)
 			// 	.set({ isSent: true })
@@ -70,7 +78,16 @@ export const actions: Actions = {
 			// 	);
 			// if (!inviteRes) throw new Error('Invite not found');
 			event.fetch('/api/send-html-email', {
-				method: 'POST'
+				method: 'POST',
+				headers: {
+					'content-type': 'application/json'
+				},
+				body: JSON.stringify({
+					to: form.data.email,
+					subject: 'You have been invited to join the platform',
+					inviteLink: `${event.url.origin}/auth/register?inviteToken=${createInviteToken(form.data.name, form.data.email, form.data.inviteId)}`,
+					htmlEmailContent: htmlTemplate.template
+				})
 			});
 			throw new Error('testing...');
 		} catch (error) {

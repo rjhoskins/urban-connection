@@ -26,7 +26,10 @@ export function handleTypeSafeError(error: unknown, message: any, form: any) {
 export function generateUserId() {
 	return nanoid(16);
 }
-export function generateNewUserInviteEmail(htmlEmailContent: UserInviteHTMLEmailTemplateType) {
+export function generateNewUserInviteEmail(
+	htmlEmailContent: UserInviteHTMLEmailTemplateType,
+	inviteLink: string
+) {
 	return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -75,7 +78,7 @@ export function generateNewUserInviteEmail(htmlEmailContent: UserInviteHTMLEmail
                             <p style="margin-bottom: 16px;">${htmlEmailContent.closing}</p>
                             
                             <p style="margin-bottom: 16px;">${htmlEmailContent.callToAction}
-                                <a href="/auth/register?inviteToken=TXIgYm9ifGV4YW1wbGVAZXhhbXBsZS5jb3x1bmRlZmluZWQ=" 
+                                <a href=${inviteLink} 
                                    style="color: #1d4ed8; text-decoration: underline; font-size: 18px;">${htmlEmailContent.registrationLinkText}</a>
                             </p>
                         </td>

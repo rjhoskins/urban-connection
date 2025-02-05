@@ -6,13 +6,15 @@ import { generateNewUserInviteEmail } from '$lib/utils';
 import { db } from '$lib/server/db';
 import { desc } from 'drizzle-orm';
 import * as table from '$lib/server/db/schema';
+import { stat } from 'fs';
 
 export const GET: RequestHandler = async () => {
 	console.log('GET /api/send-html-email===========================================> ');
-	return json({ message: 'GET /api/send-html-email' });
+	return json({ message: 'GET /api/send-html-email', 'application/json': '' });
 };
 
-export const POST: RequestHandler = async () => {
+export const POST: RequestHandler = async (event) => {
+	const res = await event.request.json();
 	const transporter = nodemailer.createTransport({
 		host: 'sandbox.smtp.mailtrap.io',
 		port: 2525,
@@ -22,27 +24,30 @@ export const POST: RequestHandler = async () => {
 		}
 	});
 
-	const sendEmail = async (to: string, subject: string, text: string) => {
+	const sendEmail = async ({
+		to,
+		subject,
+		inviteLink,
+		htmlEmailContent
+	}: {
+		to: string;
+		subject: string;
+		inviteLink: string;
+		htmlEmailContent: any;
+	}) => {
 		try {
-			const [htmlTemplate] = await getLatestHtmlTemplateData();
 			const info = await transporter.sendMail({
 				from: '"Maddison Foo Koch 👻" <maddison53@ethereal.email>', // sender address
-				to: 'bar@example.com, baz@example.com', // list of receivers
-				subject: 'Hello ✔', // Subject line
+				to: `bar@example.com, baz@example.com ${to}`, // list of receivers
+				subject: `Hello ✔ ${subject}`, // Subject line
 				text: 'Hello world?', // plain text body
-				html: generateNewUserInviteEmail(htmlTemplate.template) // html body
+				html: generateNewUserInviteEmail(htmlEmailContent, inviteLink) // html body
 			});
 			console.log('Email sent: ' + info.response);
 		} catch (error) {
 			console.error('Error sending email: ', error);
 		}
 	};
-	await sendEmail();
+	await sendEmail({ ...res });
+	return json({ status: 'success', message: 'Email sent' });
 };
-async function getLatestHtmlTemplateData() {
-	return await db
-		.select({ template: table.htmlEmailTemplatesTable.template })
-		.from(table.htmlEmailTemplatesTable)
-		.orderBy(desc(table.htmlEmailTemplatesTable.createdAt), desc(table.htmlEmailTemplatesTable.id))
-		.limit(1);
-}
