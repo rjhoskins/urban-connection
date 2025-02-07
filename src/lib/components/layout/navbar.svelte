@@ -3,6 +3,8 @@
 	import { page } from '$app/state';
 
 	const Links = [
+		{ name: 'testing', href: '/test' },
+		// { name: 'wip quiz', href: '/urban-connection-project-assessment' },
 		{ name: 'Home', href: '/' },
 		{ name: 'Contact Us', href: '/contact-us' }
 	];
