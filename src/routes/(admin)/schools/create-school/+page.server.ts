@@ -135,15 +135,17 @@ export const actions: Actions = {
 				if (inviteRes[0].inviteType === 'school') {
 					adminRes = await trx
 						.insert(table.schoolAdminsTable)
-						.values({ userId: newUser.id, schoolId: inviteRes[0].schoolId! });
-					console.log('schooladminRes => ', adminRes[0]);
+						.values({ userId: newUser.id, schoolId: inviteRes[0].schoolId! })
+						.returning({ id: table.schoolAdminsTable.id });
+					console.log(`school adminRes=> `, adminRes[0]);
 				} else if (inviteRes[0].inviteType === 'district') {
 					adminRes = await trx
 						.insert(table.districtAdminsTable)
-						.values({ userId: newUser.id, districtId: inviteRes[0].districtId! });
+						.values({ userId: newUser.id, districtId: inviteRes[0].districtId! })
+						.returning({ id: table.districtAdminsTable.id });
 					console.log('district adminRes => ', adminRes[0]);
 				}
-				if (!adminRes || !adminRes[0]) throw new Error('Failed to associate admin');
+				if (!adminRes || !adminRes[0].id) throw new Error('Failed to associate admin');
 
 				return newUser;
 			});
@@ -155,7 +157,6 @@ export const actions: Actions = {
 
 		setFlash({ type: 'success', message: 'School successfully created' }, event.cookies);
 		console.log('inviteToken => ', inviteToken);
-
 		redirect(303, `/schools/invite?inviteToken=${inviteToken}`);
 	}
 };
