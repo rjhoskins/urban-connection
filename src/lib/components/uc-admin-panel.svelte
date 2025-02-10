@@ -9,6 +9,13 @@
 			description: 'Create organization and send email invitation to administrator.',
 			icon: UserRoundPlus
 		},
+
+		{
+			title: 'Manage Districts',
+			url: '/districts',
+			description: 'View the details for all districts',
+			icon: LayoutGrid
+		},
 		{
 			title: 'Manage Schools',
 			url: '/schools',
