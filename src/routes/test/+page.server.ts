@@ -1,22 +1,10 @@
 import * as db from '$lib/server/database.js';
 
-export function load({ cookies }) {
-	let id = cookies.get('userid');
-
-	if (!id) {
-		id = crypto.randomUUID();
-		cookies.set('userid', id, { path: '/' });
-	}
-
-	return {
-		todos: db.getTodos(id)
-	};
-}
+export function load({ cookies }) {}
 
 export const actions = {
 	default: async ({ cookies, request }) => {
 		const data = await request.formData();
 		console.log('data => ', data);
-		db.createTodo(cookies.get('userid'), data.get('description'));
 	}
 };
