@@ -132,20 +132,18 @@ export const actions: Actions = {
 
 				//associate user with school/district
 				let adminRes;
-				if (inviteRes.inviteType === 'school') {
-					console.log('adminRes school =============> ');
-
+				if (inviteRes[0].inviteType === 'school') {
 					adminRes = await trx
 						.insert(table.schoolAdminsTable)
-						.values({ userId: newUser.id, schoolId: inviteRes.schoolId! });
-					console.log('adminRes => ', adminRes);
-				} else if (inviteRes.inviteType === 'district') {
-					console.log('adminRes district =============> ');
+						.values({ userId: newUser.id, schoolId: inviteRes[0].schoolId! });
+					console.log('schooladminRes => ', adminRes[0]);
+				} else if (inviteRes[0].inviteType === 'district') {
 					adminRes = await trx
 						.insert(table.districtAdminsTable)
-						.values({ userId: newUser.id, districtId: inviteRes.districtId! });
-					console.log('adminRes => ', adminRes);
+						.values({ userId: newUser.id, districtId: inviteRes[0].districtId! });
+					console.log('district adminRes => ', adminRes[0]);
 				}
+				if (!adminRes || !adminRes[0]) throw new Error('Failed to associate admin');
 
 				return newUser;
 			});

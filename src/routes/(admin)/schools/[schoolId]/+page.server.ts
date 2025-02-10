@@ -16,6 +16,7 @@ export const load = async (event) => {
 		return null;
 	};
 	if (event.locals.user && event.locals.user.role === 'school_admin') {
+		console.log('school_admin user =======================> ');
 		const userId = event.locals.user.id;
 		if (userId) {
 			dataFunc = () => getSchoolForSchoolAdmin(userId, Number(event.params.schoolId));
@@ -127,12 +128,12 @@ const getSchoolAdmin = async (schoolId: number) => {
 	const [res] = await db
 		.select({
 			adminName: table.usersTable.name,
-			adminEmail: table.usersTable.username
+			adminEmail: table.usersTable.username,
+			schoolId: table.schoolAdminsTable.id
 		})
 		.from(table.schoolAdminsTable)
 		.innerJoin(table.usersTable, eq(table.schoolAdminsTable.userId, table.usersTable.id))
-		.innerJoin(table.schoolsTable, eq(table.schoolAdminsTable.schoolId, table.schoolsTable.id))
-		.where(eq(table.schoolsTable.id, schoolId));
+		.where(eq(table.schoolAdminsTable.schoolId, schoolId));
 
 	console.log('getSchoolAdmin res => ', res);
 	return res;
