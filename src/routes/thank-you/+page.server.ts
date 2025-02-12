@@ -6,6 +6,5 @@ export const actions = {
 	default: async ({ cookies, request }) => {
 		const data = await request.formData();
 		console.log('data => ', data);
-		return { success: true, formData: JSON.stringify(data) };
 	}
 };
