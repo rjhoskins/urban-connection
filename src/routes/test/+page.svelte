@@ -71,94 +71,7 @@
 		TESTING!!! |{formData[currDomain].name} |
 		{formData[currDomain].subDomains[currSubDomain].name}
 	</h2>
-	<!-- <Card class="p-4 shadow-2xl">
-		<div class=" grid grid-cols-1 grid-rows-1 place-content-center gap-8">
-			{#each formData[0] as { name: domainName, subDomains }, domainIdx (domainName)}
-				<div class="sizes col-start-1 row-start-1">
-					<ul class="sizes grid grid-cols-1 grid-rows-1 place-content-center">
-						{#each subDomains[0] as { name: subDomainName, descriptors, description }, subDomainIdx (subDomainName)}
-							<li class=" sizes col-start-1 row-start-1 border-b border-gray-200 p-4">
-								<h3 class="pb-2 text-center text-2xl font-bold">Domain: {domainName}</h3>
-								<p class="pb-1 text-xl font-bold">Sub-domain: {subDomainName}</p>
-								<p class="py-2 text-gray-600">{description}</p>
-								<div class="flex gap-4">
-									<div class="aspect-w-16 aspect-h-9">
-										{@html '<iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ?si=6nBY3o9cLboe4jEd" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>'}
-									</div>
-									<div class="right">
-										<ul class="">
-											<form
-												method="POST"
-												id={formData[domainIdx].subDomains[subDomainIdx].name}
-												class=" flex flex-col gap-2"
-												use:enhance={({ formElement, formData, action, cancel }) => {
-													// console.log('formElement', formElement);
-													console.log('formData', formData);
-													return async ({ result, update }) => {
-														update({ reset: false });
-														console.log('result', result);
-													};
-												}}
-											>
-												{#each descriptors as descriptor, descriptorIdx (descriptorIdx)}
-													<li class="flex">
-														<div class="flex flex-col gap-1.5">
-															<p>
-																{formData[domainIdx].subDomains[subDomainIdx].descriptors[
-																	descriptorIdx
-																].text}
-															</p>
-															<label
-																class="align-middlex flex cursor-pointer items-center space-x-2"
-															>
-																<input
-																	type="radio"
-																	name={formData[domainIdx].subDomains[subDomainIdx].descriptors[
-																		descriptorIdx
-																	].id}
-																	bind:group={formData[domainIdx].subDomains[subDomainIdx]
-																		.descriptors[descriptorIdx].value}
-																	value={true}
-																	class="h-4 w-4 border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
-																/>
-																<span class="text-gray-700">Yes</span>
-															</label>
-															<label class="flex cursor-pointer items-center space-x-2">
-																<input
-																	type="radio"
-																	name={formData[domainIdx].subDomains[subDomainIdx].descriptors[
-																		descriptorIdx
-																	].id}
-																	bind:group={formData[domainIdx].subDomains[subDomainIdx]
-																		.descriptors[descriptorIdx].value}
-																	value={false}
-																	class="h-4 w-4 border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
-																/>
-																<span class="text-gray-700">No</span>
-															</label>
-														</div>
-													</li>
-												{/each}
-												<div class="flex justify-between pt-2">
-													<Button class="  w-fit">Previous</Button>
-													<Button class="  w-fit" type="submit"
-														>{formData.length === domainIdx + 1 &&
-														formData[domainIdx].subDomains.length == subDomainIdx + 1
-															? 'Finish'
-															: 'Next'}</Button
-													>
-												</div>
-											</form>
-										</ul>
-									</div>
-								</div>
-							</li>
-						{/each}
-					</ul>
-				</div>
-			{/each}
-		</div>
-	</Card> -->
+
 	<Card class="p-4 shadow-2xl">
 		<div class="flex gap-4">
 			<div class="aspect-w-16 aspect-h-9">
@@ -178,6 +91,10 @@
 								console.log('action', action);
 								console.log('formElement', formElement);
 								console.log('result', result);
+								if (result.type === 'success') {
+									console.log('Success');
+									next();
+								}
 							};
 						}}
 					>
@@ -226,9 +143,14 @@
 								class="w-fit">Previous</Button
 							>
 							{#if isLastQuestion}
-								<Button type="submit" onclick={() => handleFinish()} class="w-fit">Finish</Button>
+								<Button
+									type="submit"
+									formaction="?/finish"
+									onclick={() => handleFinish()}
+									class="w-fit">Finish</Button
+								>
 							{:else}
-								<Button type="submit" onclick={() => next()} class="w-fit">Next</Button>
+								<Button type="submit" formaction="?/submit" class="w-fit">Next</Button>
 							{/if}
 						</div>
 					</form>
@@ -236,90 +158,4 @@
 			</div>
 		</div>
 	</Card>
-	<!-- <Card class="p-4 shadow-2xl">
-		<div class=" grid grid-cols-1 grid-rows-1 place-content-center gap-8">
-			{#each formData as { name: domainName, subDomains }, domainIdx (domainName)}
-				<div class="sizes col-start-1 row-start-1">
-					<ul class="sizes grid grid-cols-1 grid-rows-1 place-content-center">
-						{#each subDomains as { name: subDomainName, descriptors, description }, subDomainIdx (subDomainName)}
-							<li class=" sizes col-start-1 row-start-1 border-b border-gray-200 p-4">
-								<h3 class="pb-2 text-center text-2xl font-bold">Domain: {domainName}</h3>
-								<p class="pb-1 text-xl font-bold">Sub-domain: {subDomainName}</p>
-								<p class="py-2 text-gray-600">{description}</p>
-								<div class="flex gap-4">
-				
-									<div class="right">
-										<ul class="">
-											<form
-												method="POST"
-												id={formData[currDomain].subDomains[currSubDomain].name}
-												class=" flex flex-col gap-2"
-												use:enhance={({ formElement, formData, action, cancel }) => {
-													// console.log('formElement', formElement);
-													console.log('formData', formData);
-													return async ({ result, update }) => {
-														update({ reset: false });
-														console.log('result', result);
-													};
-												}}
-											>
-												{#each descriptors as descriptor, descriptorIdx (descriptorIdx)}
-													<li class="flex">
-														<div class="flex flex-col gap-1.5">
-															<p>
-																{formData[domainIdx].subDomains[subDomainIdx].descriptors[
-																	descriptorIdx
-																].text}
-															</p>
-															<label
-																class="align-middlex flex cursor-pointer items-center space-x-2"
-															>
-																<input
-																	type="radio"
-																	name={formData[domainIdx].subDomains[subDomainIdx].descriptors[
-																		descriptorIdx
-																	].id}
-																	bind:group={formData[domainIdx].subDomains[subDomainIdx]
-																		.descriptors[descriptorIdx].value}
-																	value={true}
-																	class="h-4 w-4 border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
-																/>
-																<span class="text-gray-700">Yes</span>
-															</label>
-															<label class="flex cursor-pointer items-center space-x-2">
-																<input
-																	type="radio"
-																	name={formData[domainIdx].subDomains[subDomainIdx].descriptors[
-																		descriptorIdx
-																	].id}
-																	bind:group={formData[domainIdx].subDomains[subDomainIdx]
-																		.descriptors[descriptorIdx].value}
-																	value={false}
-																	class="h-4 w-4 border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
-																/>
-																<span class="text-gray-700">No</span>
-															</label>
-														</div>
-													</li>
-												{/each}
-												<div class="flex justify-between pt-2">
-													<Button class="  w-fit">Previous</Button>
-													<Button class="  w-fit" type="submit"
-														>{formData.length === domainIdx + 1 &&
-														formData[domainIdx].subDomains.length == subDomainIdx + 1
-															? 'Finish'
-															: 'Next'}</Button
-													>
-												</div>
-											</form>
-										</ul>
-									</div>
-								</div>
-							</li>
-						{/each}
-					</ul>
-				</div>
-			{/each}
-		</div>
-	</Card> -->
 </section>
