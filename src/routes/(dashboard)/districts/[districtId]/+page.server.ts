@@ -6,7 +6,7 @@ import type { PageServerLoad } from './$types';
 export const load = (async (event) => {
 	return {
 		district: await getDistrictWithSchools(parseInt(event.params.districtId)),
-		admin: await getDistrictAdmin(parseInt(event.params.districtId))
+		adminData: await getDistrictAdmin(parseInt(event.params.districtId))
 	};
 }) satisfies PageServerLoad;
 
