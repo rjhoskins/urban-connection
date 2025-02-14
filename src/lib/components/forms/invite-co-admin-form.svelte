@@ -56,6 +56,16 @@
 				</Form.Control>
 				<Form.FieldErrors />
 			</Form.Field>
+			<!-- email -->
+			<Form.Field class=" space-y-0" {form} name="phone">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label class="">Co-Admin Phone</Form.Label>
+						<Input type="" {...props} bind:value={$formData.phone} />
+					{/snippet}
+				</Form.Control>
+				<Form.FieldErrors />
+			</Form.Field>
 
 			<Form.Button type="submit" class="m-2 ml-auto w-fit">Send Invite</Form.Button>
 

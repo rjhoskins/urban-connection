@@ -123,7 +123,8 @@ export const actions: Actions = {
 						id: generateUserId(),
 						username: form.data.adminEmail,
 						name: form.data.adminName,
-						role: form.data.isDistrict ? 'district_admin' : 'school_admin'
+						role: form.data.isDistrict ? 'district_admin' : 'school_admin',
+						phone: form.data.adminPhone
 					})
 					.returning({ id: table.usersTable.id });
 				console.log('newUser => ', newUser);

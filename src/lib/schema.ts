@@ -46,7 +46,8 @@ export const newUserTokenSchema = z.object({
 export const inviteNewUserSchema = z.object({
 	name: z.string(),
 	inviteId: z.string(),
-	email: z.string().email({ message: 'invalid email' })
+	email: z.string().email({ message: 'invalid email' }),
+	phone: z.string().optional()
 });
 export const userInviteHTMLEmailTemplateSchema = z.object({
 	greeting: z.string().nonempty({ message: 'Greeting text is required' }),
@@ -77,8 +78,8 @@ export const createSchoolSchema = z
 			.string()
 			.email({ message: 'invalid email' })
 			.nonempty({ message: 'admin email is required, should be a school email' })
-			.min(4, { message: 'admin email should be at least four characters' })
-			.max(50, { message: 'admin email should be less than 50 characters' })
+			.min(4, { message: 'admin email should be at least four characters' }),
+		adminPhone: z.string().optional()
 	})
 	.superRefine((data, ctx) => {
 		if (data.isDistrict && !data.name) {

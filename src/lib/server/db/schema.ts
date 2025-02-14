@@ -12,6 +12,7 @@ export const usersTable = pgTable(
 		id: text('id').primaryKey().notNull(),
 		// age: integer('age'),
 		name: text('name'), // user supplied name
+		phone: text('phone'),
 		username: text('username').notNull().unique(), // email-based username
 		passwordHash: text('password_hash'),
 		// email: varchar('email').notNull().unique(),
@@ -118,7 +119,7 @@ export const userInvitesTable = pgTable(
 		//	.notNull(), // user who created the invite
 		expiration: timestamp('expiration', { mode: 'string' })
 			.notNull()
-			.default(sql`NOW() + INTERVAL '72 hours'`),
+			.default(sql`NOW() + INTERVAL '10 days'`),
 		isUsed: boolean('is_used').default(false),
 		role: rolesEnum('role').default('school_admin'),
 

@@ -79,7 +79,7 @@
 				<Form.Field {form} name="name">
 					<Form.Control>
 						{#snippet children({ props })}
-							<Form.Label>School Name</Form.Label>
+							<Form.Label>School Name *</Form.Label>
 							<Input {...props} bind:value={$formData.name} />
 						{/snippet}
 					</Form.Control>
@@ -90,7 +90,7 @@
 			<Form.Field {form} name="districtId">
 				<Form.Control>
 					{#snippet children({ props }: { props: any })}
-						<Form.Label>District</Form.Label>
+						<Form.Label>District *</Form.Label>
 						<Select.Root type="single" name={props.name} bind:value={$formData.districtId}>
 							<Select.Trigger class="">
 								{$formData.districtId == 0
@@ -114,7 +114,7 @@
 			<Form.Field {form} name="adminName">
 				<Form.Control>
 					{#snippet children({ props })}
-						<Form.Label>Admin Name</Form.Label>
+						<Form.Label>Admin Name *</Form.Label>
 						<Input {...props} bind:value={$formData.adminName} />
 					{/snippet}
 				</Form.Control>
@@ -126,7 +126,7 @@
 			<Form.Field {form} name="adminEmail">
 				<Form.Control>
 					{#snippet children({ props })}
-						<Form.Label>Admin Email</Form.Label>
+						<Form.Label>Admin Email *</Form.Label>
 						<Input type="email" {...props} bind:value={$formData.adminEmail} />
 					{/snippet}
 				</Form.Control>
@@ -134,6 +134,18 @@
 				<Form.Description
 					>Email to be used in admin invite: should be their school email</Form.Description
 				>
+				<Form.FieldErrors />
+			</Form.Field>
+			<!-- adminName -->
+			<Form.Field {form} name="adminPhone">
+				<Form.Control>
+					{#snippet children({ props })}
+						<Form.Label>Admin Phone</Form.Label>
+						<Input {...props} bind:value={$formData.adminPhone} />
+					{/snippet}
+				</Form.Control>
+
+				<Form.Description>optional</Form.Description>
 				<Form.FieldErrors />
 			</Form.Field>
 

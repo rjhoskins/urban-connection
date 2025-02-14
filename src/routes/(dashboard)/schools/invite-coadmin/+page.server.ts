@@ -102,7 +102,8 @@ export const actions: Actions = {
 					.values({
 						id: generateUserId(),
 						username: form.data.email,
-						name: form.data.name
+						name: form.data.name,
+						phone: form.data.phone
 					})
 					.returning({ id: table.usersTable.id });
 				console.log('newUser => ', newUser);

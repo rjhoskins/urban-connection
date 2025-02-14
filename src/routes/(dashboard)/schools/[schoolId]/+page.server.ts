@@ -41,7 +41,7 @@ export const load = async (event) => {
 		}
 	}
 	if (event.locals.user && event.locals.user.role === 'super_admin') {
-		console.log('super_admin user =======================> ');
+		console.log('super_admin user2 =======================> ');
 		dataFunc = () => getSchoolForSuperAdmin(Number(event.params.schoolId));
 		adminDataFunc = async () => getSchoolAdmin(Number(event.params.schoolId));
 		// adminDataFunc = async () => {
@@ -125,11 +125,11 @@ const getSchoolForDistrictAdmin = async (schoolId: number) => {
 	//   .limit(20))
 };
 const getSchoolAdmin = async (schoolId: number) => {
-	const [res] = await db
+	const res = await db
 		.select({
 			adminName: table.usersTable.name,
 			adminEmail: table.usersTable.username,
-			schoolId: table.schoolAdminsTable.id
+			adminPhone: table.usersTable.phone
 		})
 		.from(table.schoolAdminsTable)
 		.innerJoin(table.usersTable, eq(table.schoolAdminsTable.userId, table.usersTable.id))
