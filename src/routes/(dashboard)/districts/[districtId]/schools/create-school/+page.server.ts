@@ -12,6 +12,7 @@ import { SERVER_ERROR_MESSAGES } from '$lib/constants.js';
 import { nanoid } from 'nanoid';
 import { setFlash } from 'sveltekit-flash-message/server';
 import { desc, eq } from 'drizzle-orm';
+import { createSchool } from '$lib/server/queries.js';
 
 export const load: PageServerLoad = async (event) => {
 	if (!event.locals.user) return redirect(302, '/auth/login');
@@ -71,14 +72,14 @@ export const actions: Actions = {
 			const result = await db.transaction(async (trx) => {
 				let schoolResult;
 				if (!form.data.isDistrict) {
-					schoolResult = await trx
-						.insert(table.schoolsTable)
-						.values({
+					schoolResult = await createSchool(
+						{
 							name: form.data.name ?? '',
 							districtId: form.data.districtId,
 							createdBy: event.locals.user?.id ?? ''
-						})
-						.returning();
+						},
+						trx
+					);
 					console.log('schoolResult => ', schoolResult);
 				}
 
@@ -99,12 +100,12 @@ export const actions: Actions = {
 				};
 				// create invite here, use it in invite page to...
 				let inviteRes;
-				if (!form.data.isDistrict && schoolResult && schoolResult.length > 0) {
+				if (!form.data.isDistrict && schoolResult?.id) {
 					inviteRes = await trx
 						.insert(table.userInvitesTable)
-						.values({ ...inviteData, schoolId: schoolResult[0].id })
+						.values({ ...inviteData, schoolId: schoolResult.id })
 						.returning();
-					inviteData.schoolId = schoolResult[0].id;
+					inviteData.schoolId = schoolResult.id;
 				} else {
 					inviteRes = await trx
 						.insert(table.userInvitesTable)

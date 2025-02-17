@@ -9,7 +9,13 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { createNewUserFromInviteSchema } from '$lib/schema';
 import type { Actions, PageServerLoad } from '../$types';
 import { setFlash } from 'sveltekit-flash-message/server';
-import { generateUserId } from '$lib/utils';
+import {
+	checkRegisteredUserExists,
+	findUnusedInviteByInviteId,
+	updateRegisterInviteWithInviteeAndMarkUsed,
+	updateUserWithPassword
+} from '$lib/server/queries';
+import { set } from 'zod';
 
 export const load: PageServerLoad = async ({ url }) => {
 	const token = url.searchParams.get('inviteToken');
@@ -36,51 +42,41 @@ export const actions: Actions = {
 
 		const userEmail = form.data.email;
 
-		const [existingUnusedInvite] = await db
-			.select()
-			.from(table.userInvitesTable)
-			.where(
-				and(
-					eq(table.userInvitesTable.id, form.data.inviteId),
-					eq(table.userInvitesTable.isUsed, false)
-				)
-			);
+		const existingUnusedInvite = await findUnusedInviteByInviteId({
+			inviteId: form.data.inviteId as string
+		});
 
 		if (!existingUnusedInvite) {
+			setFlash(
+				{ type: 'error', message: 'Invalid invite, please contact your administrator' },
+				event.cookies
+			);
 			return message(form, 'Invalid invite, please contact your administrator');
 		}
 		console.log('existingUnusedInvite => ', existingUnusedInvite);
 
-		const [existingUser] = await db
-			.select()
-			.from(table.usersTable) // existing user will have pw & be active
-			.where(
-				and(
-					eq(table.usersTable.username, userEmail),
-					eq(table.usersTable.isActive, false),
-					isNotNull(table.usersTable.passwordHash)
-				)
-			);
-
+		const existingUser = await checkRegisteredUserExists({ userEmail });
 		if (existingUser) {
+			setFlash(
+				{ type: 'error', message: 'User already exists, please contact your administrator' },
+				event.cookies
+			);
 			return message(form, 'User already exists, please contact your administrator');
 		}
 
 		try {
 			const result = await db.transaction(async (trx) => {
-				const [updatedUserWithPW] = await trx
-					.update(table.usersTable)
-					.set({ isActive: true, passwordHash })
-					.where(eq(table.usersTable.username, userEmail))
-					.returning();
+				const updatedUserWithPW = await updateUserWithPassword({ userEmail, passwordHash }, trx);
 
 				if (!updatedUserWithPW) throw new Error('Failed to register user');
 
-				const [inviteRes] = await trx
-					.update(table.userInvitesTable)
-					.set({ isUsed: true, invitee: updatedUserWithPW.id })
-					.where(eq(table.userInvitesTable.email, userEmail))
-					.returning();
+				const inviteRes = await updateRegisterInviteWithInviteeAndMarkUsed(
+					{
+						userEmail,
+						inviteeId: updatedUserWithPW.id
+					},
+					trx
+				);
 
 				if (!inviteRes) throw new Error('Invite update failed');
 

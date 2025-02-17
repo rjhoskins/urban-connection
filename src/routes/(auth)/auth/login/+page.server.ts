@@ -1,16 +1,18 @@
 import { hash, verify } from '@node-rs/argon2';
 import { encodeBase32LowerCase } from '@oslojs/encoding';
 import { fail, redirect } from '@sveltejs/kit';
-import { eq, and } from 'drizzle-orm';
+
 import * as auth from '$lib/server/auth';
-import { db } from '$lib/server/db';
-import * as table from '$lib/server/db/schema';
+
 import type { Actions, PageServerLoad } from './$types';
-import { message, superValidate } from 'sveltekit-superforms/server';
+import { message, superValidate, type Message } from 'sveltekit-superforms/server';
 import { zod } from 'sveltekit-superforms/adapters';
 import { createNewUserOrLoginSchema } from '$lib/schema';
 import { SERVER_ERROR_MESSAGES } from '$lib/constants';
 import { setFlash } from 'sveltekit-flash-message/server';
+import { createNewUser, findIfActiveUserExists } from '$lib/server/queries';
+
+import { handleLogFlashReturnFormError, handleTypeSafeError } from '$lib/utils';
 
 export const load: PageServerLoad = async (event) => {
 	if (event.locals.user) {
@@ -28,38 +30,43 @@ export const actions: Actions = {
 
 		if (!form.valid) {
 			// return fail(400, { form });
-			return message(form, SERVER_ERROR_MESSAGES[400]); // Will return fail(400, { form }) since form isn't valid
+			return message(form, SERVER_ERROR_MESSAGES[400] as Message, { status: 400 }); // Will return fail(400, { form }) since form isn't valid
 		}
 
-		const results = await db
-			.select()
-			.from(table.usersTable)
-			.where(
-				and(eq(table.usersTable.username, form.data.username), eq(table.usersTable.isActive, true))
-			);
+		const existingUser = await findIfActiveUserExists({ username: form.data.username });
 
-		const existingUser = results.at(0);
 		if (!existingUser) {
-			console.log('user not found');
-			setFlash(
-				{ type: 'error', message: 'invalid username, password, or user not found' },
-				event.cookies
-			);
-			return message(form, '', {
-				status: 404
+			console.log('user exists => ', existingUser);
+			return handleLogFlashReturnFormError({
+				type: 'error',
+				form,
+				message: 'invalid username, password, or user not found',
+				status: 404,
+				event
 			});
+			// console.log('invalid username, password, or user not found');
+			// setFlash(
+			// 	{ type: 'error', message: 'invalid username, password, or user not found' },
+			// 	event.cookies
+			// );
+			// return message(form, 'invalid username, password, or user not found', {
+			// 	status: 404
+			// });
 		}
 
-		const validPassword = await verify(existingUser.passwordHash, form.data.password, {
+		const validPassword = await verify(existingUser.passwordHash!, form.data.password, {
 			memoryCost: 19456,
 			timeCost: 2,
 			outputLen: 32,
 			parallelism: 1
 		});
 		if (!validPassword) {
-			console.log('invalid password');
-			return message(form, 'invalid username or password', {
-				status: 404
+			return handleLogFlashReturnFormError({
+				type: 'error',
+				form,
+				message: 'invalid username, password, or user not found',
+				status: 404,
+				event
 			});
 		}
 
@@ -74,12 +81,16 @@ export const actions: Actions = {
 		console.log('register => ', form);
 
 		if (!form.valid) {
-			return message(form, 'Invalid form');
+			return handleLogFlashReturnFormError({
+				type: 'error',
+				form,
+				message: 'invalid username, password, or user not found',
+				status: 404,
+				event
+			});
 		}
 
-		console.log('here => ');
 		try {
-			console.log('trying here => ');
 			const userId = generateUserId();
 			const passwordHash = await hash(form.data.password, {
 				// recommended minimum parameters
@@ -88,25 +99,17 @@ export const actions: Actions = {
 				outputLen: 32,
 				parallelism: 1
 			});
-			let newUserRes = await db
-				.insert(table.usersTable)
-				.values({ id: userId, username: form.data.username, passwordHash })
-				.returning();
+			let newUserRes = await createNewUser({ userId, passwordHash, username: form.data.username });
+			console.log('register newUserRes => ', newUserRes);
 
 			const sessionToken = auth.generateSessionToken();
 			const session = await auth.createSession(sessionToken, userId);
 			auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
 		} catch (e) {
-			setFlash(
-				{ type: 'error', message: 'A user with this email address already exists.' },
-				event.cookies
-			);
-			return message(form, 'A user with this email address already exists.', {
-				status: 409
-			});
+			return handleTypeSafeError(e, 'A user with this email address already exists.', form);
 		} finally {
 		}
-		setFlash({ type: 'success', message: 'Account created successfully!' }, event.cookies);
+		setFlash{( type: 'success', message: 'Account created successfully!' }, event.cookies);
 		return redirect(302, '/');
 	}
 };

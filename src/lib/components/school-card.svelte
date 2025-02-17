@@ -1,7 +1,7 @@
 <script>
 	import * as Card from '$lib/components/ui/card';
 	import Progress from './ui/progress/progress.svelte';
-	let { school, page, isNested } = $props();
+	let { school, page, isNested = false } = $props();
 	const { name, id } = school;
 	let schoolProgess;
 </script>

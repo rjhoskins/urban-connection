@@ -2,6 +2,11 @@ import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { nanoid } from 'nanoid';
 import type { UserInviteHTMLEmailTemplateType } from './schema';
+import { message, type SuperValidated } from 'sveltekit-superforms';
+import { setFlash } from 'sveltekit-flash-message/server';
+import type { RequestEvent } from '@sveltejs/kit';
+
+type Message = { status: 'error' | 'success' | 'warning'; text: string };
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -26,6 +31,29 @@ export function handleTypeSafeError(error: unknown, message: any, form: any) {
 export function generateUserId() {
 	return nanoid(16);
 }
+
+interface HandleLogFlashReturnFormErrorParams {
+	type: 'error' | 'success';
+	form: SuperValidated<any>;
+	message: string | Message;
+	status: 400 | 401 | 402 | 403 | 404 | 500;
+	event: RequestEvent;
+}
+
+export function handleLogFlashReturnFormError({
+	type,
+	form,
+	message: messageText,
+	status: statusNum,
+	event
+}: HandleLogFlashReturnFormErrorParams) {
+	console.log(messageText);
+	setFlash({ type, message: messageText.toString() }, event.cookies);
+	return message(form, messageText, {
+		status: statusNum
+	});
+}
+
 export function generateNewUserInviteEmail(
 	htmlEmailContent: UserInviteHTMLEmailTemplateType,
 	inviteLink: string
