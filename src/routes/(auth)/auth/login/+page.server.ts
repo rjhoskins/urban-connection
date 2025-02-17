@@ -109,7 +109,7 @@ export const actions: Actions = {
 			return handleTypeSafeError(e, 'A user with this email address already exists.', form);
 		} finally {
 		}
-		setFlash{( type: 'success', message: 'Account created successfully!' }, event.cookies);
+		setFlash({ type: 'success', message: 'Account created successfully!' }, event.cookies);
 		return redirect(302, '/');
 	}
 };
