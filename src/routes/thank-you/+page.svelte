@@ -13,7 +13,6 @@
 				Your survey is helping to bring positive change across schools in your area. Your results
 				are being tabulated.
 			</p>
-			<Button href="/">Back to home</Button>
 		</Card>
 	</div>
 </section>

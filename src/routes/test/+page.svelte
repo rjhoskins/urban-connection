@@ -16,13 +16,15 @@
 		formData.length == currDomain + 1 && formData[currDomain].subDomains.length == currSubDomain + 1
 	);
 
+	const promptText =
+		'Now, considering the information you read in the indicator summary, determine if each of the descriptors below are represented at your school. It is important to note that Descriptor scoring is not a measurement of perfection. If a descriptor is an expectation regularly expressed and supported by administration, select Yes. Othenelse, select No. Select Next after answering each descriptor.';
+
 	function next() {
 		if (
 			formData.length == currDomain + 1 &&
 			formData[currDomain].subDomains.length == currSubDomain + 1
 		) {
 			console.log('Finish');
-
 			return;
 		}
 		// if (formData[currDomain].subDomains[currSubDomain].descriptors.some((d) => d.value === null)) {
@@ -50,33 +52,48 @@
 		} else {
 			currSubDomain -= 1;
 		}
-		console.log('prev?');
 	}
 	function handleFinish() {
 		console.log('Finish');
 		goto('/thank-you');
 	}
-	$effect(() => {
-		console.log('currDomain', currDomain);
-		console.log('currSubDomain', currSubDomain);
-		console.log('isFirstQuestion', isFirstQuestion);
-		console.log('isLastQuestion', isLastQuestion);
-	});
+	// $effect(() => {
+	// 	console.log('currDomain', currDomain);
+	// 	console.log('currSubDomain', currSubDomain);
+	// 	console.log('isFirstQuestion', isFirstQuestion);
+	// 	console.log('isLastQuestion', isLastQuestion);
+	// });
 </script>
 
 <section class="mx-auto max-w-7xl p-2 lg:p-8">
 	<h1 class="sr-only">testing...</h1>
 
-	<h2 class="my-3 text-center text-3xl font-bold">
-		TESTING!!! |{formData[currDomain].name} |
-		{formData[currDomain].subDomains[currSubDomain].name}
-	</h2>
+	<div class="flex flex-col gap-4 p-4">
+		<div class="flex gap-8">
+			<div class=" space-y-3">
+				<h2 class="text-right text-3xl font-bold">
+					<p class=" flex justify-end gap-2">
+						<span class="block font-normal">Domain: </span>{formData[currDomain].name}
+					</p>
+					<p class=" flex justify-end gap-2">
+						<span class="block font-normal">Sub-domain:</span>{formData[currDomain].subDomains[
+							currSubDomain
+						].name}
+					</p>
+				</h2>
 
-	<Card class="p-4 shadow-2xl">
-		<div class="flex gap-4">
+				<p class=" font-bold">Read the indicator summary below.</p>
+				<p class="">
+					{formData[currDomain].subDomains[currSubDomain].descriptors[0].text}
+				</p>
+			</div>
 			<div class="aspect-w-16 aspect-h-9">
 				{@html '<iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ?si=6nBY3o9cLboe4jEd" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>'}
 			</div>
+		</div>
+		<Card class="p-2">{promptText}</Card>
+
+		<Card class="flex max-w-prose gap-4 p-2">
 			<div class="right w-full">
 				<ul class="">
 					<form
@@ -135,7 +152,7 @@
 								</div>
 							</li>
 						{/each}
-						<div class="flex justify-between pt-2">
+						<div class="flex gap-8 pt-2">
 							<Button
 								type="button"
 								disabled={isFirstQuestion}
@@ -156,6 +173,6 @@
 					</form>
 				</ul>
 			</div>
-		</div>
-	</Card>
+		</Card>
+	</div>
 </section>
