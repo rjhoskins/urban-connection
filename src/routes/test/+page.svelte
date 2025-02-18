@@ -1,13 +1,16 @@
 <script lang="ts">
+	// The teacher/ staff will need to enter their name, select a subject area from a drop-down (English, Math, etc. DC to provide), number of years experience)
 	import { applyAction, deserialize, enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
+	import NativeDemographicsSurveyForm from '$lib/components/forms/demographics-survey-form.svelte';
+	import NativeSurveyFormTemplate from '$lib/components/forms/native-survey-form-template.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Card from '$lib/components/ui/card/card.svelte';
 
 	import { TEST_RUBRIC_DATA2, RUBRIC_DATA } from '$lib/constants';
 
 	let { data } = $props();
-	let formData = $state(RUBRIC_DATA);
+	let formData = $state(TEST_RUBRIC_DATA2);
 	let currDomain = $state(0);
 	let currSubDomain = $state(0);
 	let isFirstQuestion = $derived(currDomain === 0 && currSubDomain === 0);
@@ -69,108 +72,67 @@
 	<h1 class="sr-only">testing...</h1>
 
 	<div class="flex flex-col gap-4 p-4">
-		<div class="flex gap-8">
-			<div class=" space-y-3">
-				<h2 class="text-right text-3xl font-bold">
-					<p class=" flex justify-end gap-2">
-						<span class="block font-normal">Domain: </span>{formData[currDomain].name}
-					</p>
-					<p class=" flex justify-end gap-2">
-						<span class="block font-normal">Sub-domain:</span>{formData[currDomain].subDomains[
-							currSubDomain
-						].name}
-					</p>
-				</h2>
+		{#if formData[currDomain].subDomains[currSubDomain].name.toLowerCase() == 'demographics'}
+			<Card class="p-2">
+				{formData[currDomain].subDomains[currSubDomain].description}</Card
+			>
+		{:else}
+			<div class="flex gap-8">
+				<div class=" space-y-3">
+					<h2 class="text-right text-3xl font-bold">
+						<p class=" flex justify-end gap-2">
+							<span class="block font-normal">Domain: </span>{formData[currDomain].name}
+						</p>
+						<p class=" flex justify-end gap-2">
+							{#if formData[currDomain].subDomains[currSubDomain].name}
+								<span class="block font-normal">Sub-domain:</span>{formData[currDomain].subDomains[
+									currSubDomain
+								].name}
+							{/if}
+						</p>
+					</h2>
 
-				<p class=" font-bold">Read the indicator summary below.</p>
-				<p class="">
-					{formData[currDomain].subDomains[currSubDomain].descriptors[0].text}
-				</p>
+					<p class=" font-bold">Read the indicator summary below.</p>
+					<p class="">
+						{#if formData[currDomain]?.subDomains[currSubDomain] && formData[currDomain]?.subDomains[currSubDomain]?.descriptors}
+							{formData[currDomain].subDomains[currSubDomain].descriptors[0].text}
+						{/if}
+					</p>
+				</div>
+				<div class="aspect-w-16 aspect-h-9">
+					{@html '<iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ?si=6nBY3o9cLboe4jEd" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>'}
+				</div>
 			</div>
-			<div class="aspect-w-16 aspect-h-9">
-				{@html '<iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ?si=6nBY3o9cLboe4jEd" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>'}
-			</div>
-		</div>
-		<Card class="p-2">{promptText}</Card>
+			<Card class="p-2">
+				{promptText}</Card
+			>
+		{/if}
 
 		<Card class="flex max-w-prose gap-4 p-2">
 			<div class="right w-full">
 				<ul class="">
-					<form
-						method="POST"
-						id={formData[currDomain].subDomains[currSubDomain].name}
-						class=" flex flex-col gap-2"
-						use:enhance={({ formElement, formData, action, cancel }) => {
-							// console.log('formElement', formElement);
-							console.log('formData', formData);
-							return async ({ result, update }) => {
-								update({ reset: false });
-								console.log('action', action);
-								console.log('formElement', formElement);
-								console.log('result', result);
-								if (result.type === 'success') {
-									console.log('Success');
-									next();
-								}
-							};
-						}}
-					>
-						{#each formData[currDomain].subDomains[currSubDomain].descriptors as descriptor, descriptorIdx (descriptorIdx)}
-							<li class="flex">
-								<div class="flex flex-col gap-1.5">
-									<p>
-										{formData[currDomain].subDomains[currSubDomain].descriptors[descriptorIdx].text}
-									</p>
-									<label class="align-middlex flex cursor-pointer items-center space-x-2">
-										<input
-											type="radio"
-											name={formData[currDomain].subDomains[currSubDomain].descriptors[
-												descriptorIdx
-											].id}
-											bind:group={formData[currDomain].subDomains[currSubDomain].descriptors[
-												descriptorIdx
-											].value}
-											value={true}
-											class="h-4 w-4 border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
-										/>
-										<span class="text-gray-700">Yes</span>
-									</label>
-									<label class="flex cursor-pointer items-center space-x-2">
-										<input
-											type="radio"
-											name={formData[currDomain].subDomains[currSubDomain].descriptors[
-												descriptorIdx
-											].id}
-											bind:group={formData[currDomain].subDomains[currSubDomain].descriptors[
-												descriptorIdx
-											].value}
-											value={false}
-											class="h-4 w-4 border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
-										/>
-										<span class="text-gray-700">No</span>
-									</label>
-								</div>
-							</li>
-						{/each}
-						<div class="flex gap-8 pt-2">
-							<Button
-								type="button"
-								disabled={isFirstQuestion}
-								onclick={() => previous()}
-								class="w-fit">Previous</Button
-							>
-							{#if isLastQuestion}
-								<Button
-									type="submit"
-									formaction="?/finish"
-									onclick={() => handleFinish()}
-									class="w-fit">Finish</Button
-								>
-							{:else}
-								<Button type="submit" formaction="?/submit" class="w-fit">Next</Button>
-							{/if}
-						</div>
-					</form>
+					{#if formData[currDomain].subDomains[currSubDomain].name.toLowerCase() == 'demographics'}
+						<!-- <pre>{JSON.stringify(formData[currDomain], null, 2)}</pre> -->
+						<NativeDemographicsSurveyForm
+							data={formData}
+							{currDomain}
+							{currSubDomain}
+							{isFirstQuestion}
+							bind:handleNext={next}
+							bind:handlePrev={previous}
+						/>
+					{:else}
+						<NativeSurveyFormTemplate
+							{formData}
+							{currDomain}
+							{currSubDomain}
+							{isFirstQuestion}
+							{isLastQuestion}
+							bind:handleNext={next}
+							bind:handlePrev={previous}
+							bind:handleFin={handleFinish}
+						/>
+					{/if}
 				</ul>
 			</div>
 		</Card>

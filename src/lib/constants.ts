@@ -758,6 +758,52 @@ export const TEST_RUBRIC_DATA = testRubricData;
 
 const testRubricData2 = [
 	{
+		name: 'Demographics',
+		type: 'demographics',
+		subDomains: [
+			{
+				name: 'Demographics',
+				description: 'Please provide the following information about yourself.',
+				fields: [
+					{
+						label: 'Name',
+						type: 'text',
+						fieldName: 'name',
+						value: null,
+						placeholder: 'Enter your name'
+					},
+					{
+						label: 'Years Teaching',
+						fieldName: 'yearsTeaching',
+						type: 'number',
+						value: null,
+						placeholder: 'Enter number of years teaching'
+					},
+					{
+						label: 'Subject',
+						fieldName: 'subject',
+						type: 'select',
+						value: null,
+						options: [
+							{
+								value: 'Math',
+								label: 'Math'
+							},
+							{
+								value: 'Science',
+								label: 'Science'
+							},
+							{
+								value: 'English',
+								label: 'English'
+							}
+						]
+					}
+				]
+			}
+		]
+	},
+	{
 		name: 'Cultural Awareness',
 		totalPoints: 24,
 		subDomains: [
