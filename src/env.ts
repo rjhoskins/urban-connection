@@ -12,11 +12,11 @@ const stringBoolean = z.coerce
 
 const EnvSchema = z.object({
 	DATABASE_URL: z.string(),
-	LOCAL_DATABASE_URL: z.string(),
-	MAILTRAP_HOST: z.string(),
-	MAILTRAP_PORT: z.coerce.number(),
-	MAILTRAP_USER: z.string(),
-	MAILTRAP_PASS: z.string(),
+	// LOCAL_DATABASE_URL: z.string(),
+	// MAILTRAP_HOST: z.string(),
+	// MAILTRAP_PORT: z.coerce.number(),
+	// MAILTRAP_USER: z.string(),
+	// MAILTRAP_PASS: z.string(),
 	NODE_ENV: z.string().default('development'),
 	//   DB_HOST: z.string(),
 	//   DB_USER: z.string(),
