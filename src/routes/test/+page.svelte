@@ -7,13 +7,22 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Card from '$lib/components/ui/card/card.svelte';
 
-	import { TEST_RUBRIC_DATA2, RUBRIC_DATA, TEST_COMBINED_WITH_DEMOGRAPHICS } from '$lib/constants';
+	import {
+		TEST_RUBRIC_DATA2,
+		RUBRIC_DATA,
+		TEST_COMBINED_WITH_DEMOGRAPHICS,
+		demographicsData
+	} from '$lib/constants';
+	import { onMount } from 'svelte';
 
 	let { data } = $props();
-	let formData = $state(TEST_COMBINED_WITH_DEMOGRAPHICS);
+	let formData = $state([demographicsData, ...data.surveyData]);
 	let currDomain = $state(0);
 	let currSubDomain = $state(0);
 	let isFirstQuestion = $derived(currDomain === 0 && currSubDomain === 0);
+	onMount(() => {
+		console.log('data => ', data);
+	});
 
 	let isLastQuestion = $derived(
 		formData.length == currDomain + 1 && formData[currDomain].subDomains.length == currSubDomain + 1
@@ -67,6 +76,8 @@
 	// 	console.log('isLastQuestion', isLastQuestion);
 	// });
 </script>
+
+<!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->
 
 <section class="mx-auto max-w-7xl p-2 lg:p-8">
 	<h1 class="sr-only">testing...</h1>

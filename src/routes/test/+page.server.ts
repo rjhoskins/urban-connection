@@ -1,8 +1,18 @@
 import * as db from '$lib/server/database.js';
+import { generateQuestionnaire } from '$lib/server/queries';
 import { redirect } from '@sveltejs/kit';
 import { setFlash } from 'sveltekit-flash-message/server';
 
-export function load({ cookies }) {}
+export async function load(event) {
+	// console.log(' test load=============================>');
+	if (!event.locals.user) {
+		return redirect(302, '/auth/login');
+	}
+
+	return {
+		surveyData: await generateQuestionnaire()
+	};
+}
 
 export const actions = {
 	submit: async ({ cookies, request }) => {

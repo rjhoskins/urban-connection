@@ -5,6 +5,7 @@ import type { UserInviteHTMLEmailTemplateType } from './schema';
 import { message, type SuperValidated } from 'sveltekit-superforms';
 import { setFlash } from 'sveltekit-flash-message/server';
 import type { Cookies, RequestEvent } from '@sveltejs/kit';
+import type { Domain, Question, Subdomain, SurveyData } from './types/survey';
 
 type Message = { status: 'error' | 'success' | 'warning'; text: string };
 
@@ -130,4 +131,55 @@ export function slugify(text: string): string {
 		.replace(/\-\-+/g, '-') // Replace multiple hyphens with single
 		.replace(/^-+/, '') // Remove hyphens from start
 		.replace(/-+$/, ''); // Remove hyphens from end
+}
+
+export function transformSurveyData(rawData: SurveyData) {
+	// Group by domains first
+	const domainMap = new Map();
+
+	rawData.forEach((item) => {
+		const {
+			domain,
+			subdomain,
+			question
+		}: { domain: Domain; subdomain: Subdomain; question: Question } = item;
+
+		// Initialize domain if it doesn't exist
+		if (!domainMap.has(domain.id)) {
+			domainMap.set(domain.id, {
+				id: domain.id,
+				name: domain.name,
+				type: 'domain',
+				subDomains: []
+			});
+		}
+
+		const domainObj = domainMap.get(domain.id);
+
+		// Find or create subdomain
+		let subdomainObj = domainObj.subDomains.find((sub) => sub.name === subdomain.name);
+		if (!subdomainObj) {
+			subdomainObj = {
+				id: subdomain.id,
+				name: subdomain.name,
+				type: 'sub-domain', // Special case for Systems domain
+				description: subdomain.description,
+				questions: []
+			};
+			domainObj.subDomains.push(subdomainObj);
+		}
+
+		// Add question to subdomain using original question ID
+		subdomainObj.questions.push({
+			id: question.id,
+			subdomainId: subdomain.id,
+			value: null, // Explicitly set to null
+			text: question.text
+		});
+	});
+
+	// Sort everything for consistency
+	const result = Array.from(domainMap.values());
+
+	return result;
 }

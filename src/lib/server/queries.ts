@@ -6,7 +6,10 @@ import {
 	adminUserInvites,
 	users,
 	htmlEmailTemplates,
-	districts
+	districts,
+	surveyQuestions,
+	surveySubDomains,
+	surveyDomains
 } from '$lib/server/db/schema';
 
 import type { PostgresJsQueryResultHKT } from 'drizzle-orm/postgres-js';
@@ -15,6 +18,7 @@ import db from './db';
 import { text } from 'stream/consumers';
 import type { AdminInvite, CreateUser, UserInviteHTMLEmailTemplateType } from '$lib/schema';
 import { Columns } from 'lucide-svelte';
+import { transformSurveyData } from '$lib/utils';
 
 export async function simpleRegisterToBeDEPRICATED(
 	{
@@ -198,23 +202,31 @@ export async function createSchool(
 }
 
 export async function generateQuestionnaire() {
-	const res = await db.query.surveyQuestions.findMany({
-		columns: {
-			text: true
-		},
-		with: {
-			subDomain: {
-				columns: {
-					name: true,
-					description: true
-				},
-				with: {
-					domain: true
-				}
+	let res = await db
+		.select({
+			domain: {
+				id: surveyDomains.id,
+				name: surveyDomains.name,
+				type: sql<'domain'>`'domain'`
+			},
+			subdomain: {
+				id: surveySubDomains.id,
+				name: surveySubDomains.name,
+				description: surveySubDomains.description,
+				type: sql<'sub-domain'>`'sub-domain'`
+			},
+			question: {
+				id: surveyQuestions.id,
+				text: surveyQuestions.text,
+				value: sql<boolean | null>`NULL`,
+				subdomainId: surveyQuestions.subDomainId
 			}
-		}
-	});
-	console.log('generateQuestionnaire res => ', res);
+		})
+		.from(surveyQuestions)
+		.innerJoin(surveySubDomains, eq(surveyQuestions.subDomainId, surveySubDomains.id))
+		.innerJoin(surveyDomains, eq(surveyDomains.id, surveySubDomains.domainId));
+
+	return transformSurveyData(res);
 }
 
 export async function getLatestHtmlTemplateData(): Promise<{

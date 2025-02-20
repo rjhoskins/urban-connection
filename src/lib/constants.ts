@@ -19,7 +19,7 @@ export const INITIAL_HTML_DATA = {
 	callToAction: 'Please register to access your organization',
 	registrationLinkText: 'here'
 };
-const demographicsData = {
+export const demographicsData = {
 	name: 'Demographics',
 	type: 'demographics',
 	subDomains: [

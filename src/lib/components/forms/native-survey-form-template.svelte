@@ -33,18 +33,30 @@
 		};
 	}}
 >
-	{#each formData[currDomain].subDomains[currSubDomain].descriptors as descriptor, descriptorIdx (descriptorIdx)}
+	{#if currDomain === 1 && currSubDomain === 0}
+		<!-- ostensibly the first survey Q -->
+		<input type="hidden" name="isFirstQuestion" value="true" />
+	{/if}
+	{#if isLastQuestion}
+		<input type="hidden" name="isLastQuestion" value="true" />
+	{/if}
+
+	<input
+		type="hidden"
+		name="totalQuestions"
+		value={formData[currDomain].subDomains[currSubDomain].questions.length}
+	/>
+	{#each formData[currDomain].subDomains[currSubDomain].questions, questionIdx (questionIdx)}
 		<li class="flex">
 			<div class="flex flex-col gap-1.5">
 				<p>
-					{formData[currDomain].subDomains[currSubDomain].descriptors[descriptorIdx].text}
+					{formData[currDomain].subDomains[currSubDomain].questions[questionIdx].text}
 				</p>
 				<label class="align-middlex flex cursor-pointer items-center space-x-2">
 					<input
 						type="radio"
-						name={formData[currDomain].subDomains[currSubDomain].descriptors[descriptorIdx].id}
-						bind:group={formData[currDomain].subDomains[currSubDomain].descriptors[descriptorIdx]
-							.value}
+						name={`domainId=${formData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}qId=${formData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}`}
+						bind:group={formData[currDomain].subDomains[currSubDomain].questions[questionIdx].value}
 						value={true}
 						class="h-4 w-4 border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
 					/>
@@ -53,9 +65,8 @@
 				<label class="flex cursor-pointer items-center space-x-2">
 					<input
 						type="radio"
-						name={formData[currDomain].subDomains[currSubDomain].descriptors[descriptorIdx].id}
-						bind:group={formData[currDomain].subDomains[currSubDomain].descriptors[descriptorIdx]
-							.value}
+						name={`domainId=${formData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}qId=${formData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}`}
+						bind:group={formData[currDomain].subDomains[currSubDomain].questions[questionIdx].value}
 						value={false}
 						class="h-4 w-4 border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
 					/>
