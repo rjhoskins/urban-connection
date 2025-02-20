@@ -2,8 +2,7 @@ import { hash, verify } from '@node-rs/argon2';
 import { fail, redirect } from '@sveltejs/kit';
 import { eq, and, isNotNull } from 'drizzle-orm';
 import * as auth from '$lib/server/auth';
-import { db } from '$lib/server/db';
-import * as table from '$lib/server/db/schema';
+import * as table from '$lib/server/db/schema/db-utils';
 import { message, superValidate } from 'sveltekit-superforms/server';
 import { zod } from 'sveltekit-superforms/adapters';
 import { createNewUserFromInviteSchema } from '$lib/schema';
@@ -16,6 +15,7 @@ import {
 	updateUserWithPassword
 } from '$lib/server/queries';
 import { set } from 'zod';
+import db from '$lib/server/db';
 
 export const load: PageServerLoad = async ({ url }) => {
 	const token = url.searchParams.get('inviteToken');

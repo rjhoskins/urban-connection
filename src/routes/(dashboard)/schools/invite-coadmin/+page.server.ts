@@ -3,16 +3,13 @@ import { createSchoolSchema, inviteNewUserSchema } from '$lib/schema';
 import { zod } from 'sveltekit-superforms/adapters';
 import type { PageServerLoad, Actions } from './$types.js';
 import { fail } from '@sveltejs/kit';
-import { db } from '$lib/server/db';
-import * as table from '$lib/server/db/schema';
-import { districts } from '$lib/data/data.js';
 import { redirect } from '@sveltejs/kit';
-import { createInviteToken, generateUserId } from '$lib/utils';
-import { SERVER_ERROR_MESSAGES } from '$lib/constants.js';
+import { createInviteToken, generateUserId, handleLogFlashReturnFormError } from '$lib/utils';
 import { nanoid } from 'nanoid';
 import { setFlash } from 'sveltekit-flash-message/server';
 import { eq, and } from 'drizzle-orm';
-import { log } from 'console';
+import { users, schoolAdmins, adminUserInvites, schools } from '$lib/server/db/schema';
+import db from '$lib/server/db/index.js';
 
 export const load: PageServerLoad = async (event) => {
 	// console.log('PageServerLoad => ', event.locals.user);
@@ -33,31 +30,40 @@ export const actions: Actions = {
 		const form = await superValidate(event, zod(inviteNewUserSchema));
 
 		if (!form.valid) {
-			setFlash({ type: 'error', message: 'Check the form and try again' }, event.cookies);
-			return message(form, 'Invalid form');
+			return handleLogFlashReturnFormError({
+				type: 'error',
+				form,
+				message: 'Invalid form',
+				status: 400,
+				event
+			});
 		}
 
 		const [loggedInUserRes] = await db
 			.select()
-			.from(table.usersTable)
-			.where(eq(table.usersTable.id, event.locals.user.id));
+			.from(users)
+			.where(eq(users.id, event.locals.user.id));
 		console.log('loggedInUserRes => ', loggedInUserRes);
 
 		if (!loggedInUserRes) {
-			setFlash({ type: 'error', message: 'Check the form and try again' }, event.cookies);
-			return message(form, 'Invalid form');
+			return handleLogFlashReturnFormError({
+				type: 'error',
+				form,
+				message: 'Check the form and try again',
+				status: 404,
+				event
+			});
 		}
-		const [existingUser] = await db
-			.select()
-			.from(table.usersTable)
-			.where(eq(table.usersTable.username, form.data.email));
+		const [existingUser] = await db.select().from(users).where(eq(users.username, form.data.email));
 
 		if (existingUser) {
-			setFlash(
-				{ type: 'error', message: 'An admin already exists under this email, please check again.' },
-				event.cookies
-			);
-			return message(form, 'User already exists, please contact your administrator');
+			return handleLogFlashReturnFormError({
+				type: 'error',
+				form,
+				message: 'User already exists, please contact your administrator',
+				status: 400,
+				event
+			});
 		}
 
 		let inviteToken = '';
@@ -66,23 +72,15 @@ export const actions: Actions = {
 			console.log('create form trying... ======================> ', form);
 			const result = await db.transaction(async (trx) => {
 				const [loggedInUsersSchoolRes] = await trx
-					.select({ schoolId: table.schoolAdminsTable.schoolId })
-					.from(table.schoolAdminsTable)
-					.innerJoin(
-						table.schoolsTable,
-						eq(table.schoolsTable.id, table.schoolAdminsTable.schoolId)
-					)
-					.where(
-						and(
-							eq(table.schoolAdminsTable.userId, event.locals.user!.id),
-							eq(table.schoolsTable.isActive, true)
-						)
-					);
+					.select({ schoolId: schoolAdmins.schoolId })
+					.from(schoolAdmins)
+					.innerJoin(schools, eq(schools.id, schoolAdmins.schoolId))
+					.where(and(eq(schoolAdmins.userId, event.locals.user!.id), eq(schools.isActive, true)));
 
 				console.log('loggedInUsersSchoolRes => ', loggedInUsersSchoolRes);
 
 				const [inviteRes] = await trx
-					.insert(table.userInvitesTable)
+					.insert(adminUserInvites)
 					.values({
 						id: nanoid(),
 						name: form.data.name,
@@ -98,20 +96,20 @@ export const actions: Actions = {
 				inviteToken = createInviteToken(form.data.name, form.data.email, inviteRes.id);
 
 				const [newUser] = await trx
-					.insert(table.usersTable)
+					.insert(users)
 					.values({
 						id: generateUserId(),
 						username: form.data.email,
 						name: form.data.name,
 						phone: form.data.phone
 					})
-					.returning({ id: table.usersTable.id });
+					.returning({ id: users.id });
 				console.log('newUser => ', newUser);
 				if (!newUser) throw new Error('Failed to create user');
 
 				//associate user w/ same school
 				const [newSchoolAdminRes] = await trx
-					.insert(table.schoolAdminsTable)
+					.insert(schoolAdmins)
 					.values({ userId: newUser.id, schoolId: loggedInUsersSchoolRes.schoolId! })
 					.returning();
 				if (!newSchoolAdminRes) throw new Error('Failed to associate user with school');

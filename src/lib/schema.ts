@@ -11,7 +11,7 @@ export const createNewUserOrLoginSchema = z.object({
 	password: z
 		.string()
 		.nonempty({ message: 'password is required' })
-		.min(4, { message: 'password should be at least four characters' })
+		.min(6, { message: 'password should be at least four characters' })
 		.max(50, { message: 'password should be less than 50 characters' })
 });
 
@@ -180,3 +180,40 @@ export const schema = z.object({
 });
 
 type Color = keyof typeof colors;
+
+export const adminInviteSchema = z.object({
+	id: z.string(),
+	name: z.string().nonempty(),
+	email: z.string().email(),
+	isSent: z.boolean().default(false).optional(),
+	invitee: z.string().nullable().optional(),
+	inviter: z.string(),
+	expiration: z.string().datetime().optional(),
+	isUsed: z.boolean().default(false).optional(),
+	role: z
+		.enum(['super_admin', 'district_admin', 'school_admin'])
+		.default('school_admin')
+		.optional(),
+	inviteType: z.enum(['school', 'district']).default('school'),
+	schoolId: z.number().nullable().optional(),
+	districtId: z.number().nullable()
+});
+
+export const createUserSchema = z.object({
+	id: z.string(),
+	username: z
+		.string()
+		// .email({ message: 'invalid email, should be your school email' })
+		.nonempty({ message: 'user name is required' })
+		.min(4, { message: 'user name should be at least four characters' })
+		.max(50, { message: 'user name should be less than 50 characters' }),
+	name: z
+		.string()
+		.nonempty({ message: 'name is required' })
+		.min(2, { message: 'name should be at least two characters' }),
+	role: z.enum(['district_admin', 'school_admin']),
+	phone: z.string().optional()
+});
+
+export type AdminInvite = z.infer<typeof adminInviteSchema>;
+export type CreateUser = z.infer<typeof createUserSchema>;

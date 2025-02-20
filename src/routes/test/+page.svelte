@@ -7,10 +7,10 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Card from '$lib/components/ui/card/card.svelte';
 
-	import { TEST_RUBRIC_DATA2, RUBRIC_DATA } from '$lib/constants';
+	import { TEST_RUBRIC_DATA2, RUBRIC_DATA, TEST_COMBINED_WITH_DEMOGRAPHICS } from '$lib/constants';
 
 	let { data } = $props();
-	let formData = $state(TEST_RUBRIC_DATA2);
+	let formData = $state(TEST_COMBINED_WITH_DEMOGRAPHICS);
 	let currDomain = $state(0);
 	let currSubDomain = $state(0);
 	let isFirstQuestion = $derived(currDomain === 0 && currSubDomain === 0);
@@ -95,7 +95,7 @@
 					<p class=" font-bold">Read the indicator summary below.</p>
 					<p class="">
 						{#if formData[currDomain]?.subDomains[currSubDomain] && formData[currDomain]?.subDomains[currSubDomain]?.descriptors}
-							{formData[currDomain].subDomains[currSubDomain].descriptors[0].text}
+							{formData[currDomain].subDomains[currSubDomain].descriptors[0].text!}
 						{/if}
 					</p>
 				</div>

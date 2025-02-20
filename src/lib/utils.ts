@@ -4,7 +4,7 @@ import { nanoid } from 'nanoid';
 import type { UserInviteHTMLEmailTemplateType } from './schema';
 import { message, type SuperValidated } from 'sveltekit-superforms';
 import { setFlash } from 'sveltekit-flash-message/server';
-import type { RequestEvent } from '@sveltejs/kit';
+import type { Cookies, RequestEvent } from '@sveltejs/kit';
 
 type Message = { status: 'error' | 'success' | 'warning'; text: string };
 
@@ -47,7 +47,7 @@ export function handleLogFlashReturnFormError({
 	status: statusNum,
 	event
 }: HandleLogFlashReturnFormErrorParams) {
-	console.log(messageText);
+	console.error(messageText);
 	setFlash({ type, message: messageText.toString() }, event.cookies);
 	return message(form, messageText, {
 		status: statusNum
@@ -117,4 +117,17 @@ export function generateNewUserInviteEmail(
     </table>
 </body>
 </html>`;
+}
+
+export function slugify(text: string): string {
+	return text
+		.toString()
+		.normalize('NFKD') // Normalize unicode characters
+		.toLowerCase() // Convert to lowercase
+		.trim() // Remove whitespace from ends
+		.replace(/\s+/g, '-') // Replace spaces with hyphens
+		.replace(/[^\w\-]+/g, '') // Remove non-word chars (except hyphens)
+		.replace(/\-\-+/g, '-') // Replace multiple hyphens with single
+		.replace(/^-+/, '') // Remove hyphens from start
+		.replace(/-+$/, ''); // Remove hyphens from end
 }

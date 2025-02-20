@@ -5,59 +5,104 @@ dotenv.config();
 if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL is not set');
 const client = postgres(process.env.DATABASE_URL);
 export const db = drizzle(client);
-import * as table from '$lib/server/db/schema';
+
+import { TEST_RUBRIC_DATA2, RUBRIC_DATA, TEST_RUBRIC_DATA } from '$lib/constants';
+import { surveyDomains, surveyQuestions, surveySubDomains } from './schema';
+
+const data = TEST_RUBRIC_DATA;
 
 async function seed() {
 	console.log('🌱 Starting seed...');
-
-	setTimeout(() => {}, 1000); // Wait for the database to connect
 	// Clear existing data
-	//   await db.delete(comments);
-	//   await db.delete(posts);
-	//   await db.delete(users);
+	await db.delete(surveyQuestions);
+	await db.delete(surveySubDomains);
+	await db.delete(surveyDomains);
 
-	// Create users
-	//   const userIds = [];
-	//   for (let i = 0; i < 10; i++) {
-	//     const [user] = await db.insert(users).values({
-	//       email: faker.internet.email(),
-	//       name: faker.person.fullName(),
-	//       createdAt: faker.date.past(),
-	//       updatedAt: new Date(),
-	//     }).returning();
-	//     userIds.push(user.id);
-	//   }
+	let currDomain;
+	let currSubDomain;
+	let currDescriptor;
 
-	// Create posts
-	//   const postIds = [];
-	//   for (let i = 0; i < 50; i++) {
-	//     const [post] = await db.insert(posts).values({
-	//       title: faker.lorem.sentence(),
-	//       content: faker.lorem.paragraphs(),
-	//       authorId: faker.helpers.arrayElement(userIds),
-	//       published: faker.datatype.boolean(),
-	//       createdAt: faker.date.past(),
-	//       updatedAt: new Date(),
-	//     }).returning();
-	//     postIds.push(post.id);
-	//   }
+	for (let i = 0; i < data.length; i++) {
+		for (let j = 0; j < data[i].subDomains.length; j++) {
+			for (let k = 0; k < data[i].subDomains[j].descriptors.length; k++) {
+				const possibleDomain = await createDomainIfNotExists(data[i].name);
+				if (!possibleDomain?.id) {
+					console.error(`❌ Domain exists: ${data[i].name}`);
+				} else {
+					currDomain = possibleDomain;
+				}
+				const possibleSubDomain = await createSubDomainIfNotExists({
+					description: data[i].subDomains[j].description,
+					name: data[i].subDomains[j].name,
+					domainId: currDomain?.id!
+				});
+				if (!possibleSubDomain?.id) {
+					console.error(`❌ Sub-domain exists: ${data[i].subDomains[j].name}`);
+				} else {
+					console.log(`🌱 SubDomain created: ${data[i].subDomains[j].name}`);
+					currSubDomain = possibleSubDomain;
+				}
+				currDescriptor = await createQuestionIfNotExists({
+					text: data[i].subDomains[j].descriptors[k],
+					subDomainId: currSubDomain?.id!
+				});
+				console.log(
+					`🌱 Descriptor created id:${currDescriptor.id} => ${data[i].subDomains[j].descriptors[k]}`
+				);
 
-	// Create comments
-	//   for (let i = 0; i < 100; i++) {
-	//     await db.insert(comments).values({
-	//       content: faker.lorem.paragraph(),
-	//       authorId: faker.helpers.arrayElement(userIds),
-	//       postId: faker.helpers.arrayElement(postIds),
-	//       createdAt: faker.date.past(),
-	//       updatedAt: new Date(),
-	//     });
-	//   }
+				console.log('DATA', ` ${currDomain?.id} | ${currSubDomain?.id} |  ${currDescriptor.id}`);
+			}
+		}
+	}
 
 	console.log('✅ Seed completed!');
 }
 
-seed().catch((error) => {
-	console.error('❌ Seed failed!');
-	console.error(error);
-	process.exit(1);
-});
+seed()
+	.catch((error) => {
+		console.error('❌ Seed failed!');
+		console.error(error);
+		process.exit(1);
+	})
+	.finally(() => {
+		process.exit(0);
+	});
+
+async function createDomainIfNotExists(name: string) {
+	const [domain] = await db
+		.insert(surveyDomains)
+		.values({ name })
+		.onConflictDoNothing({ target: surveyDomains.name })
+		.returning({ id: surveyDomains.id });
+	return domain;
+}
+async function createSubDomainIfNotExists({
+	name,
+	domainId,
+	description
+}: {
+	name: string;
+	domainId: number;
+	description: string;
+}) {
+	const [subDomain] = await db
+		.insert(surveySubDomains)
+		.values({ name, domainId, description })
+		.onConflictDoNothing({ target: surveySubDomains.name })
+		.returning({ id: surveySubDomains.id });
+	return subDomain;
+}
+async function createQuestionIfNotExists({
+	text,
+	subDomainId
+}: {
+	text: string;
+	subDomainId: number;
+}) {
+	const [question] = await db
+		.insert(surveyQuestions)
+		.values({ text, subDomainId })
+		.onConflictDoNothing({ target: surveyQuestions.text })
+		.returning({ id: surveyQuestions.id });
+	return question;
+}

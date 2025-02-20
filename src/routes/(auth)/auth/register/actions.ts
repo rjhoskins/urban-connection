@@ -1,7 +1,7 @@
 import { createNewUserFromInviteSchema } from '$lib/schema';
 import * as auth from '$lib/server/auth';
-import { db } from '$lib/server/db';
-import * as table from '$lib/server/db/schema';
+import { db } from '$lib/server/db/schema';
+import * as table from '$lib/server/db/schema/db-utils';
 import { hash } from '@node-rs/argon2';
 import { redirect } from '@sveltejs/kit';
 import { and, eq } from 'drizzle-orm';

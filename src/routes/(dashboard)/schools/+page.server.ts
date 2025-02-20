@@ -1,9 +1,11 @@
 /** @type {import('./$types').PageServerLoad} */
-import { db } from '$lib/server/db';
-import * as table from '$lib/server/db/schema';
-import { eq, is } from 'drizzle-orm';
+
 import { redirect, type Actions } from '@sveltejs/kit';
-import { schools } from '$lib/data/data';
+import {
+	getSchoolIDForSchoolAdmin,
+	getSchoolsForDistrictAdmin,
+	getSchoolsForSuperAdmin
+} from '$lib/server/queries';
 
 export const load = async (event) => {
 	const { parent } = event;
@@ -45,56 +47,6 @@ export const load = async (event) => {
 // 		.innerJoin(districtAdminsTable, is(districtAdminsTable.districtId, districtsTable.id))
 // 		.where(is(districtAdminsTable.userId, userId));
 // };
-
-const getSchoolIDForSchoolAdmin = async (userId: string) => {
-	const [res] = await db
-		.select({ schoolId: table.schoolsTable.id })
-		.from(table.schoolsTable)
-		.innerJoin(table.schoolAdminsTable, eq(table.schoolAdminsTable.schoolId, table.schoolsTable.id))
-		.where(eq(table.schoolAdminsTable.userId, userId));
-
-	console.log('getSchoolIDForSchoolAdmin res => ', res);
-	return res.schoolId;
-	// .innerJoin(table.schoolAdminsTable, is(table.schoolAdminsTable.schoolId, table.schoolsTable.id))
-	// .where(is(table.schoolAdminsTable.userId, userId));
-
-	// const result = await db.select().from(users).innerJoin(pets, eq(users.id, pets.ownerId))
-};
-const getSchoolsForSuperAdmin = async () => {
-	const res = await db
-		.select({ id: table.schoolsTable.id, name: table.schoolsTable.name })
-		.from(table.schoolsTable);
-
-	console.log('getSchoolIDForSchoolAdmin res => ', res);
-	return res;
-	// .innerJoin(table.schoolAdminsTable, is(table.schoolAdminsTable.schoolId, table.schoolsTable.id))
-	// .where(is(table.schoolAdminsTable.userId, userId));
-
-	// const result = await db.select().from(users).innerJoin(pets, eq(users.id, pets.ownerId))
-};
-const getSchoolsForDistrictAdmin = async (userId: string) => {
-	try {
-		const res = await db
-			.select({
-				id: table.schoolsTable.id,
-				name: table.schoolsTable.name,
-				districtId: table.schoolsTable.districtId
-			})
-			.from(table.schoolsTable)
-			.leftJoin(table.districtsTable, eq(table.districtsTable.id, table.schoolsTable.districtId))
-			.leftJoin(
-				table.districtAdminsTable,
-				eq(table.districtAdminsTable.districtId, table.schoolsTable.districtId)
-			)
-			.where(eq(table.districtAdminsTable.userId, userId)); // Use static value here to debug if needed.
-
-		console.log('getSchoolsForDistrictAdmin res => ', res);
-		return res;
-	} catch (error) {
-		const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
-		console.log('getSchoolsForDistrictAdmin error => ', errorMessage);
-	}
-};
 
 export const actions: Actions = {
 	default: async (event) => {

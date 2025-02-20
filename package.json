@@ -19,9 +19,9 @@
 		"db:check": "drizzle-kit check",
 		"db:drop": "drizzle-kit drop",
 		"db:generate": "drizzle-kit generate",
-		"db:migrate": "drizzle-kit migrate",
 		"db:studio": "drizzle-kit studio",
-		"db:seed": "npx tsx src/lib/server/db/seed.ts"
+		"db:migrate": "cross-env DB_MIGRATING=true tsx src/db/migrate.ts",
+		"db:seed": "cross-env DB_SEEDING=true tsx src/lib/server/db/seed.ts"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.2.3",
@@ -77,6 +77,8 @@
 		"@tiptap/pm": "^2.11.3",
 		"@tiptap/starter-kit": "^2.11.3",
 		"@types/node": "^22.10.2",
+		"dotenv": "^16.4.7",
+		"dotenv-expand": "^12.0.1",
 		"drizzle-orm": "^0.38.3",
 		"drizzle-seed": "^0.3.0",
 		"nanoid": "^5.0.9",

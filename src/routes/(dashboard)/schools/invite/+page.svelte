@@ -9,7 +9,7 @@
 	import HtmlEmailUserInviteForm from '$lib/components/forms/html-email-user-invite-form.svelte';
 
 	let { data } = $props();
-	const { token, htmlTemplateData } = data;
+	const { token } = data;
 	const { name, email, inviteId } = decodeInviteToken(token || '');
 	let pageHTMLEmail = $state();
 	let pageIsEditing = $state(false);
@@ -20,23 +20,15 @@
 	<!-- <meta name="description" content="This is where the description goes for SEO" /> -->
 </svelte:head>
 
-<!-- <pre>{JSON.stringify(data.htmlTemplateData[0].template, null, 2)}</pre> -->
-<!-- <pre>{JSON.stringify(page, null, 2)}</pre> -->
+<!-- <pre>{JSON.stringify(data.htmlTemplateData.template, null, 2)}</pre> -->
 
 <h1 class="sr-only">Invite Administrator</h1>
 <p class="hidden">Invite Token => {token || 'TODO'}</p>
 <div class="grid h-full place-content-center">
 	<!-- <pre class="sizes">{JSON.stringify(pageIsEditing, null, 2)}</pre> -->
 	<Card.Root class="m-6 lg:lg:w-[65ch]">
-		<!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->
 		<Card.Content>
-			<HtmlEmailUserInviteForm
-				bind:formisEditing={pageIsEditing}
-				initialTemplateData={htmlTemplateData[0].template}
-				{token}
-				{page}
-				{data}
-			/>
+			<HtmlEmailUserInviteForm bind:formisEditing={pageIsEditing} {token} {page} {data} />
 			{#if !pageIsEditing}
 				<InviteUserByEmailForm {data} {token} {page} />
 			{/if}

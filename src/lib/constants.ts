@@ -19,7 +19,52 @@ export const INITIAL_HTML_DATA = {
 	callToAction: 'Please register to access your organization',
 	registrationLinkText: 'here'
 };
-
+const demographicsData = {
+	name: 'Demographics',
+	type: 'demographics',
+	subDomains: [
+		{
+			name: 'Demographics',
+			description: 'Please provide the following information about yourself.',
+			fields: [
+				{
+					label: 'Name',
+					type: 'text',
+					fieldName: 'name',
+					value: null,
+					placeholder: 'Enter your name'
+				},
+				{
+					label: 'Years Teaching',
+					fieldName: 'yearsTeaching',
+					type: 'number',
+					value: null,
+					placeholder: 'Enter number of years teaching'
+				},
+				{
+					label: 'Subject',
+					fieldName: 'subject',
+					type: 'select',
+					value: null,
+					options: [
+						{
+							value: 'Math',
+							label: 'Math'
+						},
+						{
+							value: 'Science',
+							label: 'Science'
+						},
+						{
+							value: 'English',
+							label: 'English'
+						}
+					]
+				}
+			]
+		}
+	]
+};
 const rubricData = [
 	{
 		name: 'Cultural Awareness',
@@ -27,7 +72,7 @@ const rubricData = [
 		subDomains: [
 			{
 				name: 'Cultural Awareness',
-				points: 5,
+				type: 'sub',
 				description:
 					'The school demonstrates intentionality in an effort to become/remain culturally aware, and use that understanding to guide decisions, foster relationships, and create an inclusive environment for students, families, and the community.',
 				descriptors: [
@@ -758,58 +803,13 @@ export const TEST_RUBRIC_DATA = testRubricData;
 
 const testRubricData2 = [
 	{
-		name: 'Demographics',
-		type: 'demographics',
-		subDomains: [
-			{
-				name: 'Demographics',
-				description: 'Please provide the following information about yourself.',
-				fields: [
-					{
-						label: 'Name',
-						type: 'text',
-						fieldName: 'name',
-						value: null,
-						placeholder: 'Enter your name'
-					},
-					{
-						label: 'Years Teaching',
-						fieldName: 'yearsTeaching',
-						type: 'number',
-						value: null,
-						placeholder: 'Enter number of years teaching'
-					},
-					{
-						label: 'Subject',
-						fieldName: 'subject',
-						type: 'select',
-						value: null,
-						options: [
-							{
-								value: 'Math',
-								label: 'Math'
-							},
-							{
-								value: 'Science',
-								label: 'Science'
-							},
-							{
-								value: 'English',
-								label: 'English'
-							}
-						]
-					}
-				]
-			}
-		]
-	},
-	{
 		name: 'Cultural Awareness',
 		totalPoints: 24,
+		type: 'domain',
 		subDomains: [
 			{
 				name: 'Cultural Awareness',
-				points: 5,
+				type: 'subdomain',
 				description:
 					'The school demonstrates intentionality in an effort to become/remain culturally aware, and use that understanding to guide decisions, foster relationships, and create an inclusive environment.',
 				descriptors: [
@@ -832,7 +832,7 @@ const testRubricData2 = [
 			},
 			{
 				name: 'Mentorship',
-				points: 5,
+				type: 'subdomain',
 				description:
 					'There is prioritization in student mentorship, focusing on building meaningful relationships with students, families, and the community.',
 				descriptors: [
@@ -861,7 +861,7 @@ const testRubricData2 = [
 		subDomains: [
 			{
 				name: 'Systemic Expectations',
-				points: 6,
+				type: 'sub',
 				description:
 					"The school's system establishes inclusive language and clear expectations involving all stakeholders.",
 				descriptors: [
@@ -887,3 +887,4 @@ const testRubricData2 = [
 ];
 
 export const TEST_RUBRIC_DATA2 = testRubricData2;
+export const TEST_COMBINED_WITH_DEMOGRAPHICS = [demographicsData, ...testRubricData2];

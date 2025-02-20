@@ -10,7 +10,7 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { createNewUserOrLoginSchema } from '$lib/schema';
 import { SERVER_ERROR_MESSAGES } from '$lib/constants';
 import { setFlash } from 'sveltekit-flash-message/server';
-import { createNewUser, findIfActiveUserExists } from '$lib/server/queries';
+import { simpleRegisterToBeDEPRICATED, findIfActiveUserExists } from '$lib/server/queries';
 
 import { handleLogFlashReturnFormError, handleTypeSafeError } from '$lib/utils';
 
@@ -44,14 +44,15 @@ export const actions: Actions = {
 				status: 404,
 				event
 			});
-			// console.log('invalid username, password, or user not found');
-			// setFlash(
-			// 	{ type: 'error', message: 'invalid username, password, or user not found' },
-			// 	event.cookies
-			// );
-			// return message(form, 'invalid username, password, or user not found', {
-			// 	status: 404
-			// });
+
+			console.log('invalid username, password, or user not found');
+			setFlash(
+				{ type: 'error', message: 'invalid username, password, or user not found' },
+				event.cookies
+			);
+			return message(form, 'invalid username, password, or user not found', {
+				status: 404
+			});
 		}
 
 		const validPassword = await verify(existingUser.passwordHash!, form.data.password, {
@@ -99,7 +100,11 @@ export const actions: Actions = {
 				outputLen: 32,
 				parallelism: 1
 			});
-			let newUserRes = await createNewUser({ userId, passwordHash, username: form.data.username });
+			let newUserRes = await simpleRegisterToBeDEPRICATED({
+				id: userId,
+				passwordHash,
+				username: form.data.username
+			});
 			console.log('register newUserRes => ', newUserRes);
 
 			const sessionToken = auth.generateSessionToken();

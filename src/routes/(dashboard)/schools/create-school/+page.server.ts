@@ -3,24 +3,25 @@ import { createSchoolSchema } from '$lib/schema';
 import { zod } from 'sveltekit-superforms/adapters';
 import type { PageServerLoad, Actions } from './$types.js';
 import { fail } from '@sveltejs/kit';
-import { db } from '$lib/server/db';
-import * as table from '$lib/server/db/schema';
-import { districts } from '$lib/data/data.js';
 import { redirect } from '@sveltejs/kit';
-import { createInviteToken, generateUserId } from '$lib/utils';
-import { SERVER_ERROR_MESSAGES } from '$lib/constants.js';
-import { nanoid } from 'nanoid';
+import { createInviteToken, generateUserId, handleLogFlashReturnFormError } from '$lib/utils';
 import { setFlash } from 'sveltekit-flash-message/server';
-import { desc, eq } from 'drizzle-orm';
+import db from '$lib/server/db/index.js';
+import {
+	createSchool,
+	createAdminUserInvite,
+	createNewUserWithDetails,
+	createSchoolAdmin,
+	createDistrictAdmin,
+	getDistricts,
+	checkAdminUserExists
+} from '$lib/server/queries.js';
+import { check } from 'drizzle-orm/mysql-core';
 
 export const load: PageServerLoad = async (event) => {
 	if (!event.locals.user) return redirect(302, '/auth/login');
 	const user = event.locals.user;
 	if (!user) return fail(400, { message: 'User not authenticated' });
-
-	async function getDistricts() {
-		return await db.select().from(table.districtsTable);
-	}
 
 	const form = await superValidate(zod(createSchoolSchema));
 
@@ -33,127 +34,113 @@ export const load: PageServerLoad = async (event) => {
 };
 export const actions: Actions = {
 	default: async (event) => {
+		console.log('here 1 ======================================================> ');
 		if (!event.locals.user) return redirect(302, '/auth/login');
 
 		const form = await superValidate(event, zod(createSchoolSchema));
-
 		if (!form.valid) {
-			// return fail(400, { form });
-			return message(form, 'Invalid form'); // Will return fail(400, { form }) since form isn't valid
+			return handleLogFlashReturnFormError({
+				type: 'error',
+				form,
+				message: 'Invalid form',
+				status: 400,
+				event
+			});
 		}
-		// if (form.valid) {
-		// 	// return fail(400, { form });
-		// 	if (form.data.isDistrict) {
-		// 		console.log('district form => ', form);
-		// 		return message(form, 'District form');
-		// 	}
-		// 	console.log('school form => ', form);
-		// 	return message(form, 'valid form'); // Will return fail(400, { form }) since form isn't valid
-		// }
 
-		const [existingUser] = await db
-			.select()
-			.from(table.usersTable)
-			.where(eq(table.usersTable.username, form.data.adminEmail));
-
+		const existingUser = await checkAdminUserExists({ username: form.data.adminEmail });
 		if (existingUser) {
-			setFlash(
-				{ type: 'error', message: 'An admin already exists under this email, please check again.' },
-				event.cookies
-			);
-			return message(form, 'User already exists, please contact your administrator');
+			return handleLogFlashReturnFormError({
+				type: 'error',
+				form,
+				message: 'User already exists, please contact your administrator',
+				status: 400,
+				event
+			});
 		}
+		console.log('existingUser => ', existingUser);
 
 		let inviteToken: string = '';
-
 		try {
 			console.log('create form trying... ======================> ', form);
 			const result = await db.transaction(async (trx) => {
 				let schoolResult;
 				if (!form.data.isDistrict) {
-					schoolResult = await trx
-						.insert(table.schoolsTable)
-						.values({
+					schoolResult = await createSchool(
+						{
 							name: form.data.name ?? '',
 							districtId: form.data.districtId,
 							createdBy: event.locals.user?.id ?? ''
-						})
-						.returning();
+						},
+						trx
+					);
+
 					console.log('schoolResult => ', schoolResult);
 				}
 
-				let inviteData: {
-					id: string;
-					name: string;
-					email: string;
-					inviteType: 'district' | 'school';
-					inviter: string;
-					schoolId?: number;
-					districtId?: number;
-				} = {
-					id: nanoid(),
-					name: form.data.adminName,
-					email: form.data.adminEmail,
-					inviteType: form.data.isDistrict ? 'district' : 'school',
-					inviter: event.locals.user?.id ?? ''
-				};
-				// create invite here, use it in invite page to...
-				let inviteRes;
-				if (!form.data.isDistrict && schoolResult && schoolResult.length > 0) {
-					inviteRes = await trx
-						.insert(table.userInvitesTable)
-						.values({ ...inviteData, schoolId: schoolResult[0].id })
-						.returning();
-					inviteData.schoolId = schoolResult[0].id;
-				} else {
-					inviteRes = await trx
-						.insert(table.userInvitesTable)
-						.values({ ...inviteData, districtId: form.data.districtId })
-						.returning();
-					inviteData.districtId = form.data.districtId;
-				}
-				console.log('inviteRes => ', inviteRes);
-				inviteToken = createInviteToken(form.data.adminName, form.data.adminEmail, inviteRes[0].id);
-
+				let inviteRes = await createAdminUserInvite(
+					{
+						inviteData: {
+							id: generateUserId(),
+							name: form.data.adminName,
+							email: form.data.adminEmail,
+							inviteType: form.data.isDistrict ? 'district' : 'school',
+							inviter: event.locals.user?.id ?? '',
+							schoolId: schoolResult?.id ?? null,
+							districtId: form.data.districtId ?? null
+						}
+					},
+					trx
+				);
 				if (!inviteRes) throw new Error('Failed to create invite');
 
-				const [newUser] = await trx
-					.insert(table.usersTable)
-					.values({
+				console.log('inviteRes => ', inviteRes);
+				inviteToken = createInviteToken(form.data.adminName, form.data.adminEmail, inviteRes.id);
+				const newUser = await createNewUserWithDetails(
+					{
 						id: generateUserId(),
 						username: form.data.adminEmail,
 						name: form.data.adminName,
 						role: form.data.isDistrict ? 'district_admin' : 'school_admin',
-						phone: form.data.adminPhone
-					})
-					.returning({ id: table.usersTable.id });
-				console.log('newUser => ', newUser);
-
-				if (!newUser) throw new Error('Failed to create user');
+						phone: form.data.adminPhone ? form.data.adminPhone : ''
+					},
+					trx
+				);
+				if (!newUser) {
+					throw new Error('Failed to create user');
+				}
 
 				//associate user with school/district
 				let adminRes;
-				if (inviteRes[0].inviteType === 'school') {
-					adminRes = await trx
-						.insert(table.schoolAdminsTable)
-						.values({ userId: newUser.id, schoolId: inviteRes[0].schoolId! })
-						.returning({ id: table.schoolAdminsTable.id });
-					console.log(`school adminRes=> `, adminRes[0]);
-				} else if (inviteRes[0].inviteType === 'district') {
-					adminRes = await trx
-						.insert(table.districtAdminsTable)
-						.values({ userId: newUser.id, districtId: inviteRes[0].districtId! })
-						.returning({ id: table.districtAdminsTable.id });
-					console.log('district adminRes => ', adminRes[0]);
+				if (inviteRes.inviteType === 'school') {
+					adminRes = await createSchoolAdmin(
+						{ userId: newUser.id, schoolId: inviteRes.schoolId! },
+						trx
+					);
+
+					console.log(`school adminRes=> `, adminRes);
+				} else if (inviteRes.inviteType === 'district') {
+					adminRes = await createDistrictAdmin(
+						{ userId: newUser.id, districtId: inviteRes.districtId! },
+						trx
+					);
+					console.log('district adminRes => ', adminRes);
 				}
-				if (!adminRes || !adminRes[0].id) throw new Error('Failed to associate admin');
+				if (!adminRes) {
+					throw new Error('Failed to associate admin');
+				}
 
 				return newUser;
 			});
 		} catch (error) {
 			const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
-			setFlash({ type: 'error', message: errorMessage }, event.cookies);
-			return message(form, 'Unexpected error: ' + errorMessage, { status: 500 });
+			return handleLogFlashReturnFormError({
+				type: 'error',
+				form,
+				message: errorMessage,
+				status: 500,
+				event
+			});
 		}
 
 		setFlash({ type: 'success', message: 'School successfully created' }, event.cookies);

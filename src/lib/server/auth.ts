@@ -2,8 +2,10 @@ import type { RequestEvent } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import { sha256 } from '@oslojs/crypto/sha2';
 import { encodeBase64url, encodeHexLowerCase } from '@oslojs/encoding';
-import { db } from '$lib/server/db';
-import * as table from '$lib/server/db/schema';
+
+import * as table from '$lib/server/db/schema/db-utils';
+import { db } from './db';
+import { sessions, users } from './db/schema';
 
 // Constants
 const DAY_IN_MS = 1000 * 60 * 60 * 24;
@@ -22,12 +24,12 @@ export function generateSessionToken() {
 
 export async function createSession(token: string, userId: string) {
 	const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
-	const session: table.Session = {
+	const session: Session = {
 		id: sessionId,
 		userId,
 		expiresAt: getISOTimestamp(30)
 	};
-	await db.insert(table.sessionsTable).values(session);
+	await db.insert(sessions).values(session);
 	return session;
 }
 
@@ -36,16 +38,16 @@ export async function validateSessionToken(token: string) {
 	const [result] = await db
 		.select({
 			user: {
-				id: table.usersTable.id,
-				username: table.usersTable.username,
-				name: table.usersTable.name,
-				role: table.usersTable.role
+				id: users.id,
+				username: users.username,
+				name: users.name,
+				role: users.role
 			},
-			session: table.sessionsTable
+			session: sessions
 		})
-		.from(table.sessionsTable)
-		.innerJoin(table.usersTable, eq(table.sessionsTable.userId, table.usersTable.id))
-		.where(eq(table.sessionsTable.id, sessionId));
+		.from(sessions)
+		.innerJoin(users, eq(sessions.userId, users.id))
+		.where(eq(sessions.id, sessionId));
 
 	if (!result) {
 		return { session: null, user: null };
@@ -56,7 +58,7 @@ export async function validateSessionToken(token: string) {
 
 	// Check if session has expired
 	if (currentTime >= session.expiresAt) {
-		await db.delete(table.sessionsTable).where(eq(table.sessionsTable.id, session.id));
+		await db.delete(sessions).where(eq(sessions.id, session.id));
 		return { session: null, user: null };
 	}
 
@@ -67,10 +69,7 @@ export async function validateSessionToken(token: string) {
 	if (currentTime >= renewalThreshold) {
 		const newExpiresAt = getISOTimestamp(30);
 		session.expiresAt = newExpiresAt;
-		await db
-			.update(table.sessionsTable)
-			.set({ expiresAt: newExpiresAt })
-			.where(eq(table.sessionsTable.id, session.id));
+		await db.update(sessions).set({ expiresAt: newExpiresAt }).where(eq(sessions.id, session.id));
 	}
 
 	return { session, user };
@@ -79,7 +78,7 @@ export async function validateSessionToken(token: string) {
 export type SessionValidationResult = Awaited<ReturnType<typeof validateSessionToken>>;
 
 export async function invalidateSession(sessionId: string) {
-	await db.delete(table.sessionsTable).where(eq(table.sessionsTable.id, sessionId));
+	await db.delete(sessions).where(eq(sessions.id, sessionId));
 }
 
 export function setSessionTokenCookie(event: RequestEvent, token: string, expiresAt: string) {

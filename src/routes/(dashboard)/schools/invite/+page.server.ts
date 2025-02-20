@@ -9,37 +9,33 @@ import { message } from 'sveltekit-superforms';
 import type { PageServerLoad, Actions } from './$types.js';
 import { fail } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
-import * as table from '$lib/server/db/schema';
-import { districts } from '$lib/data/data.js';
+
 import { redirect } from '@sveltejs/kit';
-import { createInviteToken, decodeInviteToken } from '$lib/utils';
+import { createInviteToken, decodeInviteToken, handleLogFlashReturnFormError } from '$lib/utils';
 import { eq, or, desc } from 'drizzle-orm';
 import { setFlash } from 'sveltekit-flash-message/server';
 import { INITIAL_HTML_DATA } from '$lib/constants.js';
+import { htmlEmailTemplates } from '$lib/server/db/schema/index.js';
+import { getLatestHtmlTemplateData } from '$lib/server/queries.js';
 
 export const load: PageServerLoad = async ({ url }) => {
 	const token = url.searchParams.get('inviteToken');
-	console.log('token => ', token);
-	async function getLatestHtmlTemplateData() {
-		return await db
-			.select({ template: table.htmlEmailTemplatesTable.template })
-			.from(table.htmlEmailTemplatesTable)
-			.orderBy(
-				desc(table.htmlEmailTemplatesTable.createdAt),
-				desc(table.htmlEmailTemplatesTable.id)
-			)
-			.limit(1);
-	}
-	const [htmlTemplate] = await getLatestHtmlTemplateData();
-	console.log('htmlTemplate => ', htmlTemplate.template);
+	// console.log('token => ', token);
+
+	const htmlTemplate = await getLatestHtmlTemplateData();
+	console.log('htmlTemplate => ', htmlTemplate?.template);
 	const inviteForm = await superValidate(zod(inviteNewUserSchema));
-	const emailForm = await superValidate(
-		htmlTemplate.template!,
-		zod(userInviteHTMLEmailTemplateSchema)
-	);
+	const emailForm = await superValidate(zod(userInviteHTMLEmailTemplateSchema));
+	emailForm.data = htmlTemplate?.template || {
+		greeting: '',
+		definition: '',
+		keyPoints: [],
+		closing: '',
+		callToAction: '',
+		registrationLinkText: ''
+	};
 
 	return {
-		htmlTemplateData: await getLatestHtmlTemplateData(),
 		token,
 		inviteForm,
 		emailForm
@@ -48,35 +44,19 @@ export const load: PageServerLoad = async ({ url }) => {
 export const actions: Actions = {
 	invite: async (event) => {
 		if (!event.locals.user) return redirect(302, '/auth/login');
-
 		const form = await superValidate(event, zod(inviteNewUserSchema));
-
 		if (!form.valid) {
 			setFlash({ type: 'error', message: 'errorMessage' }, event.cookies);
 			return message(form, 'Invalid form');
 		}
-
 		try {
-			const [htmlTemplate] = await db
-				.select({ template: table.htmlEmailTemplatesTable.template })
-				.from(table.htmlEmailTemplatesTable)
-				.orderBy(
-					desc(table.htmlEmailTemplatesTable.createdAt),
-					desc(table.htmlEmailTemplatesTable.id)
-				)
-				.limit(1);
-
-			// const [inviteRes] = await db
-			// 	.update(table.userInvitesTable)
-			// 	.set({ isSent: true })
-			// 	.where(
-			// 		or(
-			// 			// update specific invite but all past invites should be marked as used too
-			// 			eq(table.userInvitesTable.id, form.data.inviteId),
-			// 			eq(table.userInvitesTable.email, form.data.email)
-			// 		)
-			// 	);
-			// if (!inviteRes) throw new Error('Invite not found');
+			const htmlTemplate = await getLatestHtmlTemplateData();
+			if (!htmlTemplate) {
+				return handleLogFlashReturnFormError(
+					{ type: 'error', message: 'No html template found' },
+					event.cookies
+				);
+			}
 			event.fetch('/api/send-html-email', {
 				method: 'POST',
 				headers: {
@@ -89,37 +69,35 @@ export const actions: Actions = {
 					htmlEmailContent: htmlTemplate.template
 				})
 			});
-			throw new Error('testing...');
 		} catch (error) {
 			const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
-			setFlash({ type: 'error', message: errorMessage }, event.cookies);
-			return message(form, 'Unexpected error: ' + errorMessage, { status: 500 });
+			return handleLogFlashReturnFormError({
+				type: 'error',
+				form,
+				message: errorMessage,
+				status: 500,
+				event
+			});
 		}
-
-		console.log('invite form => ', form);
 		console.log(
 			'invite link => ',
 			`/auth/register?inviteToken=${createInviteToken(form.data.name, form.data.email, form.data.inviteId)}`
 		);
-		// TODO????
-		// redirect(302,
-		// 	`/=${createInviteToken(name, email, inviteId)}`);
+
 		setFlash({ type: 'success', message: 'Invite sent!' }, event.cookies);
 		redirect(302, '/');
-
-		// Display a success status message
 	},
 	email: async (event) => {
 		const form = await superValidate(event, zod(userInviteHTMLEmailTemplateSchema));
+		console.log('form => ', form);
 		if (!form.valid) {
 			setFlash({ type: 'error', message: 'Invalid form' }, event.cookies);
 			return message(form, 'Invalid form');
 		}
 		const [htmlEmailRes] = await db
-			.insert(table.htmlEmailTemplatesTable)
+			.insert(htmlEmailTemplates)
 			.values({ template: form.data })
 			.returning();
-
 		setFlash({ type: 'success', message: 'Email template data saved' }, event.cookies);
 		// console.log('htmlres => ', htmlEmailRes);
 		// console.log('form => ', form);

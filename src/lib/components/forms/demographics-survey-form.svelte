@@ -39,8 +39,6 @@
 		console.log('formData', formData);
 		return async ({ result, update }) => {
 			update({ reset: false });
-			console.log('action', action);
-			console.log('formElement', formElement);
 			console.log('result', result);
 			if (result.type === 'success') {
 				console.log('Success');

@@ -3,9 +3,9 @@ import type { RequestHandler } from '../$types';
 import nodemailer from 'nodemailer';
 import { INITIAL_HTML_DATA } from '$lib/constants';
 import { generateNewUserInviteEmail } from '$lib/utils';
-import { db } from '$lib/server/db';
+import { db } from '$lib/server/db/schema';
 import { desc } from 'drizzle-orm';
-import * as table from '$lib/server/db/schema';
+import * as table from '$lib/server/db/schema/db-utils';
 import { stat } from 'fs';
 
 export const GET: RequestHandler = async () => {

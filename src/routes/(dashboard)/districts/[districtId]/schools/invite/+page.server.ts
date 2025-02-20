@@ -7,30 +7,19 @@ import {
 import { zod } from 'sveltekit-superforms/adapters';
 import { message } from 'sveltekit-superforms';
 import type { PageServerLoad, Actions } from './$types.js';
-import { fail } from '@sveltejs/kit';
-import { db } from '$lib/server/db';
-import * as table from '$lib/server/db/schema';
-import { districts } from '$lib/data/data.js';
+
 import { redirect } from '@sveltejs/kit';
-import { createInviteToken, decodeInviteToken } from '$lib/utils';
-import { eq, or, desc } from 'drizzle-orm';
+import { createInviteToken, decodeInviteToken, handleLogFlashReturnFormError } from '$lib/utils';
+
 import { setFlash } from 'sveltekit-flash-message/server';
-import { INITIAL_HTML_DATA } from '$lib/constants.js';
+import { getLatestHtmlTemplateData, updateHtmlTemplateData } from '$lib/server/queries.js';
+import { get } from 'svelte/store';
 
 export const load: PageServerLoad = async ({ url }) => {
 	const token = url.searchParams.get('inviteToken');
 	console.log('token => ', token);
-	async function getLatestHtmlTemplateData() {
-		return await db
-			.select({ template: table.htmlEmailTemplatesTable.template })
-			.from(table.htmlEmailTemplatesTable)
-			.orderBy(
-				desc(table.htmlEmailTemplatesTable.createdAt),
-				desc(table.htmlEmailTemplatesTable.id)
-			)
-			.limit(1);
-	}
-	const [htmlTemplate] = await getLatestHtmlTemplateData();
+
+	const htmlTemplate = await getLatestHtmlTemplateData();
 	console.log('htmlTemplate => ', htmlTemplate.template);
 	const inviteForm = await superValidate(zod(inviteNewUserSchema));
 	const emailForm = await superValidate(
@@ -57,26 +46,8 @@ export const actions: Actions = {
 		}
 
 		try {
-			const [htmlTemplate] = await db
-				.select({ template: table.htmlEmailTemplatesTable.template })
-				.from(table.htmlEmailTemplatesTable)
-				.orderBy(
-					desc(table.htmlEmailTemplatesTable.createdAt),
-					desc(table.htmlEmailTemplatesTable.id)
-				)
-				.limit(1);
+			const htmlTemplate = await getLatestHtmlTemplateData();
 
-			// const [inviteRes] = await db
-			// 	.update(table.userInvitesTable)
-			// 	.set({ isSent: true })
-			// 	.where(
-			// 		or(
-			// 			// update specific invite but all past invites should be marked as used too
-			// 			eq(table.userInvitesTable.id, form.data.inviteId),
-			// 			eq(table.userInvitesTable.email, form.data.email)
-			// 		)
-			// 	);
-			// if (!inviteRes) throw new Error('Invite not found');
 			event.fetch('/api/send-html-email', {
 				method: 'POST',
 				headers: {
@@ -112,17 +83,16 @@ export const actions: Actions = {
 	email: async (event) => {
 		const form = await superValidate(event, zod(userInviteHTMLEmailTemplateSchema));
 		if (!form.valid) {
-			setFlash({ type: 'error', message: 'Invalid form' }, event.cookies);
-			return message(form, 'Invalid form');
+			handleLogFlashReturnFormError({
+				type: 'error',
+				form,
+				message: 'Invalid form',
+				status: 400,
+				event
+			});
 		}
-		const [htmlEmailRes] = await db
-			.insert(table.htmlEmailTemplatesTable)
-			.values({ template: form.data })
-			.returning();
+		const htmlEmailRes = await updateHtmlTemplateData({ template: form.data });
 
 		setFlash({ type: 'success', message: 'Email template data saved' }, event.cookies);
-		// console.log('htmlres => ', htmlEmailRes);
-		// console.log('form => ', form);
-		// return form;
 	}
 };

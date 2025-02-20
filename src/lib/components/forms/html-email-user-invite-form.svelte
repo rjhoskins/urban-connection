@@ -13,14 +13,14 @@
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import HtmlEmailTextPreview from '../html-email-text-preview.svelte';
 
-	let { formisEditing = $bindable(), data, token, page, initialTemplateData } = $props();
+	let { formisEditing = $bindable(), data, token, page } = $props();
 
 	const thisForm = superForm(data.emailForm, {
 		dataType: 'json',
 		validators: zodClient(userInviteHTMLEmailTemplateSchema),
 		invalidateAll: false,
-		onSubmit: async ({ formData, cancel }) => {
-			console.log('formData', formData);
+		onSubmit({ jsonData }) {
+			console.log('jsonData ===>', jsonData);
 		}
 	});
 	const {
@@ -62,7 +62,7 @@
 				<Form.Control>
 					{#snippet children({ props })}
 						<Form.Label class="">Greeting</Form.Label>
-						<Input type="text" {...props} bind:value={$emailForm.greeting} />
+						<Input type="text" bind:value={$emailForm.template.greeting} />
 					{/snippet}
 				</Form.Control>
 				<Form.FieldErrors />
@@ -73,19 +73,21 @@
 				<Form.Control>
 					{#snippet children({ props })}
 						<Form.Label class="">Definition</Form.Label>
-						<Textarea {...props} bind:value={$emailForm.definition} />
+						<Textarea {...props} bind:value={$emailForm.template.definition} />
 					{/snippet}
 				</Form.Control>
 				<Form.FieldErrors />
 			</Form.Field>
 			<ul class="flex flex-col gap-1.5">
-				{#each $emailForm.keyPoints as keyPoint (keyPoint)}
+				{#each $emailForm.template.keyPoints as keyPoint (keyPoint)}
 					<li class="flex items-center gap-x-4 p-1">
 						{keyPoint}
 						<Button
-							class=" "
+							class=""
 							onclick={() =>
-								($emailForm.keyPoints = $emailForm.keyPoints.filter((el: any) => el !== keyPoint))}
+								($emailForm.template.keyPoints = $emailForm.template.keyPoints.filter(
+									(el: any) => el !== keyPoint
+								))}
 							size="icon"
 							variant="outline"><X /></Button
 						>
@@ -96,8 +98,7 @@
 			<!-- keyPoints -->
 
 			<Form.Field class=" space-y-1" form={thisForm} name="keyPoints[]">
-				<input type="hidden" name="keyPoints[]" value={$emailForm.keyPoints} />
-
+				<input type="hidden" name="keyPoints[]" value={$emailForm.template.keyPoints} />
 				<Form.FieldErrors />
 			</Form.Field>
 			<Form.Field class=" space-y-1" form={thisForm} name="newKeyPoint">
@@ -108,7 +109,7 @@
 							<Input type="text" {...props} bind:value={newKeyPoint} />
 							<Button
 								onclick={() => {
-									$emailForm.keyPoints = [...$emailForm.keyPoints, newKeyPoint];
+									$emailForm.template.keyPoints = [...$emailForm.template.keyPoints, newKeyPoint];
 									newKeyPoint = '';
 								}}>Add</Button
 							>
@@ -123,7 +124,7 @@
 				<Form.Control>
 					{#snippet children({ props })}
 						<Form.Label class="">Closing</Form.Label>
-						<Input type="text" {...props} bind:value={$emailForm.closing} />
+						<Input type="text" {...props} bind:value={$emailForm.template.closing} />
 					{/snippet}
 				</Form.Control>
 				<Form.FieldErrors />
@@ -133,7 +134,7 @@
 				<Form.Control>
 					{#snippet children({ props })}
 						<Form.Label class="">Call To Action</Form.Label>
-						<Input type="text" {...props} bind:value={$emailForm.callToAction} />
+						<Input type="text" {...props} bind:value={$emailForm.template.callToAction} />
 					{/snippet}
 				</Form.Control>
 				<Form.FieldErrors />
@@ -144,7 +145,7 @@
 				<Form.Control>
 					{#snippet children({ props })}
 						<Form.Label class="">Registration Link Text</Form.Label>
-						<Input type="text" {...props} bind:value={$emailForm.registrationLinkText} />
+						<Input type="text" {...props} bind:value={$emailForm.template.registrationLinkText} />
 					{/snippet}
 				</Form.Control>
 				<Form.FieldErrors />
@@ -155,7 +156,9 @@
 			<!-- {#if $emailTainted}
 				<div class="message text-red-700">Form has changed</div>
 			{/if} -->
-			<!-- <SuperDebug data={$emailForm} /> -->
+			<div class="max-w-prose">
+				<SuperDebug data={$emailForm} />
+			</div>
 		</form>
 
 		<!-- END editor -->
