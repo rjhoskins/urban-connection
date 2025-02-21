@@ -53,7 +53,7 @@ export const load = async (event) => {
 	return {
 		adminData: await adminDataFunc(),
 		school: await dataFunc(),
-		surveyData: await getSurveyData(Number(event.params.schoolId))
-		questionData = await getQuestionData(Number(event.params.schoolId))
+		surveyData: await getSurveyData(Number(event.params.schoolId)),
+		questionData: await getQuestionData(Number(event.params.schoolId))
 	};
 };
