@@ -49,7 +49,7 @@
 				<p>Not Started</p>
 				<Progress barBgColor="bg-red-700" value={(surveysNotStarted / totalSurveys) * 100} />
 				<p>Started</p>
-				<Progress barBgColor="bg-green-700" value={(surveysStarted / totalSurveys) * 100} />
+				<Progress barBgColor="bg-amber-500" value={(surveysStarted / totalSurveys) * 100} />
 				<p>Completed</p>
 				<Progress barBgColor="bg-green-700" value={(surveysCompleted / totalSurveys) * 100} />
 			</div>
