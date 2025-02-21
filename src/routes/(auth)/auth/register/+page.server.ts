@@ -55,8 +55,10 @@ export const actions: Actions = {
 		}
 		console.log('existingUnusedInvite => ', existingUnusedInvite);
 
-		const existingUser = await checkRegisteredUserExists({ userEmail });
+		const existingUser = await checkRegisteredUserExists({ username: userEmail });
+		console.log('HERE => ', userEmail);
 		if (existingUser) {
+			console.log('HERE => ', userEmail);
 			setFlash(
 				{ type: 'error', message: 'User already exists, please contact your administrator' },
 				event.cookies
@@ -66,6 +68,7 @@ export const actions: Actions = {
 
 		try {
 			const result = await db.transaction(async (trx) => {
+				console.log('userEmail => ', userEmail);
 				const updatedUserWithPW = await updateUserWithPassword({ userEmail, passwordHash }, trx);
 
 				if (!updatedUserWithPW) throw new Error('Failed to register user');

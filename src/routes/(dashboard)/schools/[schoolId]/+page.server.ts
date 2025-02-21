@@ -3,7 +3,8 @@ import {
 	getSchoolForSchoolAdmin,
 	getSchoolForDistrictAdmin,
 	getSchoolForSuperAdmin,
-	getSchoolAdmin
+	getSchoolAdmin,
+	getSurveyData
 } from '$lib/server/queries';
 import { redirect } from '@sveltejs/kit';
 
@@ -22,12 +23,7 @@ export const load = async (event) => {
 		const userId = event.locals.user.id;
 		if (userId) {
 			dataFunc = () => getSchoolForSchoolAdmin(userId, Number(event.params.schoolId));
-			adminDataFunc = async () => {
-				if (event.locals.user) {
-					return { adminName: event.locals.user.name, adminEmail: event.locals.user.username };
-				}
-				return null;
-			};
+			adminDataFunc = () => getSchoolAdmin(Number(event.params.schoolId));
 		}
 	}
 	if (event.locals.user && event.locals.user.role === 'district_admin') {
@@ -56,6 +52,8 @@ export const load = async (event) => {
 
 	return {
 		adminData: await adminDataFunc(),
-		school: await dataFunc()
+		school: await dataFunc(),
+		surveyData: await getSurveyData(Number(event.params.schoolId))
+		questionData = await getQuestionData(Number(event.params.schoolId))
 	};
 };

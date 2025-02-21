@@ -10,12 +10,14 @@
 		handlePrev = $bindable(),
 		handleFin = $bindable(),
 		isFirstQuestion,
-		isLastQuestion
+		isLastQuestion,
+		surveyId
 	} = $props();
 </script>
 
 <form
 	method="POST"
+	action="?/submit"
 	id={formData[currDomain].subDomains[currSubDomain].name}
 	class=" flex flex-col gap-2"
 	use:enhance={({ formElement, formData, action, cancel }) => {
@@ -41,6 +43,7 @@
 		<input type="hidden" name="isLastQuestion" value="true" />
 	{/if}
 
+	<input type="hidden" name="surveyId" value={surveyId} />
 	<input
 		type="hidden"
 		name="totalQuestions"
@@ -55,7 +58,7 @@
 				<label class="align-middlex flex cursor-pointer items-center space-x-2">
 					<input
 						type="radio"
-						name={`domainId=${formData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}qId=${formData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}`}
+						name={`domainId=${formData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}|subDomainId=${formData[currDomain].subDomains[currSubDomain].id}|qId=${formData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}`}
 						bind:group={formData[currDomain].subDomains[currSubDomain].questions[questionIdx].value}
 						value={true}
 						class="h-4 w-4 border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
@@ -65,7 +68,7 @@
 				<label class="flex cursor-pointer items-center space-x-2">
 					<input
 						type="radio"
-						name={`domainId=${formData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}qId=${formData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}`}
+						name={`domainId=${formData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}|subDomainId=${formData[currDomain].subDomains[currSubDomain].id}|qId=${formData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}`}
 						bind:group={formData[currDomain].subDomains[currSubDomain].questions[questionIdx].value}
 						value={false}
 						class="h-4 w-4 border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
@@ -80,11 +83,9 @@
 			>Previous</Button
 		>
 		{#if isLastQuestion}
-			<Button type="submit" formaction="?/finish" onclick={() => handleFin()} class="w-fit"
-				>Finish</Button
-			>
+			<Button type="submit" onclick={() => handleFin()} class="w-fit">Finish</Button>
 		{:else}
-			<Button type="submit" formaction="?/submit" class="w-fit">Next</Button>
+			<Button type="submit" class="w-fit">Next</Button>
 		{/if}
 	</div>
 </form>

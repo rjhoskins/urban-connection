@@ -15,7 +15,8 @@
 		currSubDomain,
 		handleNext = $bindable(),
 		handlePrev = $bindable(),
-		isFirstQuestion
+		isFirstQuestion,
+		surveyId
 	} = $props();
 
 	// let questions = formData[currDomain].subDomains[currSubDomain]
@@ -23,7 +24,7 @@
 	let form = $state({
 		name: '',
 		yearsTeaching: '',
-		subject: ''
+		subjectTaught: ''
 	});
 
 	let answer = $state('');
@@ -48,6 +49,7 @@
 	}}
 >
 	<input type="hidden" name="demographics" value="true" />
+	<input type="hidden" name="surveyId" value={surveyId} />
 	<!-- <pre>{JSON.stringify(form, null, 2)}</pre> -->
 	{#each data[currDomain].subDomains[currSubDomain].fields as field (field.placeholder)}
 		{#if field.type === 'select'}
@@ -59,7 +61,7 @@
 					<select
 						id={field.fieldName}
 						name={field.fieldName}
-						bind:value={form[field.fieldName]}
+						bind:value={form[field.fieldName as keyof typeof form]}
 						class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pl-3 pr-8 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
 					>
 						<option value="" disabled selected>Select a subject</option>
@@ -96,6 +98,9 @@
 						placeholder={field.placeholder}
 						type={field.type}
 						id={field.fieldName}
+						maxlength="256"
+						inputmode={field.type === 'number' ? 'numeric' : undefined}
+						min={field.type === 'number' ? '1' : undefined}
 						class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
 					/>
 				</div>

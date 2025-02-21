@@ -10,10 +10,17 @@
 	let { data } = $props();
 	const {
 		school: { name, schoolProgess },
-		adminData
+		adminData,
+		surveyData
 	} = data;
+
+	const totalSurveys = surveyData.length;
+	const surveysNotStarted = surveyData.filter((survey) => survey.status === 'sent').length;
+	const surveysStarted = surveyData.filter((survey) => survey.status === 'started').length;
+	const surveysCompleted = surveyData.filter((survey) => survey.status === 'completed').length;
 </script>
 
+<!-- <pre>{JSON.stringify(surveyData, null, 2)}</pre> -->
 <h1 class="sr-only">Manage {name} School</h1>
 
 <section class=" mx-auto grid max-w-7xl gap-4 p-2 lg:p-8">
@@ -31,13 +38,20 @@
 				{/each}
 			</div>
 			<div class="right md:min-w-96">
-				<Button href={`${page.url.pathname}/send-assessment`} class="mb-4">Send Assessment</Button>
-				<p>Completed</p>
-				<Progress barBgColor="bg-green-700" value={schoolProgess || Math.random() * 100} />
-				<p>In Progress</p>
-				<Progress barBgColor="bg-amber-500" value={schoolProgess || Math.random() * 100} />
+				<div class="flex items-center justify-between">
+					<div class="flex gap-2">
+						<p>Total Surveys:</p>
+						<p>{totalSurveys}</p>
+					</div>
+					<Button href={`${page.url.pathname}/send-assessment`} class="mb-4">Send Assessment</Button
+					>
+				</div>
 				<p>Not Started</p>
-				<Progress barBgColor="bg-red-700" value={schoolProgess || Math.random() * 100} />
+				<Progress barBgColor="bg-red-700" value={(surveysNotStarted / totalSurveys) * 100} />
+				<p>Started</p>
+				<Progress barBgColor="bg-green-700" value={(surveysStarted / totalSurveys) * 100} />
+				<p>Completed</p>
+				<Progress barBgColor="bg-green-700" value={(surveysCompleted / totalSurveys) * 100} />
 			</div>
 		</div>
 	</Card.Root>

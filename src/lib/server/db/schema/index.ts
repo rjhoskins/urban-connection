@@ -13,6 +13,10 @@ export { default as surveys, surveysRelations } from './surveys';
 export { default as schoolAssessments, schoolAssessmentsRelations } from './schoolAssessments';
 export { default as assessmentInvites, assessmentInvitesRelations } from './assessmentInvites';
 export {
+	default as surveyQuestionsResponses,
+	surveyQuestionsResponsesRelations
+} from './surveyQuestionsResponses';
+export {
 	default as surveyDemographics,
 	surveyDemographicsRelations
 } from './surveyDemographicsResponses';

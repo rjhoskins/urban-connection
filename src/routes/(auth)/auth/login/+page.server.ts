@@ -5,7 +5,7 @@ import { fail, redirect } from '@sveltejs/kit';
 import * as auth from '$lib/server/auth';
 
 import type { Actions, PageServerLoad } from './$types';
-import { message, superValidate, type Message } from 'sveltekit-superforms/server';
+import { message, superValidate } from 'sveltekit-superforms/server';
 import { zod } from 'sveltekit-superforms/adapters';
 import { createNewUserOrLoginSchema } from '$lib/schema';
 import { SERVER_ERROR_MESSAGES } from '$lib/constants';
@@ -30,13 +30,18 @@ export const actions: Actions = {
 
 		if (!form.valid) {
 			// return fail(400, { form });
-			return message(form, SERVER_ERROR_MESSAGES[400] as Message, { status: 400 }); // Will return fail(400, { form }) since form isn't valid
+			return handleLogFlashReturnFormError({
+				type: 'error',
+				form,
+				message: SERVER_ERROR_MESSAGES[400],
+				status: 404,
+				event
+			});
 		}
 
 		const existingUser = await findIfActiveUserExists({ username: form.data.username });
 
 		if (!existingUser) {
-			console.log('user exists => ', existingUser);
 			return handleLogFlashReturnFormError({
 				type: 'error',
 				form,
@@ -54,6 +59,7 @@ export const actions: Actions = {
 				status: 404
 			});
 		}
+		console.log('existingUser => ', existingUser);
 
 		const validPassword = await verify(existingUser.passwordHash!, form.data.password, {
 			memoryCost: 19456,
@@ -62,6 +68,7 @@ export const actions: Actions = {
 			parallelism: 1
 		});
 		if (!validPassword) {
+			console.log('ERROR here => ');
 			return handleLogFlashReturnFormError({
 				type: 'error',
 				form,

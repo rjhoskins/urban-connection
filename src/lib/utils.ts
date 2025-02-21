@@ -183,3 +183,22 @@ export function transformSurveyData(rawData: SurveyData) {
 
 	return result;
 }
+
+export function transformSurveyQuestionsResponses(data) {
+	const { surveyId, ...responses } = data;
+
+	return Object.entries(responses)
+		.filter(([key]) => key.startsWith('domainId='))
+		.map(([key, value]) => {
+			const match = key.match(/domainId=(\d+)\|subDomainId=(\d+)\|qId=(\d+)/);
+			if (!match) return null;
+
+			const [, domainId, subDomainId, questionId] = match;
+			return {
+				surveyId: parseInt(surveyId, 10),
+				questionId: parseInt(questionId, 10),
+				response: value === 'true'
+			};
+		})
+		.filter(Boolean);
+}

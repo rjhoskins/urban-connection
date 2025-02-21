@@ -9,16 +9,21 @@ import {
 	districts,
 	surveyQuestions,
 	surveySubDomains,
-	surveyDomains
+	surveyDomains,
+	surveyDemographics,
+	surveyQuestionsResponses,
+	surveys,
+	surveyStatusEnum
 } from '$lib/server/db/schema';
-
 import type { PostgresJsQueryResultHKT } from 'drizzle-orm/postgres-js';
 import type { PgTransaction } from 'drizzle-orm/pg-core';
 import db from './db';
-import { text } from 'stream/consumers';
 import type { AdminInvite, CreateUser, UserInviteHTMLEmailTemplateType } from '$lib/schema';
-import { Columns } from 'lucide-svelte';
 import { transformSurveyData } from '$lib/utils';
+import type {
+	CreateDemographicsResponseInput,
+	CreateQuestionResponseInput
+} from '$lib/types/survey';
 
 export async function simpleRegisterToBeDEPRICATED(
 	{
@@ -444,4 +449,72 @@ export async function getSchoolAdmin(schoolId: number) {
 
 export async function getDistricts() {
 	return (await db.select().from(districts)) || null;
+}
+
+export async function addDemographicsData(values: CreateDemographicsResponseInput) {
+	console.log('addDemographicsData values => ', values);
+	const [newDemo] = await db
+		.insert(surveyDemographics)
+		.values({ ...values })
+		.onConflictDoUpdate({
+			target: [surveyDemographics.surveyId, surveyDemographics.schoolId],
+			set: {
+				subjectTaught: sql`excluded.subject_taught`,
+				yearsTeaching: sql`excluded.years_teaching`,
+				updatedAt: new Date().toISOString()
+			}
+		})
+		.returning({ id: surveyDemographics.id });
+
+	return newDemo;
+}
+
+export async function addQuestionsData(values: CreateQuestionResponseInput) {
+	console.log('addDemographicsData values => ', values);
+	const [newDemoData] = await db
+		.insert(surveyQuestionsResponses)
+		.values([...values])
+		.onConflictDoUpdate({
+			target: [surveyQuestionsResponses.surveyId, surveyQuestionsResponses.questionId],
+			set: {
+				response: sql`excluded.response`,
+				updatedAt: new Date().toISOString()
+			}
+		})
+		.returning({ id: surveyQuestionsResponses.id });
+
+	return newDemoData;
+}
+
+export async function setSurveyStatus({
+	surveyId,
+	status
+}: {
+	surveyId: number;
+	status: 'sent' | 'started' | 'completed';
+}) {
+	const [result] = await db
+		.update(surveys)
+		.set({ status })
+		.where(eq(surveys.id, surveyId))
+		.returning({ id: surveys.id });
+
+	return result || null;
+}
+
+export async function getSurveyData(schoolId: number) {
+	const results = await db
+		.select({ id: surveys.id, status: surveys.status })
+		.from(surveys)
+		.where(eq(surveys.schoolId, schoolId));
+
+	return results || null;
+}
+export async function getQuestionData(schoolId: number) {
+	const results = await db
+		.select({ id: surveys.id, status: surveys.status })
+		.from(surveys)
+		.where(eq(surveys.schoolId, schoolId));
+
+	return results || null;
 }

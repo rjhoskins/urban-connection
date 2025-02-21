@@ -28,13 +28,6 @@ export const demographicsData = {
 			description: 'Please provide the following information about yourself.',
 			fields: [
 				{
-					label: 'Name',
-					type: 'text',
-					fieldName: 'name',
-					value: null,
-					placeholder: 'Enter your name'
-				},
-				{
 					label: 'Years Teaching',
 					fieldName: 'yearsTeaching',
 					type: 'number',
@@ -43,7 +36,7 @@ export const demographicsData = {
 				},
 				{
 					label: 'Subject',
-					fieldName: 'subject',
+					fieldName: 'subjectTaught',
 					type: 'select',
 					value: null,
 					options: [
