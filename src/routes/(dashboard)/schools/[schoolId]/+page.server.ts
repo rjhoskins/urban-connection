@@ -4,7 +4,8 @@ import {
 	getSchoolForDistrictAdmin,
 	getSchoolForSuperAdmin,
 	getSchoolAdmin,
-	getSurveyData
+	getSurveyData,
+	getQuestionData
 } from '$lib/server/queries';
 import { redirect } from '@sveltejs/kit';
 
