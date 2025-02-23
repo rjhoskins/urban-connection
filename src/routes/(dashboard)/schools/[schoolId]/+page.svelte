@@ -22,7 +22,7 @@
 		? (surveysNotStarted / totalSurveys) * 100
 		: 0;
 	const surveysStartedPercentage = surveysStarted ? (surveysStarted / totalSurveys) * 100 : 0;
-	const surveysCompletedPercentage = surveysStarted ? (surveysStarted / totalSurveys) * 100 : 0;
+	const surveysCompletedPercentage = surveysCompleted ? (surveysCompleted / totalSurveys) * 100 : 0;
 </script>
 
 <!-- <pre>{JSON.stringify(surveyData, null, 2)}</pre> -->
