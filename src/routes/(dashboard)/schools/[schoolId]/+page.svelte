@@ -18,6 +18,11 @@
 	const surveysNotStarted = surveyData.filter((survey) => survey.status === 'sent').length;
 	const surveysStarted = surveyData.filter((survey) => survey.status === 'started').length;
 	const surveysCompleted = surveyData.filter((survey) => survey.status === 'completed').length;
+	const surveysNotStartedPercentage = surveysNotStarted
+		? (surveysNotStarted / totalSurveys) * 100
+		: 0;
+	const surveysStartedPercentage = surveysStarted ? (surveysStarted / totalSurveys) * 100 : 0;
+	const surveysCompletedPercentage = surveysStarted ? (surveysStarted / totalSurveys) * 100 : 0;
 </script>
 
 <!-- <pre>{JSON.stringify(surveyData, null, 2)}</pre> -->
@@ -47,11 +52,11 @@
 					>
 				</div>
 				<p>Not Started</p>
-				<Progress barBgColor="bg-red-700" value={(surveysNotStarted / totalSurveys) * 100} />
+				<Progress barBgColor="bg-red-700" value={surveysNotStartedPercentage} />
 				<p>Started</p>
-				<Progress barBgColor="bg-amber-500" value={(surveysStarted / totalSurveys) * 100} />
+				<Progress barBgColor="bg-amber-500" value={surveysStartedPercentage} />
 				<p>Completed</p>
-				<Progress barBgColor="bg-green-700" value={(surveysCompleted / totalSurveys) * 100} />
+				<Progress barBgColor="bg-green-700" value={surveysCompletedPercentage} />
 			</div>
 		</div>
 	</Card.Root>
