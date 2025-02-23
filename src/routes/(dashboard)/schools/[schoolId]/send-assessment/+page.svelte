@@ -27,7 +27,7 @@
 			<SendAssessmentForm bind:inviteText={text} {data} {token} />
 		</div>
 		<div class="right h-full lg:col-span-2 lg:flex lg:flex-col">
-			<h3 class="mb-2 text-xl">Email Text Preview</h3>
+			<h3 class="mb-2 text-xl">Email Text Preview - grab NEXT LINK!!!</h3>
 			<Card.Root class="h-full max-w-2xl">
 				<Card.Header>
 					<Card.Title></Card.Title>

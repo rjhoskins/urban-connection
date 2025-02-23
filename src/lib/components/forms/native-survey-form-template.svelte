@@ -44,11 +44,7 @@
 	{/if}
 
 	<input type="hidden" name="assessmentToken" value={assessmentToken} />
-	<input
-		type="hidden"
-		name="totalQuestions"
-		value={formData[currDomain].subDomains[currSubDomain].questions.length}
-	/>
+
 	{#each formData[currDomain].subDomains[currSubDomain].questions, questionIdx (questionIdx)}
 		<li class="flex">
 			<div class="flex flex-col gap-1.5">
