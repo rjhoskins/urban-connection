@@ -5,7 +5,8 @@ import {
 	getSchoolForSuperAdmin,
 	getSchoolAdmin,
 	getSurveyData,
-	getQuestionData
+	getQuestionData,
+	getSchoolDomainResultsData
 } from '$lib/server/queries';
 import { redirect } from '@sveltejs/kit';
 
@@ -40,7 +41,6 @@ export const load = async (event) => {
 		}
 	}
 	if (event.locals.user && event.locals.user.role === 'super_admin') {
-		console.log('super_admin user2 =======================> ');
 		dataFunc = () => getSchoolForSuperAdmin(Number(event.params.schoolId));
 		adminDataFunc = async () => getSchoolAdmin(Number(event.params.schoolId));
 		// adminDataFunc = async () => {
@@ -55,6 +55,7 @@ export const load = async (event) => {
 		adminData: await adminDataFunc(),
 		school: await dataFunc(),
 		surveyData: await getSurveyData(Number(event.params.schoolId)),
-		questionData: await getQuestionData(Number(event.params.schoolId))
+		questionData: await getQuestionData(Number(event.params.schoolId)),
+		domainResultsData: await getSchoolDomainResultsData(Number(event.params.schoolId))
 	};
 };

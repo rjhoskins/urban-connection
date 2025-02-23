@@ -3,7 +3,7 @@ import { z } from 'zod';
 const questionSchema = z.object({
 	id: z.number(),
 	subdomainId: z.number(),
-	value: z.union([z.null(), z.boolean()]),
+	value: z.union([z.literal(0), z.literal(1)]),
 	text: z.string()
 });
 

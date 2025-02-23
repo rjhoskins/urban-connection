@@ -7,7 +7,7 @@ import { db } from '$lib/server/db/schema/index.js';
 import * as table from '$lib/server/db/schema/db-utils.js';
 import { districts } from '$lib/data/data.js';
 import { redirect } from '@sveltejs/kit';
-import { createInviteToken } from '$lib/utils';
+import { createAdminUserInviteToken } from '$lib/utils';
 import { SERVER_ERROR_MESSAGES } from '$lib/constants.js';
 
 export const load: PageServerLoad = async (event) => {

@@ -4,13 +4,13 @@
 	import InviteUserByEmailForm from '$lib/components/forms/super-invite-user-by-email-form.svelte';
 	import type { PageData } from './$types';
 	import * as Card from '$lib/components/ui/card';
-	import { decodeInviteToken, createInviteToken } from '$lib/utils';
+	import { decodeAdminUserInviteToken, createAdminUserInviteToken } from '$lib/utils';
 	import Dialog from '$lib/components/dialog.svelte';
 	import HtmlEmailUserInviteForm from '$lib/components/forms/html-email-user-invite-form.svelte';
 
 	let { data } = $props();
 	const { token } = data;
-	const { name, email, inviteId } = decodeInviteToken(token || '');
+	const { name, email, inviteId } = decodeAdminUserInviteToken(token || '');
 	let pageHTMLEmail = $state();
 	let pageIsEditing = $state(false);
 </script>

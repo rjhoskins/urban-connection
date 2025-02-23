@@ -13,15 +13,35 @@ export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
 }
 
-export function createInviteToken(name: string, email: string, inviteId: string) {
+export function createAdminUserInviteToken(name: string, email: string, inviteId: string) {
 	const data = `${name}|${email}|${inviteId}`;
 	return btoa(data);
 }
 
-export function decodeInviteToken(token: string) {
+export function decodeAdminUserInviteToken(token: string) {
 	const data = atob(token);
 	const [name, email, inviteId] = data.split('|');
 	return { name, email, inviteId };
+}
+export function createAssessmentInviteToken({
+	name,
+	email,
+	surveyId,
+	schoolId
+}: {
+	name: string;
+	email: string;
+	surveyId: number;
+	schoolId: number;
+}) {
+	const data = `${name}|${email}|${surveyId}|${schoolId}`;
+	return btoa(data);
+}
+
+export function decodeAssessmentInviteToken(token: string) {
+	const data = atob(token);
+	const [name, email, surveyId, schoolId] = data.split('|');
+	return { name, email, surveyId, schoolId };
 }
 
 export function handleTypeSafeError(error: unknown, message: any, form: any) {
@@ -184,21 +204,35 @@ export function transformSurveyData(rawData: SurveyData) {
 	return result;
 }
 
-export function transformSurveyQuestionsResponses(data) {
+type SurveyResponseData = {
+	surveyId: number;
+	[key: string]: string | number;
+};
+
+type TransformedResponse = {
+	surveyId: number;
+	questionId: number;
+	response: number;
+};
+
+export function transformSurveyQuestionsResponses(data: SurveyResponseData): TransformedResponse[] {
 	const { surveyId, ...responses } = data;
+	console.log('transformSurveyQuestionsResponses data => ', data);
+	console.log('transformSurveyQuestionsResponses surveyId => ', surveyId);
+	console.log('transformSurveyQuestionsResponses ...responses => ', { ...responses });
 
 	return Object.entries(responses)
 		.filter(([key]) => key.startsWith('domainId='))
 		.map(([key, value]) => {
 			const match = key.match(/domainId=(\d+)\|subDomainId=(\d+)\|qId=(\d+)/);
-			if (!match) return null;
+			if (!match) return null; // This won't happen with valid data
 
 			const [, domainId, subDomainId, questionId] = match;
 			return {
-				surveyId: parseInt(surveyId, 10),
+				surveyId: surveyId,
 				questionId: parseInt(questionId, 10),
-				response: value === 'true'
+				response: parseInt(value as string, 10)
 			};
 		})
-		.filter(Boolean);
+		.filter((result): result is TransformedResponse => result !== null); // Type guard to filter null, but not strictly needed
 }

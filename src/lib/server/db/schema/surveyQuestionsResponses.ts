@@ -1,5 +1,5 @@
 import { relations } from 'drizzle-orm';
-import { boolean, integer, pgTable, uniqueIndex } from 'drizzle-orm/pg-core';
+import { boolean, integer, pgTable, smallint, uniqueIndex } from 'drizzle-orm/pg-core';
 import { timestamps } from './db-utils';
 import surveyQuestions from './surveyQuestions';
 import surveys from './surveys';
@@ -14,7 +14,7 @@ const surveyQuestionsResponses = pgTable(
 		questionId: integer('question_id')
 			.notNull()
 			.references(() => surveyQuestions.id),
-		response: boolean('response').notNull(),
+		response: smallint('response').default(null!),
 		...timestamps
 	},
 	(table) => [uniqueIndex('surveyId_qId_idx').on(table.surveyId, table.questionId)]

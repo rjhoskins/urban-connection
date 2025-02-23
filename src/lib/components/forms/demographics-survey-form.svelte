@@ -16,7 +16,7 @@
 		handleNext = $bindable(),
 		handlePrev = $bindable(),
 		isFirstQuestion,
-		surveyId
+		assessmentToken
 	} = $props();
 
 	// let questions = formData[currDomain].subDomains[currSubDomain]
@@ -37,10 +37,10 @@
 	id={data[currDomain].subDomains[currSubDomain].name}
 	class="flex flex-col gap-2 p-2"
 	use:enhance={({ formElement, formData, action, cancel }) => {
-		console.log('formData', formData);
+		console.log('action', action);
 		return async ({ result, update }) => {
 			update({ reset: false });
-			console.log('result', result);
+			console.log('actionzzzzzzzzzzzzzzzzz', action);
 			if (result.type === 'success') {
 				console.log('Success');
 				handleNext();
@@ -49,7 +49,7 @@
 	}}
 >
 	<input type="hidden" name="demographics" value="true" />
-	<input type="hidden" name="surveyId" value={surveyId} />
+	<input type="hidden" name="assessmentToken" value={assessmentToken} />
 	<!-- <pre>{JSON.stringify(form, null, 2)}</pre> -->
 	{#each data[currDomain].subDomains[currSubDomain].fields as field (field.placeholder)}
 		{#if field.type === 'select'}
@@ -112,6 +112,6 @@
 			>Previous</Button
 		>
 
-		<Button type="submit" formaction="?/submit" class="w-fit">Next</Button>
+		<Button type="submit" formaction={'?/submit'} class="w-fit">Next</Button>
 	</div>
 </form>

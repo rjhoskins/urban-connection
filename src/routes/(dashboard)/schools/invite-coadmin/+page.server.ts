@@ -4,7 +4,11 @@ import { zod } from 'sveltekit-superforms/adapters';
 import type { PageServerLoad, Actions } from './$types.js';
 import { fail } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';
-import { createInviteToken, generateUserId, handleLogFlashReturnFormError } from '$lib/utils';
+import {
+	createAdminUserInviteToken,
+	generateUserId,
+	handleLogFlashReturnFormError
+} from '$lib/utils';
 import { nanoid } from 'nanoid';
 import { setFlash } from 'sveltekit-flash-message/server';
 import { eq, and } from 'drizzle-orm';
@@ -93,7 +97,7 @@ export const actions: Actions = {
 
 				console.log('inviteRes => ', inviteRes);
 				if (!inviteRes) throw new Error('Failed to create invite');
-				inviteToken = createInviteToken(form.data.name, form.data.email, inviteRes.id);
+				inviteToken = createAdminUserInviteToken(form.data.name, form.data.email, inviteRes.id);
 
 				const [newUser] = await trx
 					.insert(users)

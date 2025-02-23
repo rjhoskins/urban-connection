@@ -5,16 +5,16 @@
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 
 	import * as Card from '$lib/components/ui/card';
-	import { inviteNewUserSchema } from '$lib/schema.js';
-	import { decodeInviteToken } from '$lib/utils';
+	import { sendAssessmentInviteSchem } from '$lib/schema.js';
+	import { decodeAdminUserInviteToken } from '$lib/utils';
 	import { superForm } from 'sveltekit-superforms';
 	import SuperDebug from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 
 	let { inviteText = $bindable(), data, token } = $props();
-	// const { name, email, inviteId } = decodeInviteToken(token);
+	// const { name, email, inviteId } = decodeAdminUserInviteToken(token);
 	const form = superForm(data.form, {
-		validators: zodClient(inviteNewUserSchema)
+		validators: zodClient(sendAssessmentInviteSchem)
 	});
 	const { form: formData, enhance, message } = form;
 
@@ -31,6 +31,7 @@
 	</Card.Header>
 	<Card.Content>
 		<form class="flex flex-col gap-3" method="POST" use:enhance>
+			<input type="hidden" name="schoolId" value={data.schoolId} />
 			<!-- name -->
 			<Form.Field class=" space-y-0" {form} name="name">
 				<Form.Control>
@@ -48,25 +49,6 @@
 					{#snippet children({ props })}
 						<Form.Label class="">Teacher Email</Form.Label>
 						<Input type="" {...props} bind:value={$formData.email} />
-					{/snippet}
-				</Form.Control>
-				<Form.FieldErrors />
-			</Form.Field>
-
-			<!-- email -->
-			<Form.Field class="" {form} name="inviteText">
-				<Form.Control>
-					{#snippet children({ props })}
-						<Form.Label>Custom Message</Form.Label>
-						<Textarea
-							onkeyup={(e) => {
-								inviteText = (e.target as HTMLTextAreaElement).value;
-							}}
-							{...props}
-							placeholder="Enter invite text"
-							class="resize-none"
-							bind:value={$formData.inviteText}
-						/>
 					{/snippet}
 				</Form.Control>
 				<Form.FieldErrors />

@@ -4,7 +4,11 @@ import { zod } from 'sveltekit-superforms/adapters';
 import type { PageServerLoad, Actions } from './$types.js';
 import { fail } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';
-import { createInviteToken, generateUserId, handleLogFlashReturnFormError } from '$lib/utils';
+import {
+	createAdminUserInviteToken,
+	generateUserId,
+	handleLogFlashReturnFormError
+} from '$lib/utils';
 import { setFlash } from 'sveltekit-flash-message/server';
 import db from '$lib/server/db/index.js';
 import {
@@ -95,7 +99,11 @@ export const actions: Actions = {
 				if (!inviteRes) throw new Error('Failed to create invite');
 
 				console.log('inviteRes => ', inviteRes);
-				inviteToken = createInviteToken(form.data.adminName, form.data.adminEmail, inviteRes.id);
+				inviteToken = createAdminUserInviteToken(
+					form.data.adminName,
+					form.data.adminEmail,
+					inviteRes.id
+				);
 				const newUser = await createNewUserWithDetails(
 					{
 						id: generateUserId(),

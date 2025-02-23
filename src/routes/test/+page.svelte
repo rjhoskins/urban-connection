@@ -16,7 +16,7 @@
 	import { onMount } from 'svelte';
 
 	let { data } = $props();
-	const { surveyId, surveyData } = data;
+	const { assessmentToken, surveyData } = data;
 	let formData = $state([demographicsData, ...data.surveyData]);
 	let currDomain = $state(0);
 	let currSubDomain = $state(0);
@@ -132,7 +132,7 @@
 							{isFirstQuestion}
 							bind:handleNext={next}
 							bind:handlePrev={previous}
-							{surveyId}
+							{assessmentToken}
 						/>
 					{:else}
 						<NativeSurveyFormTemplate
@@ -144,7 +144,7 @@
 							bind:handleNext={next}
 							bind:handlePrev={previous}
 							bind:handleFin={handleFinish}
-							{surveyId}
+							{assessmentToken}
 						/>
 					{/if}
 				</ul>

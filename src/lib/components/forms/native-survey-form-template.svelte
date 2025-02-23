@@ -11,7 +11,7 @@
 		handleFin = $bindable(),
 		isFirstQuestion,
 		isLastQuestion,
-		surveyId
+		assessmentToken
 	} = $props();
 </script>
 
@@ -43,7 +43,7 @@
 		<input type="hidden" name="isLastQuestion" value="true" />
 	{/if}
 
-	<input type="hidden" name="surveyId" value={surveyId} />
+	<input type="hidden" name="assessmentToken" value={assessmentToken} />
 	<input
 		type="hidden"
 		name="totalQuestions"
@@ -60,9 +60,15 @@
 						type="radio"
 						name={`domainId=${formData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}|subDomainId=${formData[currDomain].subDomains[currSubDomain].id}|qId=${formData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}`}
 						bind:group={formData[currDomain].subDomains[currSubDomain].questions[questionIdx].value}
-						value={true}
+						value={1}
 						class="h-4 w-4 border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
 					/>
+					<!-- <input
+						type="hidden"
+						name={`domainId=${formData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}|subDomainId=${formData[currDomain].subDomains[currSubDomain].id}|qId=${formData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}`}
+						bind:group={formData[currDomain].subDomains[currSubDomain].questions[questionIdx].value}
+						value={null}
+					/> -->
 					<span class="text-gray-700">Yes</span>
 				</label>
 				<label class="flex cursor-pointer items-center space-x-2">
@@ -70,7 +76,7 @@
 						type="radio"
 						name={`domainId=${formData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}|subDomainId=${formData[currDomain].subDomains[currSubDomain].id}|qId=${formData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}`}
 						bind:group={formData[currDomain].subDomains[currSubDomain].questions[questionIdx].value}
-						value={false}
+						value={0}
 						class="h-4 w-4 border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
 					/>
 					<span class="text-gray-700">No</span>

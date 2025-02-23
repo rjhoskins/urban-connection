@@ -6,7 +6,7 @@
 
 	import * as Card from '$lib/components/ui/card';
 	import { inviteNewUserSchema } from '$lib/schema.js';
-	import { decodeInviteToken } from '$lib/utils';
+	import { decodeAdminUserInviteToken } from '$lib/utils';
 	/** @type {{ data: import('./$types').PageData, form: import('./$types').ActionData }} */
 	import { Field, Control, Label, FieldErrors, Description } from 'formsnap';
 	import { superForm } from 'sveltekit-superforms';
@@ -14,7 +14,7 @@
 	import { zodClient } from 'sveltekit-superforms/adapters';
 
 	let { page, data, token } = $props();
-	const { name, email, inviteId } = decodeInviteToken(token);
+	const { name, email, inviteId } = decodeAdminUserInviteToken(token);
 	const form = superForm(data.inviteForm, {
 		dataType: 'json',
 		validators: zodClient(inviteNewUserSchema)

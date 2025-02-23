@@ -6,7 +6,7 @@
 
 	import * as Card from '$lib/components/ui/card';
 	import { inviteNewUserSchema } from '$lib/schema.js';
-	import { decodeInviteToken } from '$lib/utils';
+	import { decodeAdminUserInviteToken } from '$lib/utils';
 	/** @type {{ data: import('./$types').PageData, form: import('./$types').ActionData }} */
 	import { Field, Control, Label, FieldErrors, Description } from 'formsnap';
 	import { superForm } from 'sveltekit-superforms';

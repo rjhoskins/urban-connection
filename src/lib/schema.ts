@@ -49,6 +49,13 @@ export const inviteNewUserSchema = z.object({
 	email: z.string().email({ message: 'invalid email' }),
 	phone: z.string().optional()
 });
+export const sendAssessmentInviteSchem = z.object({
+	name: z
+		.string()
+		.min(2, { message: 'name should be at least two characters' })
+		.max(256, { message: 'name should not be an essay' }),
+	email: z.string().email({ message: 'invalid email' })
+});
 export const userInviteHTMLEmailTemplateSchema = z.object({
 	greeting: z.string().nonempty({ message: 'Greeting text is required' }),
 	definition: z.string().nonempty({ message: 'Definition text is required' }),

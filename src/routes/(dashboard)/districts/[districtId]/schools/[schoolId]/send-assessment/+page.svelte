@@ -1,13 +1,13 @@
 <script lang="ts">
 	/** @type {{ data: PageData }} */
 	import * as Card from '$lib/components/ui/card';
-	import { decodeInviteToken, createInviteToken } from '$lib/utils';
+	import { decodeAdminUserInviteToken, createAdminUserInviteToken } from '$lib/utils';
 	import Dialog from '$lib/components/dialog.svelte';
 	import SendAssessmentForm from '$lib/components/forms/send-assessment-form.svelte';
 
 	let { data } = $props();
 	// const { token } = data;
-	// const  { name, email, inviteId } = decodeInviteToken(token || '');
+	// const  { name, email, inviteId } = decodeAdminUserInviteToken(token || '');
 	let text = $state('');
 	let token;
 	let email = 'hi@example.com';

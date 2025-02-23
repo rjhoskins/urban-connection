@@ -510,6 +510,7 @@ export async function getSurveyData(schoolId: number) {
 
 	return results || null;
 }
+
 export async function getQuestionData(schoolId: number) {
 	const results = await db
 		.select({ id: surveys.id, status: surveys.status })
@@ -517,4 +518,48 @@ export async function getQuestionData(schoolId: number) {
 		.where(eq(surveys.schoolId, schoolId));
 
 	return results || null;
+}
+
+export async function getSchoolDomainResultsData(schoolId: number) {
+	const results = await db
+		.select({
+			domainId: surveyDomains.id,
+			domainName: surveyDomains.name,
+			questionId: surveyQuestions.id,
+			questionResponse: surveyQuestionsResponses.response,
+			subId: surveySubDomains.id,
+			subName: surveySubDomains.name
+		})
+		.from(surveyQuestionsResponses)
+		.leftJoin(surveys, eq(surveys.id, surveyQuestionsResponses.surveyId))
+		.leftJoin(surveyQuestions, eq(surveyQuestions.id, surveyQuestionsResponses.questionId))
+		.leftJoin(surveySubDomains, eq(surveySubDomains.id, surveyQuestions.subDomainId))
+		.leftJoin(surveyDomains, eq(surveyDomains.id, surveySubDomains.domainId))
+		.where(eq(surveys.schoolId, schoolId));
+
+	return results || null;
+}
+
+export async function createAssessment({
+	recipientName,
+	recipientEmail,
+	schoolId,
+	sentBy
+}: {
+	recipientName: string;
+	recipientEmail: string;
+	schoolId: number;
+	sentBy: string;
+}): Promise<{ id: number } | null> {
+	const [newSurvey] = await db
+		.insert(surveys)
+		.values({
+			recipientName,
+			recipientEmail,
+			schoolId,
+			sentBy
+		})
+		.returning({ id: surveys.id });
+
+	return newSurvey || null;
 }

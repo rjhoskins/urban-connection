@@ -11,7 +11,11 @@ import { fail } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 
 import { redirect } from '@sveltejs/kit';
-import { createInviteToken, decodeInviteToken, handleLogFlashReturnFormError } from '$lib/utils';
+import {
+	createAdminUserInviteToken,
+	decodeAdminUserInviteToken,
+	handleLogFlashReturnFormError
+} from '$lib/utils';
 import { eq, or, desc } from 'drizzle-orm';
 import { setFlash } from 'sveltekit-flash-message/server';
 import { INITIAL_HTML_DATA } from '$lib/constants.js';
@@ -65,7 +69,7 @@ export const actions: Actions = {
 				body: JSON.stringify({
 					to: form.data.email,
 					subject: 'You have been invited to join the platform',
-					inviteLink: `${event.url.origin}/auth/register?inviteToken=${createInviteToken(form.data.name, form.data.email, form.data.inviteId)}`,
+					inviteLink: `${event.url.origin}/auth/register?inviteToken=${createAdminUserInviteToken(form.data.name, form.data.email, form.data.inviteId)}`,
 					htmlEmailContent: htmlTemplate.template
 				})
 			});
@@ -81,7 +85,7 @@ export const actions: Actions = {
 		}
 		console.log(
 			'invite link => ',
-			`/auth/register?inviteToken=${createInviteToken(form.data.name, form.data.email, form.data.inviteId)}`
+			`/auth/register?inviteToken=${createAdminUserInviteToken(form.data.name, form.data.email, form.data.inviteId)}`
 		);
 
 		setFlash({ type: 'success', message: 'Invite sent!' }, event.cookies);
