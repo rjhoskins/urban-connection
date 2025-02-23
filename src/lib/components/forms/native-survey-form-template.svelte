@@ -63,12 +63,14 @@
 						value={1}
 						class="h-4 w-4 border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
 					/>
-					<!-- <input
+					<input
 						type="hidden"
 						name={`domainId=${formData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}|subDomainId=${formData[currDomain].subDomains[currSubDomain].id}|qId=${formData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}`}
 						bind:group={formData[currDomain].subDomains[currSubDomain].questions[questionIdx].value}
-						value={null}
-					/> -->
+						value={formData[currDomain].subDomains[currSubDomain].questions[questionIdx].value
+							? formData[currDomain].subDomains[currSubDomain].questions[questionIdx].value
+							: null}
+					/>
 					<span class="text-gray-700">Yes</span>
 				</label>
 				<label class="flex cursor-pointer items-center space-x-2">

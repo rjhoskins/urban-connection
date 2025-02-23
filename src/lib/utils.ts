@@ -212,14 +212,11 @@ type SurveyResponseData = {
 type TransformedResponse = {
 	surveyId: number;
 	questionId: number;
-	response: number;
+	response: number | null;
 };
 
 export function transformSurveyQuestionsResponses(data: SurveyResponseData): TransformedResponse[] {
 	const { surveyId, ...responses } = data;
-	console.log('transformSurveyQuestionsResponses data => ', data);
-	console.log('transformSurveyQuestionsResponses surveyId => ', surveyId);
-	console.log('transformSurveyQuestionsResponses ...responses => ', { ...responses });
 
 	return Object.entries(responses)
 		.filter(([key]) => key.startsWith('domainId='))
@@ -231,8 +228,8 @@ export function transformSurveyQuestionsResponses(data: SurveyResponseData): Tra
 			return {
 				surveyId: surveyId,
 				questionId: parseInt(questionId, 10),
-				response: parseInt(value as string, 10)
+				response: value ? parseInt(value as string, 10) : null
 			};
 		})
-		.filter((result): result is TransformedResponse => result !== null); // Type guard to filter null, but not strictly needed
+		.filter((item) => item !== null) as TransformedResponse[];
 }

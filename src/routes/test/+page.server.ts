@@ -44,23 +44,18 @@ export const actions = {
 		const { name, email, surveyId, schoolId } = decodedeAssessmentToken;
 
 		if (data.demographics) {
-			const parseResult = createSurveyDemographicsResponseSchema.safeParse(data);
-			if (!parseResult.success) return { success: false, data: data };
-			const demographicsResponse: CreateDemographicsResponseInput = parseResult.data;
-			console.log('demographicsResponse => ', demographicsResponse);
-			console.log('create  => ', {
+			const parseResult = createSurveyDemographicsResponseSchema.safeParse({
+				...data,
 				schoolId: parseInt(String(schoolId))!,
-				surveyId: parseInt(String(surveyId))!,
-				subjectTaught: demographicsResponse.subjectTaught ?? null,
-				yearsTeaching: demographicsResponse?.yearsTeaching! ?? null
+				surveyId: parseInt(String(surveyId))!
 			});
-			const newDemographicsEntry: CreateDemographicsResponseInput = {
-				schoolId: parseInt(String(schoolId))!,
-				surveyId: parseInt(String(surveyId))!,
-				subjectTaught: demographicsResponse.subjectTaught ?? null,
-				yearsTeaching: demographicsResponse.yearsTeaching ?? null
-			};
-			console.log('create newDemographicsEntry => ', newDemographicsEntry);
+			if (!parseResult.success) return { success: false, data: data };
+			const parseAndCheckedDemographicsResponse: CreateDemographicsResponseInput = parseResult.data;
+
+			console.log(
+				'create parseAndCheckedDemographicsResponse => ',
+				parseAndCheckedDemographicsResponse
+			);
 			// addDemographicsData(newDemographicsEntry);
 			return { success: true, data };
 		}
@@ -75,23 +70,23 @@ export const actions = {
 			setSurveyStatus({ surveyId: parseInt(surveyId), status: 'started' });
 		}
 
-		if (Number(data.totalQuestions) === numAnswered.length) {
-			const transformedSurveyQuestionsResponses = transformSurveyQuestionsResponses({
-				surveyId: parseInt(surveyId),
-				...data
-			});
-			console.log('transformedSurveyQuestionsResponses => ', transformedSurveyQuestionsResponses);
-			// addQuestionsData(transformedSurveyQuestionsResponses as CreateQuestionResponseInput);
-		} else {
-			// do nothing
-			console.log('NOT all answered - do nothing');
-		}
+		const transformedSurveyQuestionsResponses = transformSurveyQuestionsResponses({
+			surveyId: parseInt(surveyId),
+			...data
+		});
+		console.log('transformedSurveyQuestionsResponses => ', transformedSurveyQuestionsResponses);
+		addQuestionsData(transformedSurveyQuestionsResponses as CreateQuestionResponseInput);
+		// if (Number(data.totalQuestions) === numAnswered.length) {
+		// } else {
+		// 	// do nothing
+		// 	console.log('NOT all answered - do nothing');
+		// }
 		if (data.isLastQuestion) {
 			console.log('isLastQuestion');
 			//set status to started
-			setSurveyStatus({ surveyId: parseInt(surveyId), status: 'completed' });
-			setFlash({ type: 'success', message: 'Survy Completed Thank you!' }, event.cookies);
-			throw redirect(303, '/thank-you');
+			// setSurveyStatus({ surveyId: parseInt(surveyId), status: 'completed' });
+			// setFlash({ type: 'success', message: 'Survy Completed Thank you!' }, event.cookies);
+			// throw redirect(303, '/thank-you');
 		}
 	}
 };

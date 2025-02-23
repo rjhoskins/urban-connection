@@ -27,11 +27,13 @@
 		// 	icon: PenTool
 		// }
 	];
+
+	let { displayName } = $props();
 </script>
 
 <Card.Root class="mx-auto max-w-6xl">
 	<Card.Header>
-		<Card.Title class="p-6">Hello,</Card.Title>
+		<Card.Title class="p-6">Hello, {displayName ? displayName : 'TODO'}</Card.Title>
 		<!-- <Card.Description>Card Description</Card.Description> -->
 	</Card.Header>
 	<hr class="bg-primary" />

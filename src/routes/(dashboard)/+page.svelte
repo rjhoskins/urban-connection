@@ -32,7 +32,7 @@
 		<DistrictAdminPanel />
 	{:else if data.user.role == 'school_admin'}
 		<h1 class="my-6 text-center text-3xl">{data.user?.name} Admin Panel</h1>
-		<SchooladminAdminPanel />
+		<SchooladminAdminPanel displayName={data.user?.name} />
 	{:else}{/if}
 	<!-- {#if users.selectedUser == 'UC'}
 		<h1 class="my-6 text-center text-3xl">{data.user?.name} Admin Panel</h1>
