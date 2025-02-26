@@ -59,8 +59,7 @@ export const actions: Actions = {
 		setFlash(
 			{
 				type: 'success',
-				message: `Assessment invite sent=>
-			/test?assessmentToken=${assessmentToken}`
+				message: 'Assessment invite sent=>\n' + `/test?assessmentToken=${assessmentToken}`
 			},
 			event.cookies
 		);

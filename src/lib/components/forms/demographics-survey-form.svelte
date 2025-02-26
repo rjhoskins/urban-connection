@@ -107,11 +107,4 @@
 			</div>
 		{/if}
 	{/each}
-	<div class="flex gap-8 pt-2">
-		<Button type="button" disabled={isFirstQuestion} onclick={() => handlePrev()} class="w-fit"
-			>Previous</Button
-		>
-
-		<Button type="submit" formaction={'?/submit'} class="w-fit">Next</Button>
-	</div>
 </form>

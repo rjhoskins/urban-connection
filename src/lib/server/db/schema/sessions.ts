@@ -18,3 +18,5 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
 }));
 
 export default sessions;
+
+export type InsertSession = typeof sessions.$inferInsert;

@@ -40,14 +40,6 @@ export const load = async (event) => {
 	};
 };
 
-// const getDistrictForAdmin = async (userId: string) => {
-// 	return await db
-// 		.select()
-// 		.from(districtsTable)
-// 		.innerJoin(districtAdminsTable, is(districtAdminsTable.districtId, districtsTable.id))
-// 		.where(is(districtAdminsTable.userId, userId));
-// };
-
 export const actions: Actions = {
 	default: async (event) => {
 		console.log('default event => ', event);

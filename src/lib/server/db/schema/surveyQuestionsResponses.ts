@@ -14,6 +14,7 @@ const surveyQuestionsResponses = pgTable(
 		questionId: integer('question_id')
 			.notNull()
 			.references(() => surveyQuestions.id),
+		isValidSubdomainGroup: boolean('is_valid_subdomain_group').default(false),
 		response: smallint('response').default(null!),
 		...timestamps
 	},

@@ -82,14 +82,4 @@
 			</div>
 		</li>
 	{/each}
-	<div class="flex gap-8 pt-2">
-		<Button type="button" disabled={isFirstQuestion} onclick={() => handlePrev()} class="w-fit"
-			>Previous</Button
-		>
-		{#if isLastQuestion}
-			<Button type="submit" onclick={() => handleFin()} class="w-fit">Finish</Button>
-		{:else}
-			<Button type="submit" class="w-fit">Next</Button>
-		{/if}
-	</div>
 </form>

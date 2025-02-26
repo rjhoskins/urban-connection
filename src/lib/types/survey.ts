@@ -31,7 +31,15 @@ export type SurveyData = z.infer<typeof surveyDataSchema>;
 
 export default surveyDataSchema;
 
-export const createSurveyDemographicsResponseSchema = z.object({
+export const createSurveyDemographicsAndSurveyResponseFormSchema = z
+	.object({
+		assessmentToken: z.string(),
+		yearsTeaching: z.string().regex(/^\d+$/, 'yearsTeaching must be a numeric string'),
+		subjectTaught: z.string()
+	})
+	.catchall(z.string().regex(/^[01]?$/, "Responses must be '0', '1', or an empty string"));
+
+export const parseAndTransformCreateDemographicsData = z.object({
 	yearsTeaching: z
 		.union([z.string(), z.number(), z.null()])
 		.optional()
@@ -61,37 +69,16 @@ export const createSurveyDemographicsResponseSchema = z.object({
 			return isNaN(num) ? null : num;
 		})
 });
-export const surveyResponseSchema = z.object({
-	isFirstQuestion: z.boolean().optional(),
-	isLastQuestion: z.boolean().optional(),
-	surveyId: z
-		.union([z.string(), z.number(), z.null()])
-		.optional()
-		.transform((val) => {
-			if (val == null) return null;
-			const num = Number(val);
-			return isNaN(num) ? null : num;
-		}),
-	questions: z.array(
-		z.object({ questionId: z.number(), surveyId: z.number(), response: z.boolean() })
-	)
-});
 
 export type CreateDemographicsResponseInput = z.infer<
-	typeof createSurveyDemographicsResponseSchema
+	typeof parseAndTransformCreateDemographicsData
 >;
-
-const SurveyQuestionFormResponseSchema = z.object({
-	surveyId: z.coerce.number(),
-	totalQuestions: z.coerce.number().optional(),
-	isFirstQuestion: z.enum(['true', 'false']).optional(),
-	isLastQuestion: z.enum(['true', 'false']).optional()
-});
 
 const createSurveyQuestionResponseSchema = z
 	.object({
 		surveyId: z.coerce.number(),
 		questionId: z.coerce.number(),
+		isValidSubdomainGroup: z.boolean().default(false),
 		response: z.union([z.literal(0), z.literal(1), z.null()]).default(null)
 	})
 	.array();

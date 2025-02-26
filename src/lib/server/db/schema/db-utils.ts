@@ -6,7 +6,7 @@ export const inviteType = pgEnum('invite_type', ['school', 'district']);
 export const userRolesEnum = pgEnum('roles', ['super_admin', 'district_admin', 'school_admin']);
 export const status = pgEnum('status', ['sent', 'started', 'completed']);
 export const templateType = pgEnum('template_type', ['admin_invite', 'assessment_invite']);
-export const surveyStatusEnum = pgEnum('status', ['sent', 'started', 'completed']);
+export const surveyStatusEnum = pgEnum('survey_status', ['sent', 'completed']);
 
 export const timestamps = {
 	createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })

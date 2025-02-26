@@ -2,9 +2,10 @@
 	// The teacher/ staff will need to enter their name, select a subject area from a drop-down (English, Math, etc. DC to provide), number of years experience)
 	import { applyAction, deserialize, enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
+	import DemographicsAndSurveyForm from '$lib/components/forms/demographics-and-survey-form.svelte';
 	import NativeDemographicsSurveyForm from '$lib/components/forms/demographics-survey-form.svelte';
 	import NativeSurveyFormTemplate from '$lib/components/forms/native-survey-form-template.svelte';
-	import Button from '$lib/components/ui/button/button.svelte';
+
 	import Card from '$lib/components/ui/card/card.svelte';
 
 	import {
@@ -17,13 +18,10 @@
 
 	let { data } = $props();
 	const { assessmentToken, surveyData } = data;
-	let formData = $state([demographicsData, ...data.surveyData]);
+	let formData = $state([demographicsData, ...surveyData]);
 	let currDomain = $state(0);
 	let currSubDomain = $state(0);
 	let isFirstQuestion = $derived(currDomain === 0 && currSubDomain === 0);
-	onMount(() => {
-		console.log('data => ', data);
-	});
 
 	let isLastQuestion = $derived(
 		formData.length == currDomain + 1 && formData[currDomain].subDomains.length == currSubDomain + 1
@@ -37,13 +35,9 @@
 			formData.length == currDomain + 1 &&
 			formData[currDomain].subDomains.length == currSubDomain + 1
 		) {
-			console.log('Finish');
 			return;
 		}
-		// if (formData[currDomain].subDomains[currSubDomain].descriptors.some((d) => d.value === null)) {
-		// 	console.log('Please answer all questions');
-		// 	return;
-		// }
+
 		if (formData[currDomain].subDomains.length === currSubDomain + 1) {
 			if (formData.length === currDomain + 1) {
 				return;
@@ -53,8 +47,8 @@
 		} else {
 			currSubDomain += 1;
 		}
-		console.log('Next?');
 	}
+
 	function previous() {
 		if (currSubDomain === 0) {
 			if (currDomain === 0) {
@@ -66,89 +60,60 @@
 			currSubDomain -= 1;
 		}
 	}
-	function handleFinish() {
-		console.log('Finish');
-		goto('/thank-you');
-	}
-	// $effect(() => {
-	// 	console.log('currDomain', currDomain);
-	// 	console.log('currSubDomain', currSubDomain);
-	// 	console.log('isFirstQuestion', isFirstQuestion);
-	// 	console.log('isLastQuestion', isLastQuestion);
-	// });
 </script>
 
-<!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->
-
-<section class="mx-auto max-w-7xl p-2 lg:p-8">
+<section class="sizes mx-auto max-w-7xl space-y-5 p-2 lg:p-8">
 	<h1 class="sr-only">testing...</h1>
-
-	<div class="flex flex-col gap-4 p-4">
-		{#if formData[currDomain].subDomains[currSubDomain].name.toLowerCase() == 'demographics'}
-			<Card class="p-2">
-				{formData[currDomain].subDomains[currSubDomain].description}</Card
-			>
-		{:else}
-			<div class="flex gap-8">
-				<div class=" space-y-3">
-					<h2 class="text-right text-3xl font-bold">
-						<p class=" flex justify-end gap-2">
-							<span class="block font-normal">Domain: </span>{formData[currDomain].name}
-						</p>
-						<p class=" flex justify-end gap-2">
-							{#if formData[currDomain].subDomains[currSubDomain].name}
-								<span class="block font-normal">Sub-domain:</span>{formData[currDomain].subDomains[
-									currSubDomain
-								].name}
-							{/if}
-						</p>
-					</h2>
-
-					<p class=" font-bold">Read the indicator summary below.</p>
-					<p class="">
-						{#if formData[currDomain]?.subDomains[currSubDomain] && formData[currDomain]?.subDomains[currSubDomain]?.descriptors}
-							{formData[currDomain].subDomains[currSubDomain].descriptors[0].text!}
+	{#if formData[currDomain].subDomains[currSubDomain].name.toLowerCase() == 'demographics'}
+		<Card class="p-2">
+			{formData[currDomain].subDomains[currSubDomain].description}</Card
+		>
+	{:else}
+		<div class="flex gap-8">
+			<div class=" space-y-3">
+				<h2 class="text-right text-3xl font-bold">
+					<p class=" flex justify-end gap-2">
+						<span class="block font-normal">Domain: </span>{formData[currDomain].name}
+					</p>
+					<p class=" flex justify-end gap-2">
+						{#if formData[currDomain].subDomains[currSubDomain].name}
+							<span class="block font-normal">Sub-domain:</span>{formData[currDomain].subDomains[
+								currSubDomain
+							].name}
 						{/if}
 					</p>
-				</div>
-				<div class="aspect-w-16 aspect-h-9">
-					{@html '<iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ?si=6nBY3o9cLboe4jEd" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>'}
-				</div>
-			</div>
-			<Card class="p-2">
-				{promptText}</Card
-			>
-		{/if}
+				</h2>
 
-		<Card class="flex max-w-prose gap-4 p-2">
-			<div class="right w-full">
-				<ul class="">
-					{#if formData[currDomain].subDomains[currSubDomain].name.toLowerCase() == 'demographics'}
-						<!-- <pre>{JSON.stringify(formData[currDomain], null, 2)}</pre> -->
-						<NativeDemographicsSurveyForm
-							data={formData}
-							{currDomain}
-							{currSubDomain}
-							{isFirstQuestion}
-							bind:handleNext={next}
-							bind:handlePrev={previous}
-							{assessmentToken}
-						/>
-					{:else}
-						<NativeSurveyFormTemplate
-							{formData}
-							{currDomain}
-							{currSubDomain}
-							{isFirstQuestion}
-							{isLastQuestion}
-							bind:handleNext={next}
-							bind:handlePrev={previous}
-							bind:handleFin={handleFinish}
-							{assessmentToken}
-						/>
+				<p class=" font-bold">Read the indicator summary below.</p>
+				<p class="">
+					{#if formData[currDomain]?.subDomains[currSubDomain] && formData[currDomain]?.subDomains[currSubDomain]?.descriptors}
+						{formData[currDomain].subDomains[currSubDomain].descriptors[0].text!}
 					{/if}
-				</ul>
+				</p>
 			</div>
+			<div class="aspect-w-16 aspect-h-9">
+				{@html '<iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ?si=6nBY3o9cLboe4jEd" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>'}
+			</div>
+		</div>
+		<Card class="p-2">
+			{promptText}</Card
+		>
+	{/if}
+
+	<DemographicsAndSurveyForm
+		bind:demoAndSurveyformData={formData}
+		{currDomain}
+		{currSubDomain}
+		{assessmentToken}
+		bind:handleNext={next}
+		bind:handlePrev={previous}
+		{isFirstQuestion}
+		{isLastQuestion}
+	/>
+
+	<!-- <div class="flex flex-col gap-4 p-4">
+		<Card class="flex max-w-prose gap-4 p-2">
+			<div class="right w-full"></div>
 		</Card>
-	</div>
+	</div> -->
 </section>

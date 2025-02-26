@@ -2,8 +2,8 @@ import type { RequestEvent } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import { sha256 } from '@oslojs/crypto/sha2';
 import { encodeBase64url, encodeHexLowerCase } from '@oslojs/encoding';
+import { InsertSession } from './db/schema/sessions';
 
-import * as table from '$lib/server/db/schema/db-utils';
 import { db } from './db';
 import { sessions, users } from './db/schema';
 
@@ -24,7 +24,7 @@ export function generateSessionToken() {
 
 export async function createSession(token: string, userId: string) {
 	const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
-	const session: Session = {
+	const session: InsertSession = {
 		id: sessionId,
 		userId,
 		expiresAt: getISOTimestamp(30)

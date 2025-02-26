@@ -1,4 +1,4 @@
-import { eq, and, isNotNull, desc, sql, count, or } from 'drizzle-orm';
+import { eq, and, isNotNull, desc, sql, count, or, not } from 'drizzle-orm';
 import {
 	districtAdmins,
 	schoolAdmins,
@@ -456,14 +456,6 @@ export async function addDemographicsData(values: CreateDemographicsResponseInpu
 	const [newDemo] = await db
 		.insert(surveyDemographics)
 		.values({ ...values })
-		.onConflictDoUpdate({
-			target: [surveyDemographics.surveyId, surveyDemographics.schoolId],
-			set: {
-				subjectTaught: sql`excluded.subject_taught`,
-				yearsTeaching: sql`excluded.years_teaching`,
-				updatedAt: new Date().toISOString()
-			}
-		})
 		.returning({ id: surveyDemographics.id });
 
 	return newDemo;
@@ -474,13 +466,6 @@ export async function addQuestionsData(values: CreateQuestionResponseInput) {
 	const [newDemoData] = await db
 		.insert(surveyQuestionsResponses)
 		.values([...values])
-		.onConflictDoUpdate({
-			target: [surveyQuestionsResponses.surveyId, surveyQuestionsResponses.questionId],
-			set: {
-				response: sql`excluded.response`,
-				updatedAt: new Date().toISOString()
-			}
-		})
 		.returning({ id: surveyQuestionsResponses.id });
 
 	return newDemoData;
@@ -491,7 +476,7 @@ export async function setSurveyStatus({
 	status
 }: {
 	surveyId: number;
-	status: 'sent' | 'started' | 'completed';
+	status: (typeof surveyStatusEnum.enumValues)[number];
 }) {
 	const [result] = await db
 		.update(surveys)
@@ -507,6 +492,30 @@ export async function getSurveyData(schoolId: number) {
 		.select({ id: surveys.id, status: surveys.status })
 		.from(surveys)
 		.where(eq(surveys.schoolId, schoolId));
+
+	return results || [];
+}
+
+export async function getSurveyResultsData(schoolId: number) {
+	const results = await db
+		.select({
+			surveyId: surveys.id,
+			domainId: surveyDomains.id,
+			domainName: surveyDomains.name,
+			questionId: surveyQuestions.id,
+			questionResponse: surveyQuestionsResponses.response,
+			questionisValidSubdomainGroup: surveyQuestionsResponses.isValidSubdomainGroup,
+			subDomainId: surveySubDomains.id,
+			subName: surveySubDomains.name
+		})
+		.from(surveyQuestionsResponses)
+		.leftJoin(surveys, eq(surveys.id, surveyQuestionsResponses.surveyId))
+		.leftJoin(surveyQuestions, eq(surveyQuestions.id, surveyQuestionsResponses.questionId))
+		.leftJoin(surveySubDomains, eq(surveySubDomains.id, surveyQuestions.subDomainId))
+		.leftJoin(surveyDomains, eq(surveyDomains.id, surveySubDomains.domainId))
+		.where(
+			and(eq(surveys.schoolId, schoolId), eq(surveyQuestionsResponses.isValidSubdomainGroup, true))
+		);
 
 	return results || null;
 }

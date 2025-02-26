@@ -212,13 +212,14 @@ type SurveyResponseData = {
 type TransformedResponse = {
 	surveyId: number;
 	questionId: number;
-	response: number | null;
+	isValidSubdomainGroup: boolean;
+	response: 0 | 1 | null;
 };
 
 export function transformSurveyQuestionsResponses(data: SurveyResponseData): TransformedResponse[] {
 	const { surveyId, ...responses } = data;
 
-	return Object.entries(responses)
+	const rawData = Object.entries(responses)
 		.filter(([key]) => key.startsWith('domainId='))
 		.map(([key, value]) => {
 			const match = key.match(/domainId=(\d+)\|subDomainId=(\d+)\|qId=(\d+)/);
@@ -228,8 +229,30 @@ export function transformSurveyQuestionsResponses(data: SurveyResponseData): Tra
 			return {
 				surveyId: surveyId,
 				questionId: parseInt(questionId, 10),
-				response: value ? parseInt(value as string, 10) : null
+				subDomainId: parseInt(subDomainId, 10),
+				response: value === '' ? null : parseInt(String(value)) === 1 ? 1 : 0
 			};
 		})
-		.filter((item) => item !== null) as TransformedResponse[];
+		.filter((item) => item !== null);
+	console.log('rawData  ====> ', rawData);
+	let currSubdomainId;
+
+	const transformedSurveyQuestionsResponses = rawData.map((item, _, array) => {
+		const currSubdomainId = item.subDomainId;
+		const currGroup = array.filter((item) => item.subDomainId === currSubdomainId);
+		const subDomainHasNullResponse = array
+			.filter((el) => el.subDomainId === currSubdomainId)
+			.some((el) => el.response === null); // whole subdomain is tainted if any question is un-answered
+		return {
+			surveyId: item.surveyId,
+			questionId: item.questionId,
+			isValidSubdomainGroup: !subDomainHasNullResponse,
+			response: item.response
+		};
+	});
+	console.log(
+		'TESTtransformedSurveyQuestionsResponses  ====> ',
+		transformedSurveyQuestionsResponses
+	);
+	return transformedSurveyQuestionsResponses as TransformedResponse[];
 }

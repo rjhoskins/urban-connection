@@ -32,12 +32,11 @@
 			</div>
 			<div class="right md:min-w-96">
 				<Button href={`${page.url.pathname}/send-assessment`} class="mb-4">Send Assessment</Button>
-				<p>Completed</p>
-				<Progress barBgColor="bg-green-700" value={schoolProgess || Math.random() * 100} />
-				<p>In Progress</p>
-				<Progress barBgColor="bg-amber-500" value={schoolProgess || Math.random() * 100} />
+
 				<p>Not Started</p>
 				<Progress barBgColor="bg-red-700" value={schoolProgess || Math.random() * 100} />
+				<p>Completed</p>
+				<Progress barBgColor="bg-green-700" value={schoolProgess || Math.random() * 100} />
 			</div>
 		</div>
 	</Card.Root>

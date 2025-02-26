@@ -6,7 +6,7 @@
 	let schoolProgess;
 </script>
 
-<Card.Root>
+<Card.Root class="transition-shadow duration-300 ease-in-out hover:shadow-lg">
 	<Card.Header>
 		<Card.Title>{name}</Card.Title>
 		<Card.Description class="flex gap-4 text-primary/50">
