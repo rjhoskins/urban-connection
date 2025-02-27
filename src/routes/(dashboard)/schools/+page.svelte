@@ -13,6 +13,3 @@
 		<SchoolCard {page} {school} />
 	{/each}
 </section>
-
-<!-- <pre>{JSON.stringify(page, null, 2)}</pre> -->
-<pre class="sizes">{JSON.stringify(data, null, 2)}</pre>
