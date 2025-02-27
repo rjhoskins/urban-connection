@@ -1,9 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import SchoolCard from '$lib/components/school-card.svelte';
-	import * as Card from '$lib/components/ui/card';
-	import { Progress } from '$lib/components/ui/progress/index.js';
-	import { users } from '$lib/store/users.svelte';
 
 	let { data } = $props();
 	let schoolProgess;
@@ -18,4 +15,4 @@
 </section>
 
 <!-- <pre>{JSON.stringify(page, null, 2)}</pre> -->
-<!-- <pre class="sizes">{JSON.stringify(data, null, 2)}</pre> -->
+<pre class="sizes">{JSON.stringify(data, null, 2)}</pre>

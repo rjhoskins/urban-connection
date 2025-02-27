@@ -379,7 +379,7 @@ export async function getSchoolMemberSurveyTotals(
 				sql`sum(case when ${surveyQuestionsResponses.isValidSubdomainGroup} = true then ${surveyQuestionsResponses.response} else 0 end)`.mapWith(
 					Number
 				),
-			questionsTotal: sql`count(${surveyQuestionsResponses})`.mapWith(Number)
+			questionsTotal: sql`count(${surveyQuestionsResponses.response})`.mapWith(Number)
 		})
 		.from(surveys)
 		.leftJoin(schools, eq(schools.id, surveys.schoolId))
@@ -399,8 +399,11 @@ export async function getSchoolsWithSurveyCountAndScoreData(): Promise<
 		.select({
 			id: schools.id,
 			name: schools.name,
-			surveyCount: db.$count(surveys),
-			pointsTotal: sql`sum(${surveyQuestionsResponses.response})`.mapWith(String),
+			surveyCount: sql`count(distinct ${surveys.id})`.mapWith(Number),
+			pointsTotal:
+				sql`sum(case when ${surveyQuestionsResponses.isValidSubdomainGroup} = true then ${surveyQuestionsResponses.response} else 0 end)`.mapWith(
+					Number
+				),
 			questionsTotal: sql`count(${surveyQuestionsResponses.response})`.mapWith(String)
 		})
 		.from(schools)
