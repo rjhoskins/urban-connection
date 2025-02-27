@@ -579,10 +579,7 @@ export async function getSchoolSurveyResultsData(schoolId: number) {
 		.leftJoin(surveyQuestions, eq(surveyQuestions.id, surveyQuestionsResponses.questionId))
 		.leftJoin(surveySubDomains, eq(surveySubDomains.id, surveyQuestions.subDomainId))
 		.leftJoin(surveyDomains, eq(surveyDomains.id, surveySubDomains.domainId))
-		.where(
-			and(eq(surveys.schoolId, schoolId), eq(surveyQuestionsResponses.isValidSubdomainGroup, true))
-		);
-
+		.where(eq(surveys.schoolId, schoolId));
 	return results || null;
 }
 export async function getSingleSurveyResultsData(surveyId: number) {
@@ -604,7 +601,7 @@ export async function getSingleSurveyResultsData(surveyId: number) {
 		.leftJoin(surveyQuestions, eq(surveyQuestions.id, surveyQuestionsResponses.questionId))
 		.leftJoin(surveySubDomains, eq(surveySubDomains.id, surveyQuestions.subDomainId))
 		.leftJoin(surveyDomains, eq(surveyDomains.id, surveySubDomains.domainId))
-		.where(and(eq(surveys.id, surveyId), eq(surveyQuestionsResponses.isValidSubdomainGroup, true)));
+		.where(eq(surveys.id, surveyId));
 
 	return results || null;
 }
