@@ -389,14 +389,14 @@ export async function getSchoolMemberSurveyTotals(
 	return res || null;
 }
 
-export async function getSchoolsWithSurveyCountAndScoreData(
-	schoolId: number
-): Promise<{ id: number; name: string; surveyCount: number }[]> {
+export async function getSchoolsWithSurveyCountAndScoreData(): Promise<
+	{ id: number; name: string; surveyCount: number }[]
+> {
 	const res = db
 		.select({
 			id: schools.id,
 			name: schools.name,
-			surveyCount: db.$count(surveys, eq(schools.id, schoolId)),
+			surveyCount: db.$count(surveys),
 			pointsTotal: sql`sum(${surveyQuestionsResponses.response})`.mapWith(String),
 			questionsTotal: sql`count(${surveyQuestionsResponses.response})`.mapWith(String)
 		})
@@ -404,7 +404,8 @@ export async function getSchoolsWithSurveyCountAndScoreData(
 		.leftJoin(surveys, eq(schools.id, surveys.schoolId))
 		.leftJoin(surveyQuestionsResponses, eq(surveys.id, surveyQuestionsResponses.surveyId))
 		.leftJoin(surveyQuestions, eq(surveyQuestions.id, surveyQuestionsResponses.questionId))
-		.groupBy(schools.id, schools.name);
+		.groupBy(schools.id, schools.name)
+		.orderBy(schools.createdAt);
 	console.log('getSchoolsWithSurveyCountForSuperAdmin res => ', res);
 	return res || null;
 }
