@@ -19,19 +19,30 @@
 		return acc;
 	}, []);
 
-	console.log(DomainQuestionsArr);
+	console.log('DomainQuestionsArr', DomainQuestionsArr);
+	const validDomainAnswersArr = thisDomainDataSorted.reduce((acc, curr) => {
+		// console.log('acc', acc);
+		console.log('curr', curr);
+		if (
+			acc.findIndex((item: any) => item.questionId === curr.questionId) !== -1 &&
+			curr.questionisValidSubdomainGroup
+		) {
+			acc[acc.findIndex((item: any) => item.questionId === curr.questionId)].questions.push(curr);
+		} else if (curr.questionisValidSubdomainGroup) {
+			acc.push({ questionId: curr.questionId, questions: [curr] });
+		}
+
+		return acc;
+	}, []);
+	// const validAnswers = thisDomainDataSorted.filter((el) => el.questions.questionisValidSubdomainGroup === true);
+	console.log('validDomainAnswersArr ', validDomainAnswersArr);
 	const totalDomainScore =
-		thisDomainDataSorted.reduce((acc, curr) => (acc += curr.questionResponse), 0) /
-		totalDomainQuestions;
+		thisDomainDataSorted
+			.filter((el) => el.questionisValidSubdomainGroup)
+			.reduce((acc, curr) => (acc += curr.questionResponse), 0) / totalDomainQuestions;
 </script>
 
 <Card class="space-y-3 p-4">
-	<!-- <pre>{JSON.stringify(totalDomainQuestions, null, 2)}</pre>
-	<pre>{JSON.stringify(
-			thisDomainDataSorted.reduce((acc, curr) => acc + curr.questionResponse, 0),
-			null,
-			2
-		)}</pre> -->
 	<h3 class="my-1 text-2xl font-light tracking-wide">
 		{thisDomainDataSorted[0].domainName}
 	</h3>
