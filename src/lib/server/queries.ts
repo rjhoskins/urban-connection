@@ -375,8 +375,11 @@ export async function getSchoolMemberSurveyTotals(
 			id: surveys.id,
 			name: surveys.recipientName,
 			email: surveys.recipientEmail,
-			pointsTotal: sql`sum(${surveyQuestionsResponses.response})`.mapWith(Number),
-			questionsTotal: sql`count(${surveyQuestionsResponses.response})`.mapWith(Number)
+			pointsTotal:
+				sql`sum(case when ${surveyQuestionsResponses.isValidSubdomainGroup} = true then ${surveyQuestionsResponses.response} else 0 end)`.mapWith(
+					Number
+				),
+			questionsTotal: sql`count(${surveyQuestionsResponses})`.mapWith(Number)
 		})
 		.from(surveys)
 		.leftJoin(schools, eq(schools.id, surveys.schoolId))

@@ -29,7 +29,10 @@
 			href={`${page.url.pathname}/surveys/${id}`}>View Results</a
 		>
 		<div class="flex grow flex-col gap-2">
-			<p class="">Total Assessment Score</p>
+			<div class="flex justify-between">
+				<p>Total Assessment Score:</p>
+				<p>{Math.floor(progress)}%</p>
+			</div>
 			<Progress barBgColor="bg-green-700" value={progress} />
 		</div>
 	</Card.Content>
