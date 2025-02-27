@@ -5,7 +5,10 @@ import {
 	getSchoolForSuperAdmin,
 	getSchoolAdmin,
 	getSurveyData,
-	getSchoolMemberSurveyTotals
+	getQuestionData,
+	getSchoolDomainResultsData,
+	getSchoolSurveyResultsData,
+	getLoggedInSchoolAdminsSchool
 } from '$lib/server/queries';
 import { redirect } from '@sveltejs/kit';
 
@@ -14,7 +17,9 @@ export const load = async (event) => {
 		throw redirect(302, '/auth/login');
 	}
 
-	const schoolNumber = parseInt(event.params.schoolId);
+	const userSchoolId = (await getLoggedInSchoolAdminsSchool(event.locals.user.id))?.id ?? 0;
+	if (userSchoolId === 0) throw redirect(302, '/auth/login');
+
 	let dataFunc: () => Promise<any> = async () => {
 		return null;
 	};
@@ -25,14 +30,14 @@ export const load = async (event) => {
 		console.log('school_admin user =======================> ');
 		const userId = event.locals.user.id;
 		if (userId) {
-			dataFunc = () => getSchoolForSchoolAdmin(userId, schoolNumber);
-			adminDataFunc = () => getSchoolAdmin(schoolNumber);
+			dataFunc = () => getSchoolForSchoolAdmin(userId, userSchoolId);
+			adminDataFunc = () => getSchoolAdmin(userSchoolId);
 		}
 	}
 	if (event.locals.user && event.locals.user.role === 'district_admin') {
 		const userId = event.locals.user.id;
 		if (userId) {
-			dataFunc = () => getSchoolForDistrictAdmin(schoolNumber);
+			dataFunc = () => getSchoolForDistrictAdmin(userSchoolId);
 			adminDataFunc = async () => {
 				if (event.locals.user) {
 					return { adminName: event.locals.user.name, adminEmail: event.locals.user.username };
@@ -42,8 +47,8 @@ export const load = async (event) => {
 		}
 	}
 	if (event.locals.user && event.locals.user.role === 'super_admin') {
-		dataFunc = () => getSchoolForSuperAdmin(schoolNumber);
-		adminDataFunc = async () => getSchoolAdmin(schoolNumber);
+		dataFunc = () => getSchoolForSuperAdmin(userSchoolId);
+		adminDataFunc = async () => getSchoolAdmin(userSchoolId);
 		// 	if (event.locals.user) {
 		// 		return { adminName: event.locals.user.name, adminEmail: event.locals.user.username };
 		// 	}
@@ -54,7 +59,9 @@ export const load = async (event) => {
 	return {
 		adminData: await adminDataFunc(),
 		school: await dataFunc(),
-		surveyData: await getSurveyData(schoolNumber),
-		memberData: await getSchoolMemberSurveyTotals(schoolNumber)
+		surveyData: await getSurveyData(userSchoolId),
+		surveyResultsData: await getSchoolSurveyResultsData(userSchoolId),
+		questionData: await getQuestionData(userSchoolId),
+		domainResultsData: await getSchoolDomainResultsData(userSchoolId)
 	};
 };

@@ -1,16 +1,12 @@
 <script lang="ts">
-	import { Button } from '$lib/components/ui/button';
+	/** @type {{ data: import('./$types').PageData, form: import('./$types').ActionData }} */
 	import * as Form from '$lib/components/ui/form/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
-	import { Textarea } from '$lib/components/ui/textarea/index.js';
-
 	import * as Card from '$lib/components/ui/card';
-	import { inviteNewUserSchema } from '$lib/schema.js';
-	import { decodeAdminUserInviteToken } from '$lib/utils';
-	/** @type {{ data: import('./$types').PageData, form: import('./$types').ActionData }} */
-	import { Field, Control, Label, FieldErrors, Description } from 'formsnap';
 	import { superForm } from 'sveltekit-superforms';
 	import SuperDebug from 'sveltekit-superforms';
+
+	import { inviteNewUserSchema } from '$lib/schema.js';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 
 	let { page, data } = $props();
@@ -27,7 +23,7 @@
 	});
 </script>
 
-<Card.Root class="mx-auto max-w-6xl">
+<Card.Root class="w-96 max-w-6xl">
 	<Card.Header>
 		<Card.Title class="p-6">Invite a Co-Admin</Card.Title>
 		<!-- <Card.Description>Card Description</Card.Description> -->
@@ -43,7 +39,7 @@
 						<Input type="" {...props} bind:value={$formData.name} />
 					{/snippet}
 				</Form.Control>
-				<Form.FieldErrors />
+				<Form.FieldErrors class="my-1" />
 			</Form.Field>
 
 			<!-- email -->
@@ -54,7 +50,7 @@
 						<Input type="" {...props} bind:value={$formData.email} />
 					{/snippet}
 				</Form.Control>
-				<Form.FieldErrors />
+				<Form.FieldErrors class="my-1" />
 			</Form.Field>
 			<!-- email -->
 			<Form.Field class=" space-y-0" {form} name="phone">

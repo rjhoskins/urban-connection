@@ -9,8 +9,7 @@
 	import DomainQuestionResultsCard from '$lib/components/survey-question-results-domain-stats-card.svelte';
 
 	let { data } = $props();
-	const { adminData, school, surveyData, surveyResultsData, questionData, domainResultsData } =
-		data;
+	const { adminData, school, surveyData, surveyResultsData } = data;
 
 	const domainIdsArr = surveyResultsData.map((result) => result.domainId);
 
@@ -26,7 +25,7 @@
 
 <!-- <pre>{JSON.stringify(domainIdsArr, null, 2)}</pre> -->
 <!-- <pre>{JSON.stringify(surveyResultsData, null, 2)}</pre> -->
-<h1 class="sr-only">Manage {school.name} School</h1>
+<h1 class="sr-only">View {school.name} Survey Detail</h1>
 
 <section class=" mx-auto grid max-w-7xl gap-4 p-2 lg:p-8">
 	<Card.Root class=" p-4">
@@ -42,23 +41,29 @@
 					<AdminContactDetailsCard {admin} />
 				{/each}
 			</div>
-			<div class="right md:min-w-96">
+			<div class="right space-y-3 md:min-w-96">
 				<div class="flex items-center justify-between">
 					<div class="flex gap-2">
 						<p>Total Surveys:</p>
 						<p>{totalSurveys}</p>
 					</div>
-					<Button href={`${page.url.pathname}/send-assessment`} class="mb-4">Send Assessment</Button
-					>
 				</div>
-				<p>Not Started</p>
-				<Progress barBgColor="bg-red-700" value={surveysNotStartedPercentage} />
-				<p>Completed</p>
-				<Progress barBgColor="bg-green-700" value={surveysCompletedPercentage} />
+				<div class="space-y-2">
+					<p>Not Started</p>
+					<Progress barBgColor="bg-red-700" value={surveysNotStartedPercentage} />
+				</div>
+				<div class="space-y-2">
+					<p>Completed</p>
+					<Progress barBgColor="bg-green-700" value={surveysCompletedPercentage} />
+				</div>
 			</div>
 		</div>
 	</Card.Root>
 	{#if domainIds.size > 0}
+		<Card.Root class=" flex justify-between p-4">
+			<p>Participant Name: {surveyResultsData[0].participantName}</p>
+			<p>Participant Email: {surveyResultsData[0].participantEmail}</p>
+		</Card.Root>
 		<div class="grid grid-cols-2 gap-4">
 			{#each domainIds as domainId (domainId)}
 				<DomainQuestionResultsCard {domainId} {surveyResultsData} />
@@ -68,5 +73,3 @@
 		<p>No survey results available</p>
 	{/if}
 </section>
-<!-- 
-<pre class="">{JSON.stringify(data, null, 2)}</pre> -->

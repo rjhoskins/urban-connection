@@ -349,7 +349,7 @@ export async function getDistrictAdmin(districtId: number) {
 	return res || null;
 }
 
-export async function getSchoolIDForSchoolAdmin(userId: string): Promise<number> {
+export async function getSchoolIDForSchoolAdmin(userId: string): Promise<number | null> {
 	const [res] = await db
 		.select({ schoolId: schools.id })
 		.from(schools)
@@ -364,6 +364,48 @@ export async function getSchoolsForSuperAdmin(): Promise<{ id: number; name: str
 	const res = await db.select({ id: schools.id, name: schools.name }).from(schools);
 
 	console.log('getSchoolIDForSchoolAdmin res => ', res);
+	return res || null;
+}
+
+export async function getSchoolMemberSurveyTotals(
+	schoolId: number
+): Promise<{ id: number; name: string; pointsTotal: number; questionsTotal: number }[]> {
+	const res = await db
+		.select({
+			id: surveys.id,
+			name: surveys.recipientName,
+			email: surveys.recipientEmail,
+			pointsTotal: sql`sum(${surveyQuestionsResponses.response})`.mapWith(Number),
+			questionsTotal: sql`count(${surveyQuestionsResponses.response})`.mapWith(Number)
+		})
+		.from(surveys)
+		.leftJoin(schools, eq(schools.id, surveys.schoolId))
+		.leftJoin(surveyQuestionsResponses, eq(surveys.id, surveyQuestionsResponses.surveyId))
+		.leftJoin(surveyQuestions, eq(surveyQuestions.id, surveyQuestionsResponses.questionId))
+		.groupBy(surveys.id, schools.id)
+		.where(eq(schools.id, schoolId))
+		.orderBy(surveys.createdAt);
+	console.log('getSchoolMemberSurveyTotals res => ', res);
+	return res || null;
+}
+
+export async function getSchoolsWithSurveyCountAndScoreData(
+	schoolId: number
+): Promise<{ id: number; name: string; surveyCount: number }[]> {
+	const res = db
+		.select({
+			id: schools.id,
+			name: schools.name,
+			surveyCount: db.$count(surveys, eq(schools.id, schoolId)),
+			pointsTotal: sql`sum(${surveyQuestionsResponses.response})`.mapWith(String),
+			questionsTotal: sql`count(${surveyQuestionsResponses.response})`.mapWith(String)
+		})
+		.from(schools)
+		.leftJoin(surveys, eq(schools.id, surveys.schoolId))
+		.leftJoin(surveyQuestionsResponses, eq(surveys.id, surveyQuestionsResponses.surveyId))
+		.leftJoin(surveyQuestions, eq(surveyQuestions.id, surveyQuestionsResponses.questionId))
+		.groupBy(schools.id, schools.name);
+	console.log('getSchoolsWithSurveyCountForSuperAdmin res => ', res);
 	return res || null;
 }
 
@@ -396,6 +438,21 @@ export async function getSchoolForSchoolAdmin(userId: string, schoolId: number) 
 		.from(schoolAdmins)
 		.innerJoin(schools, eq(schoolAdmins.schoolId, schools.id))
 		.where(and(eq(schoolAdmins.userId, userId), eq(schoolAdmins.schoolId, schoolId)));
+
+	console.log('getSchoolForSchoolAdmin res => ', res);
+	return res || null;
+}
+export async function getLoggedInSchoolAdminsSchool(userId: string) {
+	const [res] = await db
+		.select({
+			id: schools.id,
+			name: schools.name,
+			createdAt: schools.createdAt,
+			createdBy: schools.createdBy
+		})
+		.from(schoolAdmins)
+		.innerJoin(schools, eq(schoolAdmins.schoolId, schools.id))
+		.where(eq(schoolAdmins.userId, userId));
 
 	console.log('getSchoolForSchoolAdmin res => ', res);
 	return res || null;
@@ -495,8 +552,16 @@ export async function getSurveyData(schoolId: number) {
 
 	return results || [];
 }
+export async function getSchoolSurveyDataWithSummaryResult(schoolId: number) {
+	const results = await db
+		.select({ id: surveys.id, status: surveys.status })
+		.from(surveys)
+		.where(eq(surveys.schoolId, schoolId));
 
-export async function getSurveyResultsData(schoolId: number) {
+	return results || [];
+}
+
+export async function getSchoolSurveyResultsData(schoolId: number) {
 	const results = await db
 		.select({
 			surveyId: surveys.id,
@@ -516,6 +581,29 @@ export async function getSurveyResultsData(schoolId: number) {
 		.where(
 			and(eq(surveys.schoolId, schoolId), eq(surveyQuestionsResponses.isValidSubdomainGroup, true))
 		);
+
+	return results || null;
+}
+export async function getSingleSurveyResultsData(surveyId: number) {
+	const results = await db
+		.select({
+			participantName: surveys.recipientName,
+			participantEmail: surveys.recipientEmail,
+			surveyId: surveys.id,
+			domainId: surveyDomains.id,
+			domainName: surveyDomains.name,
+			questionId: surveyQuestions.id,
+			questionResponse: surveyQuestionsResponses.response,
+			questionisValidSubdomainGroup: surveyQuestionsResponses.isValidSubdomainGroup,
+			subDomainId: surveySubDomains.id,
+			subName: surveySubDomains.name
+		})
+		.from(surveyQuestionsResponses)
+		.leftJoin(surveys, eq(surveys.id, surveyQuestionsResponses.surveyId))
+		.leftJoin(surveyQuestions, eq(surveyQuestions.id, surveyQuestionsResponses.questionId))
+		.leftJoin(surveySubDomains, eq(surveySubDomains.id, surveyQuestions.subDomainId))
+		.leftJoin(surveyDomains, eq(surveyDomains.id, surveySubDomains.domainId))
+		.where(and(eq(surveys.id, surveyId), eq(surveyQuestionsResponses.isValidSubdomainGroup, true)));
 
 	return results || null;
 }

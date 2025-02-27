@@ -7,14 +7,11 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import AdminContactDetailsCard from '$lib/components/admin-contact-details-card.svelte';
 	import DomainQuestionResultsCard from '$lib/components/survey-question-results-domain-stats-card.svelte';
+	import MemberSurveyResultsCard from '$lib/components/member-survey-results-card.svelte';
 
 	let { data } = $props();
-	const { adminData, school, surveyData, surveyResultsData, questionData, domainResultsData } =
-		data;
+	const { adminData, school, surveyData, memberData } = data;
 
-	const domainIdsArr = surveyResultsData.map((result) => result.domainId);
-
-	const domainIds = new Set([...surveyResultsData.map((result) => result.domainId)]);
 	const totalSurveys = surveyData.length;
 	const surveysNotStarted = surveyData.filter((survey) => survey.status === 'sent').length;
 	const surveysCompleted = surveyData.filter((survey) => survey.status === 'completed').length;
@@ -24,7 +21,6 @@
 	const surveysCompletedPercentage = surveysCompleted ? (surveysCompleted / totalSurveys) * 100 : 0;
 </script>
 
-<!-- <pre>{JSON.stringify(domainIdsArr, null, 2)}</pre> -->
 <!-- <pre>{JSON.stringify(surveyResultsData, null, 2)}</pre> -->
 <h1 class="sr-only">Manage {school.name} School</h1>
 
@@ -58,15 +54,17 @@
 			</div>
 		</div>
 	</Card.Root>
-	{#if domainIds.size > 0}
-		<div class="grid grid-cols-2 gap-4">
-			{#each domainIds as domainId (domainId)}
-				<DomainQuestionResultsCard {domainId} {surveyResultsData} />
+
+	<!-- <pre>{JSON.stringify(memberData, null, 2)}</pre> -->
+	<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+		{#if memberData.length > 0}
+			{#each memberData as member (member.id)}
+				<MemberSurveyResultsCard {member} />
 			{/each}
-		</div>
-	{:else}
-		<p>No survey results available</p>
-	{/if}
+		{:else}
+			<p>No survey results available</p>
+		{/if}
+	</div>
 </section>
 <!-- 
 <pre class="">{JSON.stringify(data, null, 2)}</pre> -->

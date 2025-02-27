@@ -2,4 +2,4 @@
 	let { data } = $props();
 </script>
 
-<h1>UC Admin Assessments</h1>
+<h1>Assessment Results</h1>

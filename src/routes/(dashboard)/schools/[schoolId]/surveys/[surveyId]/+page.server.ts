@@ -1,20 +1,24 @@
-/** @type {import('./$types').PageServerLoad} */
 import {
-	getSchoolForSchoolAdmin,
-	getSchoolForDistrictAdmin,
-	getSchoolForSuperAdmin,
 	getSchoolAdmin,
+	getSchoolForDistrictAdmin,
+	getSchoolForSchoolAdmin,
+	getSchoolForSuperAdmin,
+	getSingleSurveyResultsData,
 	getSurveyData,
-	getSchoolMemberSurveyTotals
+	getSurveyResultsData
 } from '$lib/server/queries';
 import { redirect } from '@sveltejs/kit';
+import type { PageServerLoad } from './$types';
 
 export const load = async (event) => {
 	if (!event.locals.user) {
 		throw redirect(302, '/auth/login');
 	}
+	console.log('event.params.schoolId =>', event.params.schoolId);
+	console.log('event.params.surveyId =>', event.params.surveyId);
 
 	const schoolNumber = parseInt(event.params.schoolId);
+	const surveyNumber = parseInt(event.params.surveyId);
 	let dataFunc: () => Promise<any> = async () => {
 		return null;
 	};
@@ -41,20 +45,28 @@ export const load = async (event) => {
 			};
 		}
 	}
+
 	if (event.locals.user && event.locals.user.role === 'super_admin') {
 		dataFunc = () => getSchoolForSuperAdmin(schoolNumber);
 		adminDataFunc = async () => getSchoolAdmin(schoolNumber);
-		// 	if (event.locals.user) {
-		// 		return { adminName: event.locals.user.name, adminEmail: event.locals.user.username };
-		// 	}
-		// 	return null;
-		// };
 	}
+
+	// const adminData = await adminDataFunc();
+	// console.log('adminData =>', adminData);
+
+	// const school = await dataFunc();
+	// console.log('school =>', school);
+
+	// const surveyData = await getSurveyData(schoolNumber);
+	// console.log('surveyData =>', surveyData);
+
+	// const surveyResultsData = await getSurveyResultsData(schoolNumber);
+	// console.log('surveyResultsData =>', surveyResultsData);
 
 	return {
 		adminData: await adminDataFunc(),
 		school: await dataFunc(),
 		surveyData: await getSurveyData(schoolNumber),
-		memberData: await getSchoolMemberSurveyTotals(schoolNumber)
+		surveyResultsData: await getSingleSurveyResultsData(surveyNumber)
 	};
 };

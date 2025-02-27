@@ -25,7 +25,7 @@
 		totalDomainQuestions;
 </script>
 
-<Card class="p-4">
+<Card class="space-y-3 p-4">
 	<!-- <pre>{JSON.stringify(totalDomainQuestions, null, 2)}</pre>
 	<pre>{JSON.stringify(
 			thisDomainDataSorted.reduce((acc, curr) => acc + curr.questionResponse, 0),
@@ -35,14 +35,18 @@
 	<h3 class="my-1 text-2xl font-light tracking-wide">
 		{thisDomainDataSorted[0].domainName}
 	</h3>
+	<div class="flex justify-between">
+		<p>Score</p>
+		<p>{Math.ceil(totalDomainScore * 100)}%</p>
+	</div>
 	<Progress barBgColor="bg-green-700" value={totalDomainScore * 100} />
 
 	<div class="my-3">
-		<p class="my-3 text-xl">Questions</p>
+		<!-- <p class="my-3 text-xl">Questions</p> -->
 	</div>
 	<div class="space-y-4">
 		{#each DomainQuestionsArr as questionSet (questionSet.questionId)}
-			<QuestionsCard questions={questionSet} />
+			<!-- <QuestionsCard questions={questionSet} /> -->
 		{/each}
 	</div>
 </Card>

@@ -62,10 +62,10 @@
 	}
 </script>
 
-<section class="sizes mx-auto max-w-7xl space-y-5 p-2 lg:p-8">
+<section class="mx-auto max-w-7xl space-y-5 p-2 lg:p-8">
 	<h1 class="sr-only">testing...</h1>
 	{#if formData[currDomain].subDomains[currSubDomain].name.toLowerCase() == 'demographics'}
-		<Card class="p-2">
+		<Card class="p-4 shadow-md">
 			{formData[currDomain].subDomains[currSubDomain].description}</Card
 		>
 	{:else}

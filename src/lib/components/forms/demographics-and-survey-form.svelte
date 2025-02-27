@@ -90,7 +90,7 @@
 </script>
 
 <!-- <pre>{JSON.stringify(demoAndSurveyformData[currDomain].subDomains[currSubDomain], null, 2)}</pre> -->
-<Card>
+<Card class="max-w-prose  p-4 shadow-md">
 	<form method="POST" id={'demoAndSurveyForm'} class=" flex flex-col gap-2">
 		<input type="hidden" name="assessmentToken" value={assessmentToken} />
 
