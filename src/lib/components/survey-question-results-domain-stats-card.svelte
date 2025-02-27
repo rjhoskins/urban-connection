@@ -48,7 +48,7 @@
 	</h3>
 	<div class="flex justify-between">
 		<p>Score</p>
-		<p>{Math.ceil(totalDomainScore * 100)}%</p>
+		<p>{Math.floor(totalDomainScore * 100)}%</p>
 	</div>
 	<Progress barBgColor="bg-green-700" value={totalDomainScore * 100} />
 
