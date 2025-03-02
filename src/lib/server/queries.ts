@@ -367,7 +367,30 @@ export async function getSchoolsForSuperAdmin(): Promise<{ id: number; name: str
 	return res || null;
 }
 
-export async function getSchoolMemberSurveyTotals(
+export async function getSchoolMemberSurveyTotalsForSchoolAndDistrictAdmin(
+	schoolId: number
+): Promise<{ id: number; name: string; pointsTotal: number; questionsTotal: number }[]> {
+	const res = await db
+		.select({
+			id: surveys.id,
+			pointsTotal:
+				sql`sum(case when ${surveyQuestionsResponses.isValidSubdomainGroup} = true then ${surveyQuestionsResponses.response} else 0 end)`.mapWith(
+					Number
+				),
+			questionsTotal: sql`count(${surveyQuestionsResponses.response})`.mapWith(Number)
+		})
+		.from(surveys)
+		.leftJoin(schools, eq(schools.id, surveys.schoolId))
+		.leftJoin(surveyQuestionsResponses, eq(surveys.id, surveyQuestionsResponses.surveyId))
+		.leftJoin(surveyQuestions, eq(surveyQuestions.id, surveyQuestionsResponses.questionId))
+		.groupBy(surveys.id, schools.id)
+		.where(eq(schools.id, schoolId))
+		.orderBy(surveys.createdAt);
+	console.log('getSchoolMemberSurveyTotals res => ', res);
+	return res || null;
+}
+
+export async function getSchoolMemberSurveyTotalsForSuperUser(
 	schoolId: number
 ): Promise<{ id: number; name: string; pointsTotal: number; questionsTotal: number }[]> {
 	const res = await db
@@ -588,11 +611,32 @@ export async function getSchoolSurveyResultsData(schoolId: number) {
 		.where(eq(surveys.schoolId, schoolId));
 	return results || null;
 }
-export async function getSingleSurveyResultsData(surveyId: number) {
+export async function getSingleSurveyResultsDataForSuperAdmin(surveyId: number) {
 	const results = await db
 		.select({
 			participantName: surveys.recipientName,
 			participantEmail: surveys.recipientEmail,
+			surveyId: surveys.id,
+			domainId: surveyDomains.id,
+			domainName: surveyDomains.name,
+			questionId: surveyQuestions.id,
+			questionResponse: surveyQuestionsResponses.response,
+			questionisValidSubdomainGroup: surveyQuestionsResponses.isValidSubdomainGroup,
+			subDomainId: surveySubDomains.id,
+			subName: surveySubDomains.name
+		})
+		.from(surveyQuestionsResponses)
+		.leftJoin(surveys, eq(surveys.id, surveyQuestionsResponses.surveyId))
+		.leftJoin(surveyQuestions, eq(surveyQuestions.id, surveyQuestionsResponses.questionId))
+		.leftJoin(surveySubDomains, eq(surveySubDomains.id, surveyQuestions.subDomainId))
+		.leftJoin(surveyDomains, eq(surveyDomains.id, surveySubDomains.domainId))
+		.where(eq(surveys.id, surveyId));
+
+	return results || null;
+}
+export async function getSingleSurveyResultsDataForSchoolAndDistrictAdmin(surveyId: number) {
+	const results = await db
+		.select({
 			surveyId: surveys.id,
 			domainId: surveyDomains.id,
 			domainName: surveyDomains.name,

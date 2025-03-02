@@ -1,17 +1,11 @@
 <script lang="ts">
 	import * as Card from '$lib/components/ui/card';
 	import Progress from '$lib/components/ui/progress/progress.svelte';
-	import { users } from '$lib/store/users.svelte';
-
-	import { page } from '$app/state';
-	import { Button } from '$lib/components/ui/button/index.js';
 	import AdminContactDetailsCard from '$lib/components/admin-contact-details-card.svelte';
 	import DomainQuestionResultsCard from '$lib/components/survey-question-results-domain-stats-card.svelte';
 
 	let { data } = $props();
 	const { adminData, school, surveyData, surveyResultsData } = data;
-
-	const domainIdsArr = surveyResultsData.map((result) => result.domainId);
 
 	const domainIds = new Set([...surveyResultsData.map((result) => result.domainId)]);
 	const totalSurveys = surveyData.length;
@@ -60,10 +54,12 @@
 		</div>
 	</Card.Root>
 	{#if domainIds.size > 0}
-		<Card.Root class=" flex justify-between p-4">
-			<p>Participant Name: {surveyResultsData[0].participantName}</p>
-			<p>Participant Email: {surveyResultsData[0].participantEmail}</p>
-		</Card.Root>
+		{#if surveyResultsData[0]?.participantName && surveyResultsData[0]?.participantEmail}
+			<Card.Root class=" flex justify-between p-4">
+				<p>Participant Name: {surveyResultsData[0]?.participantName}</p>
+				<p>Participant Email: {surveyResultsData[0]?.participantEmail}</p>
+			</Card.Root>
+		{/if}
 		<div class="grid grid-cols-2 gap-4">
 			{#each domainIds as domainId (domainId)}
 				<DomainQuestionResultsCard {domainId} {surveyResultsData} />

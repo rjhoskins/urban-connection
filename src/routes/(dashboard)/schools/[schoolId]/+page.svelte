@@ -6,7 +6,6 @@
 	import { page } from '$app/state';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import AdminContactDetailsCard from '$lib/components/admin-contact-details-card.svelte';
-	import DomainQuestionResultsCard from '$lib/components/survey-question-results-domain-stats-card.svelte';
 	import MemberSurveyResultsCard from '$lib/components/member-survey-results-card.svelte';
 
 	let { data } = $props();
@@ -58,8 +57,8 @@
 	<!-- <pre>{JSON.stringify(memberData, null, 2)}</pre> -->
 	<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 		{#if memberData.length > 0}
-			{#each memberData as member (member.id)}
-				<MemberSurveyResultsCard {member} />
+			{#each memberData as member, idx (member.id)}
+				<MemberSurveyResultsCard {member} {idx} />
 			{/each}
 		{:else}
 			<p>No survey results available</p>

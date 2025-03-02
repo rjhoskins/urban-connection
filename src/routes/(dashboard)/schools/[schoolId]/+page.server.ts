@@ -5,7 +5,7 @@ import {
 	getSchoolForSuperAdmin,
 	getSchoolAdmin,
 	getSurveyData,
-	getSchoolMemberSurveyTotals
+	getSchoolMemberSurveyTotalsForSchoolAndDistrictAdmin
 } from '$lib/server/queries';
 import { redirect } from '@sveltejs/kit';
 
@@ -55,6 +55,6 @@ export const load = async (event) => {
 		adminData: await adminDataFunc(),
 		school: await dataFunc(),
 		surveyData: await getSurveyData(schoolNumber),
-		memberData: await getSchoolMemberSurveyTotals(schoolNumber)
+		memberData: await getSchoolMemberSurveyTotalsForSchoolAndDistrictAdmin(schoolNumber)
 	};
 };

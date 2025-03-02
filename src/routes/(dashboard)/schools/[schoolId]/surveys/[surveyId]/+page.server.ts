@@ -3,7 +3,7 @@ import {
 	getSchoolForDistrictAdmin,
 	getSchoolForSchoolAdmin,
 	getSchoolForSuperAdmin,
-	getSingleSurveyResultsData,
+	getSingleSurveyResultsDataForSchoolAndDistrictAdmin,
 	getSurveyData,
 	getSurveyResultsData
 } from '$lib/server/queries';
@@ -67,6 +67,6 @@ export const load = async (event) => {
 		adminData: await adminDataFunc(),
 		school: await dataFunc(),
 		surveyData: await getSurveyData(schoolNumber),
-		surveyResultsData: await getSingleSurveyResultsData(surveyNumber)
+		surveyResultsData: await getSingleSurveyResultsDataForSchoolAndDistrictAdmin(surveyNumber)
 	};
 };

@@ -3,7 +3,7 @@
 	import Progress from './ui/progress/progress.svelte';
 	import { page } from '$app/state';
 
-	let { member } = $props();
+	let { member, idx } = $props();
 	const { id, name, email, pointsTotal, questionsTotal } = member;
 	const progress = $derived.by(() => {
 		if (pointsTotal && questionsTotal) {
@@ -16,12 +16,8 @@
 
 <Card.Root class="transition-shadow duration-300 ease-in-out hover:shadow-lg">
 	<Card.Header>
-		<Card.Title>{name}</Card.Title>
-		<Card.Description class="flex gap-4 text-primary/50">
-			{#if email}
-				<p>email {email}</p>
-			{/if}
-		</Card.Description>
+		<Card.Title>Teacher {idx + 1}</Card.Title>
+		<Card.Description class="flex gap-4 text-primary/50"></Card.Description>
 	</Card.Header>
 	<Card.Content class="flex items-center gap-3 p-4 ">
 		<a
