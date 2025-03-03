@@ -367,7 +367,7 @@ export async function getSchoolsForSuperAdmin(): Promise<{ id: number; name: str
 	return res || null;
 }
 
-export async function getSchoolMemberSurveyTotalsForSchoolAndDistrictAdmin(
+export async function getSchoolMemberSurveyTotalsForSchoolAndDistrictAdminBySchool(
 	schoolId: number
 ): Promise<{ id: number; name: string; pointsTotal: number; questionsTotal: number }[]> {
 	const res = await db
@@ -386,6 +386,31 @@ export async function getSchoolMemberSurveyTotalsForSchoolAndDistrictAdmin(
 		.groupBy(surveys.id, schools.id)
 		.where(eq(schools.id, schoolId))
 		.orderBy(surveys.createdAt);
+	console.log('getSchoolMemberSurveyTotals res => ', res);
+	return res || null;
+}
+
+export async function getSchoolMemberSurveyTotalsForSchoolAndDistrictAdminByDistrict(
+	districtId: number
+): Promise<{ id: number; name: string; pointsTotal: number; questionsTotal: number }[]> {
+	const res = await db
+		.select({
+			id: schools.id,
+			name: schools.name,
+			surveyCount: sql`count(distinct ${surveys.id})`.mapWith(Number),
+			pointsTotal:
+				sql`sum(case when ${surveyQuestionsResponses.isValidSubdomainGroup} = true then ${surveyQuestionsResponses.response} else 0 end)`.mapWith(
+					Number
+				),
+			questionsTotal: sql`count(${surveyQuestionsResponses.response})`.mapWith(Number)
+		})
+		.from(schools)
+		.leftJoin(surveys, eq(schools.id, surveys.schoolId))
+		.leftJoin(surveyQuestionsResponses, eq(surveys.id, surveyQuestionsResponses.surveyId))
+		.leftJoin(surveyQuestions, eq(surveyQuestions.id, surveyQuestionsResponses.questionId))
+		.groupBy(schools.id, schools.name)
+		.where(eq(schools.districtId, districtId)) // school /district /whatever
+		.orderBy(schools.createdAt);
 	console.log('getSchoolMemberSurveyTotals res => ', res);
 	return res || null;
 }
