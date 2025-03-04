@@ -1,5 +1,6 @@
 import type { Handle } from '@sveltejs/kit';
 import * as auth from '$lib/server/auth.js';
+import { sequence } from '@sveltejs/kit/hooks';
 
 const handleAuth: Handle = async ({ event, resolve }) => {
 	// console.log('middleware event');
@@ -23,5 +24,12 @@ const handleAuth: Handle = async ({ event, resolve }) => {
 
 	return resolve(event);
 };
+const checkPathUnathorizedUser: Handle = async ({ event, resolve }) => {
+	console.log('middleware event');
+	console.log('middleware event', event);
+	const sessionToken = event.cookies.get(auth.sessionCookieName);
 
-export const handle: Handle = handleAuth;
+	return resolve(event);
+};
+
+export const handle: Handle = sequence(handleAuth, checkPathUnathorizedUser);

@@ -19,10 +19,7 @@
 		return acc;
 	}, []);
 
-	console.log('DomainQuestionsArr', DomainQuestionsArr);
 	const validDomainAnswersArr = thisDomainDataSorted.reduce((acc, curr) => {
-		// console.log('acc', acc);
-		console.log('curr', curr);
 		if (
 			acc.findIndex((item: any) => item.questionId === curr.questionId) !== -1 &&
 			curr.questionisValidSubdomainGroup
@@ -34,8 +31,6 @@
 
 		return acc;
 	}, []);
-	// const validAnswers = thisDomainDataSorted.filter((el) => el.questions.questionisValidSubdomainGroup === true);
-	console.log('validDomainAnswersArr ', validDomainAnswersArr);
 	const totalDomainScore =
 		thisDomainDataSorted
 			.filter((el) => el.questionisValidSubdomainGroup)

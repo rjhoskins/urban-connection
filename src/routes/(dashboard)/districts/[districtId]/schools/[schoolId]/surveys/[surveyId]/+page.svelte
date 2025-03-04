@@ -19,7 +19,7 @@
 
 <!-- <pre>{JSON.stringify(domainIdsArr, null, 2)}</pre> -->
 <!-- <pre>{JSON.stringify(surveyResultsData, null, 2)}</pre> -->
-<h1 class="sr-only">View {school.name} Survey Detail</h1>
+<h1 class="">View Survey Detail</h1>
 
 <section class=" mx-auto grid max-w-7xl gap-4 p-2 lg:p-8">
 	<Card.Root class=" p-4">
@@ -54,6 +54,12 @@
 		</div>
 	</Card.Root>
 	{#if domainIds.size > 0}
+		{#if surveyResultsData[0]?.participantName && surveyResultsData[0]?.participantEmail}
+			<Card.Root class=" flex justify-between p-4">
+				<p>Participant Name: {surveyResultsData[0]?.participantName}</p>
+				<p>Participant Email: {surveyResultsData[0]?.participantEmail}</p>
+			</Card.Root>
+		{/if}
 		<div class="grid grid-cols-2 gap-4">
 			{#each domainIds as domainId (domainId)}
 				<DomainQuestionResultsCard {domainId} {surveyResultsData} />
@@ -63,3 +69,4 @@
 		<p>No survey results available</p>
 	{/if}
 </section>
+<!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->
