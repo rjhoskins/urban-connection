@@ -1,4 +1,5 @@
 import { eq, and, isNotNull, desc, sql, count, or, not, sum } from 'drizzle-orm';
+import { dev } from '$app/environment';
 import {
 	districtAdmins,
 	schoolAdmins,
@@ -277,13 +278,14 @@ export async function createNewUserWithDetails(
 	{ id, username, name, role, phone }: CreateUser,
 	trx?: PgTransaction<PostgresJsQueryResultHKT, any, any>
 ): Promise<{ id: string }> {
-	console.log('createNewUserWithDetails ==================================> ', {
-		id,
-		username,
-		name,
-		role,
-		phone
-	});
+	if (dev)
+		console.log('createNewUserWithDetails ==================================> ', {
+			id,
+			username,
+			name,
+			role,
+			phone
+		});
 	const queryBuilder = trx ? trx.insert(users) : db.insert(users);
 	const [newUser] = await queryBuilder
 		.values({
@@ -311,7 +313,7 @@ export async function getDistrictsWithSchools() {
 		.from(districts)
 		.leftJoin(schools, eq(schools.districtId, districts.id))
 		.groupBy(districts.id);
-	console.log(districtsRes);
+	if (dev) console.log(districtsRes);
 	return districtsRes || null;
 }
 
@@ -330,7 +332,7 @@ export async function getDistrictWithSchools(districtId: number) {
 		.leftJoin(schools, eq(schools.districtId, districts.id))
 		.groupBy(districts.id)
 		.where(eq(districts.id, districtId));
-	console.log(districtsRes);
+	if (dev) console.log(districtsRes);
 	return districtsRes || null;
 }
 
@@ -345,7 +347,7 @@ export async function getDistrictAdmin(districtId: number) {
 		.innerJoin(users, eq(districtAdmins.userId, users.id))
 		.where(eq(districtAdmins.id, districtId));
 
-	console.log('getDisctrictAdmin res => ', res);
+	if (dev) console.log('getDisctrictAdmin res => ', res);
 	return res || null;
 }
 
@@ -356,14 +358,14 @@ export async function getSchoolIDForSchoolAdmin(userId: string): Promise<number 
 		.innerJoin(schoolAdmins, eq(schoolAdmins.schoolId, schools.id))
 		.where(eq(schoolAdmins.userId, userId));
 
-	console.log('getSchoolIDForSchoolAdmin res => ', res);
+	if (dev) console.log('getSchoolIDForSchoolAdmin res => ', res);
 	return res?.schoolId || null;
 }
 
 export async function getSchoolsForSuperAdmin(): Promise<{ id: number; name: string }[]> {
 	const res = await db.select({ id: schools.id, name: schools.name }).from(schools);
 
-	console.log('getSchoolIDForSchoolAdmin res => ', res);
+	if (dev) console.log('getSchoolIDForSchoolAdmin res => ', res);
 	return res || null;
 }
 
@@ -386,7 +388,8 @@ export async function getSchoolMemberSurveyTotalsForSchoolAndDistrictAdminByScho
 		.groupBy(surveys.id, schools.id)
 		.where(eq(schools.id, schoolId))
 		.orderBy(surveys.createdAt);
-	console.log('getSchoolMemberSurveyTotals res => ', res);
+	if (dev) console.log('getSchoolMemberSurveyTotals res => ', res);
+
 	return res || null;
 }
 
@@ -413,7 +416,7 @@ export async function getDistrictSurveyTotals(): Promise<
 		.leftJoin(surveyQuestions, eq(surveyQuestions.id, surveyQuestionsResponses.questionId))
 		.groupBy(districts.id)
 		.orderBy(districts.id);
-	console.log('getDistrictSurveyTotals res => ', res);
+	if (dev) console.log('getDistrictSurveyTotals res => ', res);
 	return res || null;
 }
 
@@ -438,7 +441,7 @@ export async function getSchoolMemberSurveyTotalsForSchoolAndDistrictAdminByDist
 		.groupBy(schools.id, schools.name)
 		.where(eq(schools.districtId, districtId)) // school /district /whatever
 		.orderBy(schools.createdAt);
-	console.log('getSchoolMemberSurveyTotals res => ', res);
+	if (dev) console.log('getSchoolMemberSurveyTotals res => ', res);
 	return res || null;
 }
 
@@ -463,7 +466,7 @@ export async function getSchoolMemberSurveyTotalsForSuperUser(
 		.groupBy(surveys.id, schools.id)
 		.where(eq(schools.id, schoolId))
 		.orderBy(surveys.createdAt);
-	console.log('getSchoolMemberSurveyTotalsForSuperUser res => ', res);
+	if (dev) console.log('getSchoolMemberSurveyTotalsForSuperUser res => ', res);
 	return res || null;
 }
 
@@ -487,7 +490,7 @@ export async function getSchoolsWithSurveyCountAndScoreData(): Promise<
 		.leftJoin(surveyQuestions, eq(surveyQuestions.id, surveyQuestionsResponses.questionId))
 		.groupBy(schools.id, schools.name)
 		.orderBy(schools.createdAt);
-	console.log('getSchoolsWithSurveyCountForSuperAdmin res => ', res);
+	if (dev) console.log('getSchoolsWithSurveyCountForSuperAdmin res => ', res);
 	return res || null;
 }
 
@@ -505,7 +508,7 @@ export async function getSchoolsForDistrictAdmin(
 		.leftJoin(districtAdmins, eq(districtAdmins.districtId, schools.districtId))
 		.where(eq(districtAdmins.userId, userId)); // Use static value here to debug if needed.
 
-	console.log('getSchoolsForDistrictAdmin res => ', res);
+	if (dev) console.log('getSchoolsForDistrictAdmin res => ', res);
 	return res || null;
 }
 
@@ -521,7 +524,7 @@ export async function getSchoolForSchoolAdmin(userId: string, schoolId: number) 
 		.innerJoin(schools, eq(schoolAdmins.schoolId, schools.id))
 		.where(and(eq(schoolAdmins.userId, userId), eq(schoolAdmins.schoolId, schoolId)));
 
-	console.log('getSchoolForSchoolAdmin res => ', res);
+	if (dev) console.log('getSchoolForSchoolAdmin res => ', res);
 	return res || null;
 }
 export async function getLoggedInSchoolAdminsSchool(userId: string) {
@@ -536,7 +539,7 @@ export async function getLoggedInSchoolAdminsSchool(userId: string) {
 		.innerJoin(schools, eq(schoolAdmins.schoolId, schools.id))
 		.where(eq(schoolAdmins.userId, userId));
 
-	console.log('getSchoolForSchoolAdmin res => ', res);
+	if (dev) console.log('getSchoolForSchoolAdmin res => ', res);
 	return res || null;
 }
 
@@ -551,7 +554,7 @@ export async function getSchoolForSuperAdmin(schoolId: number) {
 		.from(schools)
 		.where(eq(schools.id, schoolId));
 
-	console.log('getSchoolForSuperAdmin res => ', res);
+	if (dev) console.log('getSchoolForSuperAdmin res => ', res);
 	return res || null;
 }
 
@@ -567,7 +570,7 @@ export async function getSchoolForDistrictAdmin(schoolId: number) {
 		.innerJoin(districtAdmins, eq(districtAdmins.districtId, schools.districtId))
 		.where(eq(schools.isActive, true));
 
-	console.log('getSchoolForSuperAdmin res => ', res);
+	if (dev) console.log('getSchoolForSuperAdmin res => ', res);
 	return res || null;
 }
 
@@ -582,7 +585,7 @@ export async function getSchoolAdminBySchoolId(schoolId: number) {
 		.innerJoin(users, eq(schoolAdmins.userId, users.id))
 		.where(eq(schoolAdmins.schoolId, schoolId));
 
-	console.log('getSchoolAdmin res => ', res);
+	if (dev) console.log('getSchoolAdmin res => ', res);
 	return res || null;
 }
 
@@ -591,7 +594,7 @@ export async function getDistricts() {
 }
 
 export async function addDemographicsData(values: CreateDemographicsResponseInput) {
-	console.log('addDemographicsData values => ', values);
+	if (dev) console.log('addDemographicsData values => ', values);
 	const [newDemo] = await db
 		.insert(surveyDemographics)
 		.values({ ...values })
@@ -601,7 +604,7 @@ export async function addDemographicsData(values: CreateDemographicsResponseInpu
 }
 
 export async function addQuestionsData(values: CreateQuestionResponseInput) {
-	console.log('addDemographicsData values => ', values);
+	if (dev) console.log('addDemographicsData values => ', values);
 	const [newDemoData] = await db
 		.insert(surveyQuestionsResponses)
 		.values([...values])
