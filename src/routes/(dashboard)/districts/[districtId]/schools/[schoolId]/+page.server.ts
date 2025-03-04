@@ -21,7 +21,7 @@ export const load = async (event) => {
 	const schoolId = parseInt(event.params.schoolId);
 	console.log('schoolId----------------', schoolId);
 
-	let dataFunc: () => Promise<any> = async () => {
+	let schoolDataFunc: () => Promise<any> = async () => {
 		return null;
 	};
 	let adminDataFunc: () => Promise<any> = async () => {
@@ -34,21 +34,21 @@ export const load = async (event) => {
 	if (event.locals.user.role === 'district_admin') {
 		const userId = event.locals.user.id;
 		if (userId) {
-			dataFunc = () => getSchoolForDistrictAdmin(schoolId);
+			schoolDataFunc = () => getSchoolForDistrictAdmin(schoolId);
 			adminDataFunc = async () => getSchoolAdminBySchoolId(schoolId);
 			memberDataFunc = async () =>
 				getSchoolMemberSurveyTotalsForSchoolAndDistrictAdminBySchool(schoolId);
 		}
 	}
 	if (event.locals.user.role === 'super_admin') {
-		dataFunc = () => getSchoolForSuperAdmin(schoolId);
+		schoolDataFunc = () => getSchoolForSuperAdmin(schoolId);
 		adminDataFunc = async () => getSchoolAdminBySchoolId(schoolId);
 		memberDataFunc = async () => getSchoolMemberSurveyTotalsForSuperUser(schoolId);
 	}
 
 	return {
 		adminData: await adminDataFunc(),
-		school: await dataFunc(),
+		school: await schoolDataFunc(),
 		surveyData: await getSurveyData(schoolId),
 		memberData: await memberDataFunc()
 	};
