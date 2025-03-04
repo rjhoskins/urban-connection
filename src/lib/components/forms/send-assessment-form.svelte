@@ -11,7 +11,7 @@
 	import SuperDebug from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 
-	let { inviteText = $bindable(), data, token } = $props();
+	let { inviteText = $bindable(), data } = $props();
 	// const { name, email, inviteId } = decodeAdminUserInviteToken(token);
 	const form = superForm(data.form, {
 		validators: zodClient(sendAssessmentInviteSchem)
@@ -62,4 +62,5 @@
 			{/if}
 		</form>
 	</Card.Content>
+	<!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->
 </Card.Root>

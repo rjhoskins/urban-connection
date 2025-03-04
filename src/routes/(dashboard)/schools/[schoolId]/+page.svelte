@@ -46,7 +46,7 @@
 					<Button href={`${page.url.pathname}/send-assessment`} class="mb-4">Send Assessment</Button
 					>
 				</div>
-				<p>Not Started</p>
+				<p>Sent</p>
 				<Progress barBgColor="bg-red-700" value={surveysNotStartedPercentage} />
 				<p>Completed</p>
 				<Progress barBgColor="bg-green-700" value={surveysCompletedPercentage} />

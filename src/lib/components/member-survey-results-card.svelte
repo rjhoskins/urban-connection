@@ -16,8 +16,8 @@
 
 <Card.Root class="transition-shadow duration-300 ease-in-out hover:shadow-lg">
 	<Card.Header>
-		<Card.Title>Teacher {idx + 1}</Card.Title>
-		<Card.Description class="flex gap-4 text-primary/50"></Card.Description>
+		<Card.Title>{name ? name : `Teacher ${idx + 1}`}</Card.Title>
+		<Card.Description class="flex gap-4 text-primary/50">{email ? email : null}</Card.Description>
 	</Card.Header>
 	<Card.Content class="flex items-center gap-3 p-4 ">
 		<a

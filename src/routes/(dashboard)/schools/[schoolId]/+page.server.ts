@@ -3,10 +3,9 @@ import {
 	getSchoolForSchoolAdmin,
 	getSchoolForDistrictAdmin,
 	getSchoolForSuperAdmin,
-	getSchoolAdmin,
 	getSurveyData,
-	getSchoolMemberSurveyTotalsForSchoolAndDistrictAdminBySchool,
-	getSchoolAdminBySchoolId
+	getSchoolMemberSurveyTotalsForSchoolAndDistrictAdminBySchool
+	// getSchoolAdminBySchoolId
 } from '$lib/server/queries';
 import { redirect } from '@sveltejs/kit';
 
@@ -15,25 +14,27 @@ export const load = async (event) => {
 		throw redirect(302, '/auth/login');
 	}
 
-	const schoolNumber = parseInt(event.params.schoolId);
+	const schoolId = parseInt(event.params.schoolId);
+
 	let dataFunc: () => Promise<any> = async () => {
 		return null;
 	};
 	let adminDataFunc: () => Promise<any> = async () => {
 		return null;
 	};
+
 	if (event.locals.user && event.locals.user.role === 'school_admin') {
 		console.log('school_admin user =======================> ');
 		const userId = event.locals.user.id;
 		if (userId) {
-			dataFunc = () => getSchoolForSchoolAdmin(userId, schoolNumber);
-			adminDataFunc = () => getSchoolAdminBySchoolId(schoolNumber);
+			dataFunc = () => getSchoolForSchoolAdmin(userId, schoolId);
+			// adminDataFunc = () => getSchoolAdminBySchoolId(schoolId);
 		}
 	}
 	if (event.locals.user && event.locals.user.role === 'district_admin') {
 		const userId = event.locals.user.id;
 		if (userId) {
-			dataFunc = () => getSchoolForDistrictAdmin(schoolNumber);
+			dataFunc = () => getSchoolForDistrictAdmin(schoolId);
 			adminDataFunc = async () => {
 				if (event.locals.user) {
 					return { adminName: event.locals.user.name, adminEmail: event.locals.user.username };
@@ -43,19 +44,13 @@ export const load = async (event) => {
 		}
 	}
 	if (event.locals.user && event.locals.user.role === 'super_admin') {
-		dataFunc = () => getSchoolForSuperAdmin(schoolNumber);
-		adminDataFunc = async () => getSchoolAdminBySchoolId(schoolNumber);
-		// 	if (event.locals.user) {
-		// 		return { adminName: event.locals.user.name, adminEmail: event.locals.user.username };
-		// 	}
-		// 	return null;
-		// };
+		dataFunc = () => getSchoolForSuperAdmin(schoolId);
+		// adminDataFunc = () => getSchoolAdminBySchoolId(schoolId);
 	}
 
 	return {
-		adminData: await adminDataFunc(),
 		school: await dataFunc(),
-		surveyData: await getSurveyData(schoolNumber),
-		memberData: await getSchoolMemberSurveyTotalsForSchoolAndDistrictAdminBySchool(schoolNumber)
+		surveyData: await getSurveyData(schoolId),
+		memberData: await getSchoolMemberSurveyTotalsForSchoolAndDistrictAdminBySchool(schoolId)
 	};
 };

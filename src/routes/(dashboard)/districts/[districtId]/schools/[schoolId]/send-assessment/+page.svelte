@@ -6,12 +6,7 @@
 	import SendAssessmentForm from '$lib/components/forms/send-assessment-form.svelte';
 
 	let { data } = $props();
-	// const { token } = data;
-	// const  { name, email, inviteId } = decodeAdminUserInviteToken(token || '');
 	let text = $state('');
-	let token;
-	let email = 'hi@example.com';
-	let name = 'hi';
 </script>
 
 <svelte:head>
@@ -24,7 +19,7 @@
 <div class="grid h-full place-content-center">
 	<div class="grid gap-6 lg:grid-cols-3">
 		<div class="left lg:col-span-1">
-			<SendAssessmentForm bind:inviteText={text} {data} {token} />
+			<SendAssessmentForm bind:inviteText={text} {data} />
 		</div>
 		<div class="right h-full lg:col-span-2 lg:flex lg:flex-col">
 			<h3 class="mb-2 text-xl">Email Text Preview - grab LINK!!!</h3>

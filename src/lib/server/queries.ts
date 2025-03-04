@@ -463,7 +463,7 @@ export async function getSchoolMemberSurveyTotalsForSuperUser(
 		.groupBy(surveys.id, schools.id)
 		.where(eq(schools.id, schoolId))
 		.orderBy(surveys.createdAt);
-	console.log('getSchoolMemberSurveyTotals res => ', res);
+	console.log('getSchoolMemberSurveyTotalsForSuperUser res => ', res);
 	return res || null;
 }
 
