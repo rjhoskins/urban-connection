@@ -16,7 +16,6 @@
 	const { districtsData } = data as {
 		districtsData: District[];
 	};
-	console.log(districtsData);
 </script>
 
 <h1 class="my-6 text-center text-3xl">Manage All Districts</h1>
