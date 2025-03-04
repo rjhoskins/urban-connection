@@ -56,4 +56,3 @@
 		</Card.Content>
 	</Card.Root>
 {/snippet}
-<pre>{JSON.stringify(districtsData, null, 2)}</pre>
