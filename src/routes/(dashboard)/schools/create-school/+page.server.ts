@@ -1,4 +1,5 @@
-import { message, superValidate } from 'sveltekit-superforms/server';
+import { page } from '$app/state';
+import { superValidate } from 'sveltekit-superforms/server';
 import { createSchoolSchema } from '$lib/schema';
 import { zod } from 'sveltekit-superforms/adapters';
 import type { PageServerLoad, Actions } from './$types.js';
@@ -19,8 +20,7 @@ import {
 	createDistrictAdmin,
 	getDistricts,
 	checkAdminUserExists
-} from '$lib/server/queries.js';
-import { check } from 'drizzle-orm/mysql-core';
+} from '$lib/server/queries';
 
 export const load: PageServerLoad = async (event) => {
 	if (!event.locals.user) return redirect(302, '/auth/login');
@@ -137,6 +137,7 @@ export const actions: Actions = {
 				if (!adminRes) {
 					throw new Error('Failed to associate admin');
 				}
+				// throw new Error('testing error');
 
 				return newUser;
 			});
@@ -151,8 +152,18 @@ export const actions: Actions = {
 			});
 		}
 
-		setFlash({ type: 'success', message: 'School successfully created' }, event.cookies);
-		console.log('inviteToken => ', inviteToken);
-		redirect(303, `/schools/invite?inviteToken=${inviteToken}`);
+		setFlash(
+			{
+				type: 'success',
+				message: `School successfully created: school admin invite link => \n${page.url.origin}/auth/register?inviteToken=${inviteToken}`
+			},
+			event.cookies
+		);
+		console.log(
+			'school admin invite token => ',
+			`${page.url.origin}/auth/register?inviteToken=${inviteToken}`
+		);
+		// todo: email inviteToken to user
+		// redirect(303, `/schools/invite?inviteToken=${inviteToken}`);
 	}
 };

@@ -34,12 +34,7 @@ export const load = async (event) => {
 		const userId = event.locals.user.id;
 		if (userId) {
 			dataFunc = () => getSchoolForDistrictAdmin(schoolId);
-			adminDataFunc = async () => {
-				if (event.locals.user) {
-					return { adminName: event.locals.user.name, adminEmail: event.locals.user.username };
-				}
-				return null;
-			};
+			adminDataFunc = async () => getSchoolAdminBySchoolId(schoolId);
 			memberDataFunc = async () =>
 				getSchoolMemberSurveyTotalsForSchoolAndDistrictAdminBySchool(schoolId);
 		}

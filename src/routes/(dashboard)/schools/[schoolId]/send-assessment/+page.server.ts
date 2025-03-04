@@ -5,7 +5,7 @@ import type { PageServerLoad, Actions } from './$types.js';
 import { createAssessmentInviteToken, handleLogFlashReturnFormError } from '$lib/utils.js';
 import { setFlash } from 'sveltekit-flash-message/server';
 import { redirect } from '@sveltejs/kit';
-import { createAssessment } from '$lib/server/queries.js';
+import { createAssessment } from '$lib/server/queries';
 
 export const load: PageServerLoad = async (event) => {
 	const form = await superValidate(zod(sendAssessmentInviteSchem));

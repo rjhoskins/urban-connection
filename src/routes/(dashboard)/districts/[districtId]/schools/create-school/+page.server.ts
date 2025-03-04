@@ -19,8 +19,7 @@ import {
 	createDistrictAdmin,
 	getDistricts,
 	checkAdminUserExists
-} from '$lib/server/queries.js';
-import { check } from 'drizzle-orm/mysql-core';
+} from '$lib/server/queries';
 
 export const load: PageServerLoad = async (event) => {
 	if (!event.locals.user) return redirect(302, '/auth/login');
@@ -153,6 +152,6 @@ export const actions: Actions = {
 
 		setFlash({ type: 'success', message: 'School successfully created' }, event.cookies);
 		console.log('inviteToken => ', inviteToken);
-		redirect(303, `/schools/invite?inviteToken=${inviteToken}`);
+		// redirect(303, `/schools/invite?inviteToken=${inviteToken}`);
 	}
 };

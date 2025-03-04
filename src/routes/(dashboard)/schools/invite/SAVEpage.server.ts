@@ -20,7 +20,7 @@ import { eq, or, desc } from 'drizzle-orm';
 import { setFlash } from 'sveltekit-flash-message/server';
 import { INITIAL_HTML_DATA } from '$lib/constants.js';
 import { htmlEmailTemplates } from '$lib/server/db/schema/index.js';
-import { getLatestHtmlTemplateData } from '$lib/server/queries.js';
+import { getLatestHtmlTemplateData } from '$lib/server/queries';
 
 export const load: PageServerLoad = async ({ url }) => {
 	const token = url.searchParams.get('inviteToken');

@@ -16,7 +16,7 @@ import {
 } from '$lib/utils';
 
 import { setFlash } from 'sveltekit-flash-message/server';
-import { getLatestHtmlTemplateData, updateHtmlTemplateData } from '$lib/server/queries.js';
+import { getLatestHtmlTemplateData, updateHtmlTemplateData } from '$lib/server/queries';
 import { get } from 'svelte/store';
 
 export const load: PageServerLoad = async ({ url }) => {

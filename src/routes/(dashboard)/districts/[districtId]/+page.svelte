@@ -19,7 +19,7 @@
 	let { data }: { data: PageData } = $props();
 	const { district, adminData, memberSurveyData } = data as {
 		district: District;
-		adminData: unknown;
+		adminData: Array<Record<string, any>> | Record<string, any>;
 		memberSurveyData: Array<{ id: string; [key: string]: any }>;
 	};
 </script>
@@ -29,14 +29,17 @@
 <section class=" container grid max-w-6xl p-4 py-8">
 	<div class="left space-y-3 pt-3">
 		{#if adminData}
-			{#if adminData?.length === 1}
-				<p class=" text-2xl">Administrator</p>
-			{:else}
-				<p class=" text-2xl">Administrators</p>
-			{/if}
-			{#each adminData as admin, idx (idx)}
-				<AdminContactDetailsCard {admin} />
-			{/each}
+			<Card class="p-4">
+				{#if !Array.isArray(adminData)}
+					<p class=" text-2xl">Administrator</p>
+					<AdminContactDetailsCard admin={adminData} />
+				{:else}
+					<p class=" text-2xl">Administrators</p>
+					{#each adminData as admin, idx (idx)}
+						<AdminContactDetailsCard {admin} />
+					{/each}
+				{/if}
+			</Card>
 		{:else}
 			<Card class="p-4">
 				<p class=" text-xl font-semibold">No Admins Found</p>
@@ -49,6 +52,4 @@
 		{/each}
 	</div>
 </section>
-<!-- <pre>{JSON.stringify(adminData, null, 2)}</pre> -->
-<!-- <pre>{JSON.stringify(district, null, 2)}</pre> -->
-<!-- <pre>{JSON.stringify(memberSurveyData, null, 2)}</pre> -->
+<pre>{JSON.stringify(data, null, 2)}</pre>

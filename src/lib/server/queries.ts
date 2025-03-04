@@ -340,6 +340,7 @@ export async function getDistrictAdmin(districtId: number) {
 	const [res] = await db
 		.select({
 			adminName: users.name,
+			AdminPhone: users.phone,
 			adminEmail: users.username,
 			districtId: districtAdmins.id
 		})
@@ -738,6 +739,17 @@ export async function getSchoolDomainResultsData(schoolId: number) {
 		.where(eq(surveys.schoolId, schoolId));
 
 	return results || null;
+}
+
+export async function getDistrictAdminsDistrictIdByUserId(
+	userId: string
+): Promise<{ id: number } | null> {
+	const [districtRes] = await db
+		.select({ id: districtAdmins.id })
+		.from(districtAdmins)
+		.where(eq(districtAdmins.userId, userId));
+
+	return districtRes || null;
 }
 
 export async function createAssessment({

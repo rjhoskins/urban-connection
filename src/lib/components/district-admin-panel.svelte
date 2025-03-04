@@ -1,20 +1,19 @@
 <script lang="ts">
 	import * as Card from '$lib/components/ui/card';
 	import { LayoutGrid, List, PenTool, Slice, UserRoundPlus } from 'lucide-svelte';
-	import { users } from '$lib/store/users.svelte';
 
 	const adminData = [
 		{
-			title: 'Invite School Administator',
-			url: '/schools/create',
-			description: 'Send email invitation to administrator.',
+			title: 'View  Dashboard',
+			url: '/districts',
+			description: 'View dashboard and manage district.',
 			icon: LayoutGrid
 		},
 		{
-			title: 'View Schools Dashboard',
+			title: '',
 			url: '/schools',
-			description: 'View completed assessment results for all Schools',
-			icon: List
+			description: 'Send email invitation to administrator.',
+			icon: LayoutGrid
 		}
 		// {
 		// 	title: 'Manage Assessments',

@@ -25,7 +25,7 @@ const handleAuth: Handle = async ({ event, resolve }) => {
 	return resolve(event);
 };
 const checkPathUnathorizedUser: Handle = async ({ event, resolve }) => {
-	//TODO: Implement this MAYBE TBD - TEST TEST TEST
+	//TODO: Implement this MAYBE TBD - TEST
 	// console.log('middleware event');
 
 	return resolve(event);
