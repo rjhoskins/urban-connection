@@ -24,7 +24,7 @@
 	};
 </script>
 
-<h1 class="text-2xl font-semibold">District || {district.name}</h1>
+<h1 class="sr-only text-2xl font-semibold">District || {district.name}</h1>
 
 <section class=" container grid max-w-6xl p-4 py-8">
 	<div class="left space-y-3 pt-3">
@@ -52,4 +52,4 @@
 		{/each}
 	</div>
 </section>
-<pre>{JSON.stringify(data, null, 2)}</pre>
+<!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->

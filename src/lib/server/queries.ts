@@ -340,7 +340,7 @@ export async function getDistrictAdmin(districtId: number) {
 	const [res] = await db
 		.select({
 			adminName: users.name,
-			AdminPhone: users.phone,
+			adminPhone: users.phone,
 			adminEmail: users.username,
 			districtId: districtAdmins.id
 		})

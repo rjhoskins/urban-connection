@@ -1,6 +1,6 @@
 <script lang="ts">
 	let { admin } = $props();
-	const { adminName, adminEmail, adminPhone = '' } = admin;
+	const { adminName, adminEmail, adminPhone } = admin;
 </script>
 
 <p class="">Name: {adminName}</p>
@@ -10,3 +10,4 @@
 		<p class="">Phone: {adminPhone}</p>
 	{/if}
 </div>
+<!-- <pre>{JSON.stringify(admin, null, 2)}</pre> -->
