@@ -31,7 +31,7 @@ export const load = async (event) => {
 		const userId = event.locals.user.id;
 		if (userId) {
 			dataFunc = () => getSchoolForSchoolAdmin(userId, userSchoolId);
-			adminDataFunc = () => getSchoolAdmin(userSchoolId);
+			adminDataFunc = () => getSchoolAdminBySchoolId(userSchoolId);
 		}
 	}
 	if (event.locals.user && event.locals.user.role === 'district_admin') {
@@ -48,7 +48,7 @@ export const load = async (event) => {
 	}
 	if (event.locals.user && event.locals.user.role === 'super_admin') {
 		dataFunc = () => getSchoolForSuperAdmin(userSchoolId);
-		adminDataFunc = async () => getSchoolAdmin(userSchoolId);
+		adminDataFunc = async () => getSchoolAdminBySchoolId(userSchoolId);
 		// 	if (event.locals.user) {
 		// 		return { adminName: event.locals.user.name, adminEmail: event.locals.user.username };
 		// 	}

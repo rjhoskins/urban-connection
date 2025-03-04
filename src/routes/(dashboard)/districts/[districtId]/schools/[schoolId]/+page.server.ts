@@ -48,7 +48,7 @@ export const load = async (event) => {
 	}
 	if (event.locals.user && event.locals.user.role === 'super_admin') {
 		dataFunc = () => getSchoolForSuperAdmin(Number(event.params.schoolId));
-		adminDataFunc = async () => getSchoolAdmin(Number(event.params.schoolId));
+		adminDataFunc = async () => getSchoolAdminBySchoolId(Number(event.params.schoolId));
 		// adminDataFunc = async () => {
 		// 	if (event.locals.user) {
 		// 		return { adminName: event.locals.user.name, adminEmail: event.locals.user.username };

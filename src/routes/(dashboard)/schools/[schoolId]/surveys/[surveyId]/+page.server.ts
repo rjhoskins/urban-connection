@@ -30,7 +30,7 @@ export const load = async (event) => {
 		const userId = event.locals.user.id;
 		if (userId) {
 			dataFunc = () => getSchoolForSchoolAdmin(userId, schoolNumber);
-			adminDataFunc = () => getSchoolAdmin(schoolNumber);
+			adminDataFunc = () => getSchoolAdminBySchoolId(schoolNumber);
 		}
 	}
 	if (event.locals.user && event.locals.user.role === 'district_admin') {
@@ -48,7 +48,7 @@ export const load = async (event) => {
 
 	if (event.locals.user && event.locals.user.role === 'super_admin') {
 		dataFunc = () => getSchoolForSuperAdmin(schoolNumber);
-		adminDataFunc = async () => getSchoolAdmin(schoolNumber);
+		adminDataFunc = async () => getSchoolAdminBySchoolId(schoolNumber);
 	}
 
 	// const adminData = await adminDataFunc();

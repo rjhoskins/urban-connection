@@ -1,4 +1,4 @@
-import { eq, and, isNotNull, desc, sql, count, or, not } from 'drizzle-orm';
+import { eq, and, isNotNull, desc, sql, count, or, not, sum } from 'drizzle-orm';
 import {
 	districtAdmins,
 	schoolAdmins,
@@ -369,7 +369,7 @@ export async function getSchoolsForSuperAdmin(): Promise<{ id: number; name: str
 
 export async function getSchoolMemberSurveyTotalsForSchoolAndDistrictAdminBySchool(
 	schoolId: number
-): Promise<{ id: number; name: string; pointsTotal: number; questionsTotal: number }[]> {
+): Promise<{ id: number; pointsTotal: number; questionsTotal: number }[]> {
 	const res = await db
 		.select({
 			id: surveys.id,
@@ -387,6 +387,33 @@ export async function getSchoolMemberSurveyTotalsForSchoolAndDistrictAdminByScho
 		.where(eq(schools.id, schoolId))
 		.orderBy(surveys.createdAt);
 	console.log('getSchoolMemberSurveyTotals res => ', res);
+	return res || null;
+}
+
+export async function getDistrictSurveyTotals(): Promise<
+	{ id: number; pointsTotal: number; questionsTotal: number }[]
+> {
+	const res = await db
+		.select({
+			id: districts.id,
+			name: districts.name,
+			// memberSchoolsCount: sql`COUNT(DISTINCT ${schools.id})`.mapWith(Number),
+			// memberSchoolsCount: sum(schools.id),
+			memberSchoolsCount: sql`COUNT(DISTINCT ${schools.id})`.mapWith(Number),
+			pointsTotal:
+				sql`SUM(CASE WHEN ${surveyQuestionsResponses.isValidSubdomainGroup} = true THEN ${surveyQuestionsResponses.response} ELSE 0 END)`.mapWith(
+					Number
+				),
+			questionsTotal: sql`COUNT(${surveyQuestionsResponses.response})`.mapWith(Number)
+		})
+		.from(districts)
+		.leftJoin(schools, eq(schools.districtId, districts.id))
+		.leftJoin(surveys, eq(schools.id, surveys.schoolId))
+		.leftJoin(surveyQuestionsResponses, eq(surveys.id, surveyQuestionsResponses.surveyId))
+		.leftJoin(surveyQuestions, eq(surveyQuestions.id, surveyQuestionsResponses.questionId))
+		.groupBy(districts.id)
+		.orderBy(districts.id);
+	console.log('getDistrictSurveyTotals res => ', res);
 	return res || null;
 }
 
@@ -544,7 +571,7 @@ export async function getSchoolForDistrictAdmin(schoolId: number) {
 	return res || null;
 }
 
-export async function getSchoolAdmin(schoolId: number) {
+export async function getSchoolAdminBySchoolId(schoolId: number) {
 	const res = await db
 		.select({
 			adminName: users.name,
