@@ -25,9 +25,8 @@ const handleAuth: Handle = async ({ event, resolve }) => {
 	return resolve(event);
 };
 const checkPathUnathorizedUser: Handle = async ({ event, resolve }) => {
-	console.log('middleware event');
-	console.log('middleware event', event);
-	const sessionToken = event.cookies.get(auth.sessionCookieName);
+	//TODO: Implement this MAYBE TBD - TEST TEST TEST
+	// console.log('middleware event');
 
 	return resolve(event);
 };
