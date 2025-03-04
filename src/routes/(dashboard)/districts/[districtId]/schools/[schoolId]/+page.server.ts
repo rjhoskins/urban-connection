@@ -1,5 +1,5 @@
 /** @type {import('./$types').PageServerLoad} */
-import { redirect } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import {
 	getSchoolAdminBySchoolId,
 	getSchoolForDistrictAdmin,
@@ -15,10 +15,11 @@ export const load = async (event) => {
 		throw redirect(302, '/auth/login');
 	}
 	if (event.locals.user.role === 'school_admin') {
-		throw redirect(302, '/unauthorized');
+		throw error(401, '/unauthorized');
 	}
 
 	const schoolId = parseInt(event.params.schoolId);
+	console.log('schoolId----------------', schoolId);
 
 	let dataFunc: () => Promise<any> = async () => {
 		return null;
