@@ -21,7 +21,7 @@
 </script>
 
 <!-- <pre>{JSON.stringify(surveyResultsData, null, 2)}</pre> -->
-<h1 class="">Manage {school.name} School</h1>
+<h1 class="sr-only">Manage {school.name} School</h1>
 
 <section class=" mx-auto grid max-w-7xl gap-4 p-2 lg:p-8">
 	<Card.Root class=" p-4">
