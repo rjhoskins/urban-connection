@@ -20,7 +20,7 @@
 <Card.Root class="mx-auto max-w-6xl min-w-96">
 	<Card.Header>
 		<Card.Title>Account Access</Card.Title>
-		<Card.Description>Log In or Sign Up</Card.Description>
+		<Card.Description>Log In</Card.Description>
 	</Card.Header>
 	<Card.Content>
 		<form class="flex flex-col gap-3" action="?/login" method="POST" use:enhance>
