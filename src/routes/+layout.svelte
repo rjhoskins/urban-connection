@@ -3,11 +3,15 @@
 	import '../app.css';
 	import Footer from '$lib/components/layout/footer.svelte';
 	import Navbar from '$lib/components/layout/navbar.svelte';
+
+	import { getFlash, initFlash } from 'sveltekit-flash-message';
 	import { page } from '$app/state';
-	import { initFlash } from 'sveltekit-flash-message';
 
 	const flash = initFlash(page, {
-		clearAfterMs: 10000
+		clearOnNavigate: true,
+		clearAfterMs: 3000
+		//   clearArray: false,
+		//   flashCookieOptions: CookieSerializeOptions
 	});
 	$effect(() => {
 		if ($flash) {

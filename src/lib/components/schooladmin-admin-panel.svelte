@@ -52,7 +52,7 @@
 	<Card.Content>
 		<a href={item.url} class="flex gap-3">
 			<!-- svelte-ignore svelte_component_deprecated -->
-			<svelte:component this={item.icon} />
+			<item.icon />
 			<div class="space-y-2">
 				<p>{item.title}</p>
 				<p class="text-primary/50">{item.description}</p>

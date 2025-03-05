@@ -218,7 +218,7 @@ export const createUserSchema = z.object({
 		.string()
 		.nonempty({ message: 'name is required' })
 		.min(2, { message: 'name should be at least two characters' }),
-	role: z.enum(['district_admin', 'school_admin']),
+	role: z.enum(['district_admin', 'school_admin']).optional(),
 	phone: z.string().optional()
 });
 

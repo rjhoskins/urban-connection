@@ -9,7 +9,6 @@
 			description: 'Create school and send email invitation to administrator.',
 			icon: UserRoundPlus
 		},
-
 		{
 			title: 'Manage Districts',
 			url: '/districts',
@@ -55,13 +54,20 @@
 		{#each adminData.slice(2, adminData.length) as item (item.title)}
 			{@render dashItem(item)}
 		{/each}
+		<button
+			class="sizes"
+			onclick={() => {
+				throw new Error('Sentry Frontend Error');
+			}}
+			>Error time
+		</button>
 	</Card.Content>
 </Card.Root>
 
 {#snippet dashItem(item: any)}
 	<Card.Content>
 		<a href={item.url} class="flex gap-3">
-			<svelte:component this={item.icon} />
+			<item.icon />
 			<div class="space-y-2">
 				<p>{item.title}</p>
 				<p class="text-primary/50">{item.description}</p>

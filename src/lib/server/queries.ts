@@ -275,11 +275,11 @@ export async function createAdminUserInvite(
 }
 
 export async function createNewUserWithDetails(
-	{ id, username, name, role, phone }: CreateUser,
+	{ id, username, name, role = 'school_admin', phone }: CreateUser,
 	trx?: PgTransaction<PostgresJsQueryResultHKT, any, any>
 ): Promise<{ id: string }> {
 	if (dev)
-		console.log('createNewUserWithDetails ==================================> ', {
+		console.log('createNewUserWithDetails =================> ', {
 			id,
 			username,
 			name,
@@ -341,12 +341,11 @@ export async function getDistrictAdmin(districtId: number) {
 		.select({
 			adminName: users.name,
 			adminPhone: users.phone,
-			adminEmail: users.username,
-			districtId: districtAdmins.id
+			adminEmail: users.username
 		})
 		.from(districtAdmins)
 		.innerJoin(users, eq(districtAdmins.userId, users.id))
-		.where(eq(districtAdmins.id, districtId));
+		.where(eq(districtAdmins.districtId, districtId));
 
 	if (dev) console.log('getDisctrictAdmin res => ', res);
 	return res || null;
