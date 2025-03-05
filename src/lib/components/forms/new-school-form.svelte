@@ -10,7 +10,6 @@
 	import SuperDebug from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { Switch } from '../ui/switch';
-	// import { onMount } from 'svelte'; TODO: TEST TEST TEST
 
 	let { isDistrict = $bindable(), data } = $props();
 	const { districts } = data;

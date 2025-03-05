@@ -14,7 +14,6 @@
 		TEST_COMBINED_WITH_DEMOGRAPHICS,
 		demographicsData
 	} from '$lib/constants';
-	import { onMount } from 'svelte';
 
 	let { data } = $props();
 	const { assessmentToken, surveyData } = data;
