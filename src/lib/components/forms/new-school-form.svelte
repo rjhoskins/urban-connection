@@ -1,16 +1,16 @@
 <script lang="ts">
+	/** @type {{ data: import('./$types').PageData, form: import('./$types').ActionData }} */
 	import * as Form from '$lib/components/ui/form/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import * as Select from '$lib/components/ui/select/index.js';
 	import * as Card from '$lib/components/ui/card';
 	import { createSchoolSchema } from '$lib/schema.js';
-	/** @type {{ data: import('./$types').PageData, form: import('./$types').ActionData }} */
 
 	import { superForm } from 'sveltekit-superforms';
 	import SuperDebug from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { Switch } from '../ui/switch';
-	import { onMount } from 'svelte';
+	// import { onMount } from 'svelte'; TODO: TEST TEST TEST
 
 	let { isDistrict = $bindable(), data } = $props();
 	const { districts } = data;
@@ -18,19 +18,9 @@
 
 	const form = superForm(data.form, {
 		validators: zodClient(createSchoolSchema)
-
-		// onResult({ result }) {
-		// 	if (result.status === 200) {
-		// 		form.reset();
-		// 		console.log('onResult => ', result);
-		// 		$formData.districtId = 0;
-		// 	}
-		// }
 	});
 	const { form: formData, enhance, message } = form;
-	onMount(() => {
-		$formData.name = '';
-	});
+
 	$effect(() => {
 		$formData.isDistrict = isDistrict;
 		// if ($formData.isDistrict) {
@@ -95,7 +85,7 @@
 							<Select.Trigger class="">
 								{$formData.districtId == 0
 									? 'Select a district'
-									: districts.find((el) => el.id == $formData.districtId).name}
+									: districts.find((el: { id: any }) => el.id == $formData.districtId).name}
 							</Select.Trigger>
 							<Select.Content class="">
 								{#each districts as district}

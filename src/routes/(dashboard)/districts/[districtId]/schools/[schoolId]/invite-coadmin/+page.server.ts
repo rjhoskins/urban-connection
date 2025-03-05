@@ -16,7 +16,7 @@ import { users, schoolAdmins, adminUserInvites, schools } from '$lib/server/db/s
 import db from '$lib/server/db/index.js';
 
 export const load: PageServerLoad = async (event) => {
-	// console.log('PageServerLoad => ', event.locals.user);
+	console.log('invite-coadmin PageServerLoad => ', event.locals.user);
 	if (!event.locals.user) return redirect(302, '/auth/login');
 	const user = event.locals.user;
 	if (!user) return fail(400, { message: 'User not authenticated' });
@@ -29,7 +29,7 @@ export const actions: Actions = {
 	default: async (event) => {
 		console.log('aaaaand action!!! => ');
 		if (!event.locals.user) return redirect(302, '/auth/login');
-		// console.log('default => ', event.locals.user);
+		console.log('default => ', event.locals.user);
 
 		const form = await superValidate(event, zod(inviteNewUserSchema));
 
@@ -42,22 +42,9 @@ export const actions: Actions = {
 				event
 			});
 		}
+		const schoolId = parseInt(event.params.schoolId);
+		console.log('schoolId => ', schoolId);
 
-		const [loggedInUserRes] = await db
-			.select()
-			.from(users)
-			.where(eq(users.id, event.locals.user.id));
-		console.log('loggedInUserRes => ', loggedInUserRes);
-
-		if (!loggedInUserRes) {
-			return handleLogFlashReturnFormError({
-				type: 'error',
-				form,
-				message: 'Check the form and try again',
-				status: 404,
-				event
-			});
-		}
 		const [existingUser] = await db.select().from(users).where(eq(users.username, form.data.email));
 
 		if (existingUser) {
@@ -75,21 +62,13 @@ export const actions: Actions = {
 		try {
 			console.log('create form trying... ======================> ', form);
 			const result = await db.transaction(async (trx) => {
-				const [loggedInUsersSchoolRes] = await trx
-					.select({ schoolId: schoolAdmins.schoolId })
-					.from(schoolAdmins)
-					.innerJoin(schools, eq(schools.id, schoolAdmins.schoolId))
-					.where(and(eq(schoolAdmins.userId, event.locals.user!.id), eq(schools.isActive, true)));
-
-				console.log('loggedInUsersSchoolRes => ', loggedInUsersSchoolRes);
-
 				const [inviteRes] = await trx
 					.insert(adminUserInvites)
 					.values({
 						id: nanoid(),
 						name: form.data.name,
 						email: form.data.email,
-						schoolId: loggedInUsersSchoolRes.schoolId,
+						schoolId: schoolId,
 						inviter: event.locals.user?.id ?? '',
 						isSent: true
 					})
@@ -114,10 +93,11 @@ export const actions: Actions = {
 				//associate user w/ same school
 				const [newSchoolAdminRes] = await trx
 					.insert(schoolAdmins)
-					.values({ userId: newUser.id, schoolId: loggedInUsersSchoolRes.schoolId! })
+					.values({ userId: newUser.id, schoolId })
 					.returning();
 				if (!newSchoolAdminRes) throw new Error('Failed to associate user with school');
 				console.log('newSchoolAdminRes => ', newSchoolAdminRes);
+				// throw new Error('testing error');
 				return newUser;
 			});
 		} catch (error) {
@@ -138,7 +118,7 @@ export const actions: Actions = {
 
 		console.log('register =>', `/auth/register?inviteToken=${inviteToken}`);
 
-		return redirect(302, '/');
+		return redirect(302, './');
 	}
 };
 
