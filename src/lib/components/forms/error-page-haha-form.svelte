@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { superForm } from 'sveltekit-superforms';
+	import { dev } from '$app/environment';
+	import SuperDebug, { superForm } from 'sveltekit-superforms';
 	import { Field, Control, Fieldset } from 'formsnap';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { schema, errorPageList } from '$lib/schema';
@@ -27,7 +28,7 @@
 			<ShieldAlertIcon class="size-8 text-red-700" /><span>Oops! Unauthorized Access</span
 			></Card.Title
 		>
-		<Card.Description class="text-lg text-primary">
+		<Card.Description class="text-primary text-lg">
 			Looks like you don't have the right access key for page or survey. But while you're here, why
 			not take our "Unauthorized User Survey"?</Card.Description
 		>
@@ -41,7 +42,7 @@
 							<div class="flex items-center gap-3">
 								<div class="relative">
 									<input
-										class="peer absolute left-0 top-1/2 h-6 w-6 -translate-y-1/2 rounded-lg border-gray-300 text-primary accent-primary focus:ring-primary/90"
+										class="peer text-primary accent-primary focus:ring-primary/90 absolute top-1/2 left-0 h-6 w-6 -translate-y-1/2 rounded-lg border-gray-300"
 										type="checkbox"
 										{...props}
 										bind:group={$formData.errorPageList}
@@ -49,7 +50,7 @@
 									/>
 
 									<label class="flex py-3" for={`custom-checkbox-${item}`}>
-										<div class="ml-10 mr-4 flex flex-row items-center justify-between">
+										<div class="mr-4 ml-10 flex flex-row items-center justify-between">
 											<div>
 												<h3 class="font-bold">{item}</h3>
 											</div>
@@ -61,17 +62,19 @@
 					</Control>
 				{/each}
 			</Fieldset>
-			<!-- <SuperDebug data={$formData} /> -->
+			{#if dev}
+				<SuperDebug data={$formData} />
+			{/if}
 		</form>
 	</Card.Content>
 	<Card.Footer>
 		<div class="flex w-full gap-4">
 			<a
-				class="inline-flex h-10 grow items-center justify-center whitespace-nowrap rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+				class="border-input bg-background ring-offset-background hover:bg-accent hover:text-accent-foreground focus-visible:ring-ring inline-flex h-10 grow items-center justify-center rounded-md border px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50"
 				href="/auth/login">Go to Authorized Area</a
 			>
 			<a
-				class={`inline-flex h-10 grow items-center justify-center whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+				class={`ring-offset-background focus-visible:ring-ring inline-flex h-10 grow items-center justify-center rounded-md px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden ${
 					$formData.errorPageList.length == errorPageList.length
 						? 'bg-primary text-primary-foreground hover:bg-primary/90'
 						: 'pointer-events-none bg-gray-400 text-gray-500 opacity-50'

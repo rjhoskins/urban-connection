@@ -7,7 +7,7 @@
 </script>
 
 <svelte:head>
-	<title>Hello world!</title>
+	<title>The Urban Connection Project</title>
 	<meta name="description" content="This is where the description goes for SEO" />
 </svelte:head>
 

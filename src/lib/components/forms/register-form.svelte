@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { dev } from '$app/environment';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import { createNewUserFromInviteSchema } from '$lib/schema.js';
@@ -119,5 +120,7 @@
 	{#if $message}
 		<div class="message text-red-700">{$message}</div>
 	{/if}
-	<SuperDebug data={$formData} />
+	{#if dev}
+		<SuperDebug data={$formData} />
+	{/if}
 </Card.Root>

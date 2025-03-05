@@ -10,6 +10,7 @@
 	import SuperDebug from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { Switch } from '../ui/switch';
+	import { dev } from '$app/environment';
 
 	let { isDistrict = $bindable(), data } = $props();
 	const { districts } = data;
@@ -38,7 +39,7 @@
 				School
 			{/if}
 		</Card.Title>
-		<Card.Description class="text-sm text-primary/75">
+		<Card.Description class="text-primary/75 text-sm">
 			{#if $formData.isDistrict}
 				Add a District Admin to a district
 			{:else}
@@ -141,5 +142,7 @@
 			<Form.Button>Submit</Form.Button>
 		</form>
 	</Card.Content>
-	<SuperDebug data={$formData} />
+	{#if dev}
+		<SuperDebug data={$formData} />
+	{/if}
 </Card.Root>

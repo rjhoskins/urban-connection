@@ -8,6 +8,7 @@
 
 	import { inviteNewUserSchema } from '$lib/schema.js';
 	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { dev } from '$app/environment';
 
 	let { page, data } = $props();
 
@@ -63,9 +64,11 @@
 				<Form.FieldErrors />
 			</Form.Field>
 
-			<Form.Button type="submit" class="m-2 ml-auto w-fit">Send Invite</Form.Button>
+			<Form.Button type="submit" class="m-2">Send Invite</Form.Button>
 
-			<SuperDebug data={$formData} />
+			{#if dev}
+				<SuperDebug data={$formData} />
+			{/if}
 		</form>
 	</Card.Content>
 </Card.Root>

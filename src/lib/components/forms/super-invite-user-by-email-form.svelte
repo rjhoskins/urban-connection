@@ -12,6 +12,7 @@
 	import { superForm } from 'sveltekit-superforms';
 	import SuperDebug from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { dev } from '$app/environment';
 
 	let { page, data, token } = $props();
 	const { name, email, inviteId } = decodeAdminUserInviteToken(token);
@@ -63,7 +64,9 @@
 
 	<Form.Button type="submit" class="m-2 ml-auto w-fit">Send Invite</Form.Button>
 
-	<SuperDebug data={$formData} />
+	{#if dev}
+		<SuperDebug data={$formData} />
+	{/if}
 	{#if $message}
 		<div class="message text-red-700">{$message}</div>
 	{/if}

@@ -28,11 +28,14 @@
 		<div class="top flex justify-between">
 			<div class="left space-y-3">
 				<p class=" text-2xl font-semibold">{school.name} | Dashboard</p>
-				{#if adminData.length === 1}
-					<p class=" text-2xl">Administrator</p>
-				{:else}
-					<p class=" text-2xl">Administrators</p>
-				{/if}
+				<div class="flex justify-between">
+					{#if adminData.length === 1}
+						<p class=" text-2xl">Administrator</p>
+					{:else}
+						<p class=" text-2xl">Administrators</p>
+					{/if}
+					<Button href={`${page.url.pathname}/invite-coadmin`} class="">Add School Admin</Button>
+				</div>
 				{#each adminData as admin (admin.adminEmail)}
 					<AdminContactDetailsCard {admin} />
 				{/each}

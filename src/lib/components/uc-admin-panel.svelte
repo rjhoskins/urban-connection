@@ -24,7 +24,7 @@
 		},
 		{
 			title: 'View Results Dashboard',
-			url: '/schools/results',
+			url: '/results',
 			description: 'View completed assessment results for all schools',
 			icon: List
 		}
@@ -39,7 +39,7 @@
 	let { displayName } = $props();
 </script>
 
-<Card.Root class="mx-auto max-w-6xl">
+<Card.Root class="mx-auto max-w-6xl shadow-lg">
 	<Card.Header>
 		<Card.Title class="p-6">Hello, {displayName ? displayName : 'TODO'}</Card.Title>
 		<!-- <Card.Description>Card Description</Card.Description> -->

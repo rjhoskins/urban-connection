@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { dev } from '$app/environment';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
 	import { createNewUserOrLoginSchema } from '$lib/schema.js';
@@ -16,7 +17,7 @@
 	const { form: formData, enhance, message } = form;
 </script>
 
-<Card.Root class="mx-auto min-w-96 max-w-6xl">
+<Card.Root class="mx-auto max-w-6xl min-w-96">
 	<Card.Header>
 		<Card.Title>Account Access</Card.Title>
 		<Card.Description>Log In or Sign Up</Card.Description>
@@ -32,7 +33,7 @@
 							{...props}
 							type="text"
 							name="username"
-							class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+							class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
 							placeholder="Enter Username"
 							bind:value={$formData.username}
 						/>
@@ -61,11 +62,10 @@
 			</Field>
 			<div class="flex gap-4">
 				<Button class="grow" type="submit" variant="default">Login</Button>
-				<Button class="grow" type="submit" formaction="?/register" variant="outline"
-					>Register</Button
-				>
 			</div>
-			<SuperDebug data={$formData} />
+			{#if dev}
+				<SuperDebug data={$formData} />
+			{/if}
 		</form>
 	</Card.Content>
 </Card.Root>

@@ -12,6 +12,7 @@
 	import SuperDebug from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import HtmlEmailTextPreview from '../html-email-text-preview.svelte';
+	import { dev } from '$app/environment';
 
 	let { formisEditing = $bindable(), data, token, page } = $props();
 
@@ -38,7 +39,7 @@
 <!-- <pre>{JSON.stringify(page, null, 2)}</pre> -->
 <div class="relative flex w-full">
 	<Button
-		class="absolute right-2 top-2 ml-auto"
+		class="absolute top-2 right-2 ml-auto"
 		size="icon"
 		variant="outline"
 		onclick={() => (formisEditing = !formisEditing)}
@@ -157,7 +158,9 @@
 				<div class="message text-red-700">Form has changed</div>
 			{/if} -->
 			<div class="max-w-prose">
-				<SuperDebug data={$emailForm} />
+				{#if dev}
+					<SuperDebug data={$emailForm} />
+				{/if}
 			</div>
 		</form>
 
