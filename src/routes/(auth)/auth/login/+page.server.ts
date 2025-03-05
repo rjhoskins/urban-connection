@@ -59,7 +59,6 @@ export const actions: Actions = {
 				status: 404
 			});
 		}
-		console.log('existingUser => ', existingUser);
 
 		const validPassword = await verify(existingUser.passwordHash!, form.data.password, {
 			memoryCost: 19456,

@@ -1,4 +1,3 @@
-import { page } from '$app/state';
 import { superValidate } from 'sveltekit-superforms/server';
 import { createSchoolSchema } from '$lib/schema';
 import { zod } from 'sveltekit-superforms/adapters';
@@ -38,7 +37,6 @@ export const load: PageServerLoad = async (event) => {
 };
 export const actions: Actions = {
 	default: async (event) => {
-		console.log('here 1 ======================================================> ');
 		if (!event.locals.user) return redirect(302, '/auth/login');
 
 		const form = await superValidate(event, zod(createSchoolSchema));
@@ -62,11 +60,10 @@ export const actions: Actions = {
 				event
 			});
 		}
-		console.log('existingUser => ', existingUser);
 
 		let inviteToken: string = '';
 		try {
-			console.log('create form trying... ======================> ', form);
+			console.log('', form);
 			const result = await db.transaction(async (trx) => {
 				let schoolResult;
 				if (!form.data.isDistrict) {
@@ -78,8 +75,6 @@ export const actions: Actions = {
 						},
 						trx
 					);
-
-					console.log('schoolResult => ', schoolResult);
 				}
 
 				let inviteRes = await createAdminUserInvite(
@@ -98,7 +93,6 @@ export const actions: Actions = {
 				);
 				if (!inviteRes) throw new Error('Failed to create invite');
 
-				console.log('inviteRes => ', inviteRes);
 				inviteToken = createAdminUserInviteToken(
 					form.data.adminName,
 					form.data.adminEmail,
@@ -155,13 +149,13 @@ export const actions: Actions = {
 		setFlash(
 			{
 				type: 'success',
-				message: `School successfully created: school admin invite link => \n${page.url.origin}/auth/register?inviteToken=${inviteToken}`
+				message: `School successfully created: school admin invite link => \n${event.url.origin}/auth/register?inviteToken=${inviteToken}`
 			},
 			event.cookies
 		);
 		console.log(
 			'school admin invite token => ',
-			`${page.url.origin}/auth/register?inviteToken=${inviteToken}`
+			`${event.url.origin}/auth/register?inviteToken=${inviteToken}`
 		);
 		// todo: email inviteToken to user
 		// redirect(303, `/schools/invite?inviteToken=${inviteToken}`);

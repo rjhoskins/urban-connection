@@ -60,7 +60,6 @@ export const actions: Actions = {
 		let inviteToken = '';
 
 		try {
-			console.log('create form trying... ======================> ', form);
 			const result = await db.transaction(async (trx) => {
 				const [inviteRes] = await trx
 					.insert(adminUserInvites)
@@ -74,7 +73,6 @@ export const actions: Actions = {
 					})
 					.returning();
 
-				console.log('inviteRes => ', inviteRes);
 				if (!inviteRes) throw new Error('Failed to create invite');
 				inviteToken = createAdminUserInviteToken(form.data.name, form.data.email, inviteRes.id);
 
