@@ -4,7 +4,7 @@
 	const schoolAdminPanelAdminData = [
 		{
 			title: 'Invite Administrator',
-			url: '/schools/invite-coadmin',
+			url: '/schools/invite',
 			description: 'Send email invitation to administrator.',
 			icon: UserRoundPlus
 		},
@@ -33,7 +33,7 @@
 
 <Card.Root class="mx-auto max-w-6xl shadow-2xl">
 	<Card.Header>
-		<p class="-mb-2 text-primary/50">Manage School</p>
+		<p class="text-primary/50 -mb-2">Manage School</p>
 		<Card.Title class="mt-0! py-4">{school.name}</Card.Title>
 		<!-- <Card.Description>Card Description</Card.Description> -->
 	</Card.Header>
