@@ -14,9 +14,9 @@ export const load = async (event) => {
 	if (!event.locals.user) {
 		throw redirect(302, '/auth/login');
 	}
-	if (event.locals.user.role === 'school_admin') {
-		throw error(401, '/unauthorized');
-	}
+	// if (event.locals.user.role === 'school_admin') {
+	// 	throw error(401, '/unauthorized');
+	// }
 
 	const schoolId = parseInt(event.params.schoolId);
 	console.log('schoolId----------------', schoolId);
@@ -31,6 +31,15 @@ export const load = async (event) => {
 		return null;
 	};
 
+	if (event.locals.user.role === 'school_admin') {
+		const userId = event.locals.user.id;
+		if (userId) {
+			schoolDataFunc = () => getSchoolForDistrictAdmin(schoolId);
+			adminDataFunc = async () => getSchoolAdminBySchoolId(schoolId);
+			memberDataFunc = async () =>
+				getSchoolMemberSurveyTotalsForSchoolAndDistrictAdminBySchool(schoolId);
+		}
+	}
 	if (event.locals.user.role === 'district_admin') {
 		const userId = event.locals.user.id;
 		if (userId) {

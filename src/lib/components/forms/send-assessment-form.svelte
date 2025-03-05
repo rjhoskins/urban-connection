@@ -31,7 +31,6 @@
 	</Card.Header>
 	<Card.Content>
 		<form class="flex flex-col gap-3" method="POST" use:enhance>
-			<input type="hidden" name="schoolId" value={data.schoolId} />
 			<!-- name -->
 			<Form.Field class=" space-y-0" {form} name="name">
 				<Form.Control>
