@@ -1,10 +1,61 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
-body,
-html {
-	height: 100%;
+@config '../tailwind.config.ts';
+
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+	*,
+	::after,
+	::before,
+	::backdrop,
+	::file-selector-button {
+		border-color: var(--color-gray-200, currentColor);
+	}
+}
+
+@utility sizes {
+	/* ui utility  */
+	@apply border-2 border-dashed sm:border-red-700 md:border-blue-700 lg:border-green-700 xl:border-solid xl:border-orange-700;
+}
+
+@utility redz {
+	@apply border-2 border-dashed border-red-700;
+}
+
+@utility no-scrollbar {
+	&::-webkit-scrollbar {
+		display: none;
+	}
+
+	/* Hide scrollbar for IE, Edge and Firefox */
+	-ms-overflow-style: none;
+	/* IE and Edge */
+	scrollbar-width: none;
+	/* Firefox */
+}
+
+@utility right-services-gradient {
+	background: rgba(255, 255, 255, 0);
+	background: linear-gradient(270deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
+}
+
+@utility left-services-gradient {
+	background: rgba(255, 255, 255, 0);
+	background: linear-gradient(90deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
+}
+
+@layer utilities {
+	body,
+	html {
+		height: 100%;
+	}
 }
 @layer base {
 	:root {
@@ -75,38 +126,5 @@ html {
 	}
 	body {
 		@apply bg-background text-foreground;
-	}
-}
-
-@layer utilities {
-	/* ui utility  */
-	.sizes {
-		@apply border-2 border-dashed sm:border-red-700 md:border-blue-700 lg:border-green-700 xl:border-solid xl:border-orange-700;
-	}
-
-	.redz {
-		@apply border-2 border-red-700;
-	}
-
-	.no-scrollbar::-webkit-scrollbar {
-		display: none;
-	}
-
-	/* Hide scrollbar for IE, Edge and Firefox */
-	.no-scrollbar {
-		-ms-overflow-style: none;
-		/* IE and Edge */
-		scrollbar-width: none;
-		/* Firefox */
-	}
-
-	.right-services-gradient {
-		background: rgba(255, 255, 255, 0);
-		background: linear-gradient(270deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
-	}
-
-	.left-services-gradient {
-		background: rgba(255, 255, 255, 0);
-		background: linear-gradient(90deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
 	}
 }

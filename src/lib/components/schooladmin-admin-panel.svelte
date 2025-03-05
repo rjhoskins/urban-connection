@@ -34,7 +34,7 @@
 <Card.Root class="mx-auto max-w-6xl shadow-2xl">
 	<Card.Header>
 		<p class="-mb-2 text-primary/50">Manage School</p>
-		<Card.Title class="!mt-0 py-4">{school.name}</Card.Title>
+		<Card.Title class="mt-0! py-4">{school.name}</Card.Title>
 		<!-- <Card.Description>Card Description</Card.Description> -->
 	</Card.Header>
 	<hr class="bg-primary" />
