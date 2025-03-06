@@ -70,9 +70,7 @@ export function handleLogFlashReturnFormError({
 }: HandleLogFlashReturnFormErrorParams) {
 	console.error(messageText);
 	setFlash({ type, message: messageText.toString() }, event.cookies);
-	return message(form, messageText, {
-		status: statusNum
-	});
+	return message(form, { status: type, text: messageText.toString() });
 }
 
 export function generateNewUserInviteEmail(

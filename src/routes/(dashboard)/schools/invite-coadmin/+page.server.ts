@@ -14,7 +14,6 @@ import { setFlash } from 'sveltekit-flash-message/server';
 import { eq, and } from 'drizzle-orm';
 import { users, schoolAdmins, adminUserInvites, schools } from '$lib/server/db/schema';
 import db from '$lib/server/db/index.js';
-import { checkRegisteredUserExists, createNewUserWithDetails } from '$lib/server/queries.js';
 
 export const load: PageServerLoad = async (event) => {
 	// console.log('PageServerLoad => ', event.locals.user);
@@ -29,17 +28,8 @@ export const load: PageServerLoad = async (event) => {
 export const actions: Actions = {
 	default: async (event) => {
 		console.log('aaaaand action!!! => ');
-		setFlash(
-			{
-				type: 'success',
-				message: `Invite successfully created`
-			},
-			event.cookies
-		);
-
 		if (!event.locals.user) return redirect(302, '/auth/login');
 		// console.log('default => ', event.locals.user);
-		const schoolId = parseInt(event.params.schoolId);
 
 		const form = await superValidate(event, zod(inviteNewUserSchema));
 
@@ -53,7 +43,22 @@ export const actions: Actions = {
 			});
 		}
 
-		const existingUser = await checkRegisteredUserExists({ username: form.data.email });
+		const [loggedInUserRes] = await db
+			.select()
+			.from(users)
+			.where(eq(users.id, event.locals.user.id));
+		console.log('loggedInUserRes => ', loggedInUserRes);
+
+		if (!loggedInUserRes) {
+			return handleLogFlashReturnFormError({
+				type: 'error',
+				form,
+				message: 'Check the form and try again',
+				status: 404,
+				event
+			});
+		}
+		const [existingUser] = await db.select().from(users).where(eq(users.username, form.data.email));
 
 		if (existingUser) {
 			return handleLogFlashReturnFormError({
@@ -68,64 +73,73 @@ export const actions: Actions = {
 		let inviteToken = '';
 
 		try {
-			console.log('', form);
+			console.log('create form trying... ======================> ', form);
 			const result = await db.transaction(async (trx) => {
+				const [loggedInUsersSchoolRes] = await trx
+					.select({ schoolId: schoolAdmins.schoolId })
+					.from(schoolAdmins)
+					.innerJoin(schools, eq(schools.id, schoolAdmins.schoolId))
+					.where(and(eq(schoolAdmins.userId, event.locals.user!.id), eq(schools.isActive, true)));
+
+				console.log('loggedInUsersSchoolRes => ', loggedInUsersSchoolRes);
+
 				const [inviteRes] = await trx
 					.insert(adminUserInvites)
 					.values({
+						id: nanoid(),
 						name: form.data.name,
 						email: form.data.email,
-						schoolId,
-						inviterId: event.locals.user?.id ?? '',
+						schoolId: loggedInUsersSchoolRes.schoolId,
+						inviter: event.locals.user?.id ?? '',
 						isSent: true
 					})
 					.returning();
 
+				console.log('inviteRes => ', inviteRes);
 				if (!inviteRes) throw new Error('Failed to create invite');
 				inviteToken = createAdminUserInviteToken(form.data.name, form.data.email, inviteRes.id);
 
-				const newUser = await createNewUserWithDetails(
-					{
+				const [newUser] = await trx
+					.insert(users)
+					.values({
 						id: generateUserId(),
 						username: form.data.email,
 						name: form.data.name,
 						phone: form.data.phone
-					},
-					trx
-				);
-
+					})
+					.returning({ id: users.id });
 				console.log('newUser => ', newUser);
 				if (!newUser) throw new Error('Failed to create user');
 
 				//associate user w/ same school
 				const [newSchoolAdminRes] = await trx
 					.insert(schoolAdmins)
-					.values({ userId: newUser.id, schoolId })
+					.values({ userId: newUser.id, schoolId: loggedInUsersSchoolRes.schoolId! })
 					.returning();
 				if (!newSchoolAdminRes) throw new Error('Failed to associate user with school');
 				console.log('newSchoolAdminRes => ', newSchoolAdminRes);
+				// throw new Error('test error');
 				return newUser;
 			});
 		} catch (error) {
 			const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
-			setFlash({ type: 'error', message: errorMessage }, event.cookies);
-			return message(form, 'Unexpected error: ' + errorMessage, { status: 500 });
-			console.log('error => ', form, 'Unexpected error: ' + errorMessage);
+			const UnexpectedErrorMsg = 'Unexpected error: ' + errorMessage;
+			console.log('error => ', form, UnexpectedErrorMsg);
+			setFlash({ type: 'error', message: UnexpectedErrorMsg }, event.cookies);
+			return message(form, { status: 'error', text: UnexpectedErrorMsg });
 		}
 
-		const registerLink = `/auth/register?inviteToken=${inviteToken}`;
+		const registerLink = `${event.url.origin}/auth/register?inviteToken=${inviteToken}`;
 		setFlash(
 			{
 				type: 'success',
-				message: `Invite successfully created \n  ${registerLink}`
+				message: `Invite successfully sent admin invite\n  ${registerLink}`
 			},
 			event.cookies
 		);
 
-		console.log('register =>', `/auth/register?inviteToken=${inviteToken}`);
+		console.log('register link =>', registerLink);
 
-		return redirect(302, '/');
+		return redirect(302, './');
 	}
 };
-
-function createCoadminInvite() {}

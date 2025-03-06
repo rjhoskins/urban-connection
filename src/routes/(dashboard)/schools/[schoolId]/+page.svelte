@@ -34,7 +34,9 @@
 					{:else}
 						<p class=" text-2xl">Administrators</p>
 					{/if}
-					<Button href={`${page.url.pathname}/invite-coadmin`} class="">Add School Admin</Button>
+					<Button href={`${page.url.origin}/schools/invite-coadmin`} class=""
+						>Add School Admin</Button
+					>
 				</div>
 				{#each adminData as admin (admin.adminEmail)}
 					<AdminContactDetailsCard {admin} />
@@ -68,5 +70,3 @@
 		{/if}
 	</div>
 </section>
-
-<!-- <pre class="">{JSON.stringify(data, null, 2)}</pre> -->
