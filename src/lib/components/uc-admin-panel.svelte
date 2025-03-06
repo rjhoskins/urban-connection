@@ -54,13 +54,6 @@
 		{#each adminData.slice(2, adminData.length) as item (item.title)}
 			{@render dashItem(item)}
 		{/each}
-		<button
-			class="sizes"
-			onclick={() => {
-				throw new Error('Sentry Frontend Error');
-			}}
-			>Error time
-		</button>
 	</Card.Content>
 </Card.Root>
 

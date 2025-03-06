@@ -19,7 +19,7 @@
 </script>
 
 <h1 class="my-6 text-center text-3xl">Manage All Districts</h1>
-<section class=" container grid max-w-6xl grid-cols-schools-fluid gap-4 py-8">
+<section class=" grid-cols-schools-fluid container grid max-w-6xl gap-4 py-8">
 	{#each districtsData as district (district.id)}
 		{@render districtCard(district)}
 	{/each}
@@ -40,12 +40,15 @@
 		</Card.Header>
 		<Card.Content class="flex items-center gap-3 p-4 ">
 			<a
-				class="inline-flex h-10 grow items-center justify-center whitespace-nowrap rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+				class="border-input bg-background ring-offset-background hover:bg-accent hover:text-accent-foreground focus-visible:ring-ring inline-flex h-10 grow items-center justify-center rounded-md border px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50"
 				href={`${page.url.pathname}/${district.id}`}>View District</a
 			>
 			{#if district.questionsTotal && district.pointsTotal}
 				<div class="flex grow flex-col gap-2">
-					<p class="">Assessment Progress</p>
+					<div class="flex justify-between">
+						<p>Total Score:</p>
+						<p>{Math.floor((district.pointsTotal / district.questionsTotal) * 100)}%</p>
+					</div>
 					<Progress
 						barBgColor="bg-green-700"
 						value={(district.pointsTotal / district.questionsTotal) * 100}

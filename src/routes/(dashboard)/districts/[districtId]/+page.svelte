@@ -17,7 +17,7 @@
 	}
 
 	let { data }: { data: PageData } = $props();
-	const { district, adminData, memberSurveyData } = data as {
+	const { district, adminData, memberSurveyData } = data as unknown as {
 		district: District;
 		adminData: Array<Record<string, any>> | Record<string, any>;
 		memberSurveyData: Array<{ id: string; [key: string]: any }>;
@@ -31,9 +31,10 @@
 		{#if adminData}
 			<Card class="p-4">
 				{#if !Array.isArray(adminData)}
-					<p class=" text-2xl">Administrator</p>
+					<p class=" text-2xl">District Administrator</p>
 					<AdminContactDetailsCard admin={adminData} />
 				{:else}
+					<!-- just in case  -->
 					<p class=" text-2xl">Administrators</p>
 					{#each adminData as admin, idx (idx)}
 						<AdminContactDetailsCard {admin} />
@@ -46,7 +47,7 @@
 			</Card>
 		{/if}
 	</div>
-	<div class=" grid max-w-6xl grid-cols-schools-fluid gap-4 py-8">
+	<div class=" grid-cols-schools-fluid grid max-w-6xl gap-4 py-8">
 		{#each memberSurveyData as school (school.id)}
 			<SchoolCard isNested {page} {school} />
 		{/each}

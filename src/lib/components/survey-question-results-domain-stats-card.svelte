@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Card from './ui/card/card.svelte';
+	import * as Card from '$lib/components/ui/card';
 	import Progress from './ui/progress/progress.svelte';
 	import QuestionsCard from '$lib/components/questions-card.svelte';
 
@@ -37,7 +37,7 @@
 			.reduce((acc, curr) => (acc += curr.questionResponse), 0) / totalDomainQuestions;
 </script>
 
-<Card class="space-y-3 p-4">
+<Card.Root class="space-y-3 p-4">
 	<h3 class="my-1 text-2xl font-light tracking-wide">
 		{thisDomainDataSorted[0].domainName}
 	</h3>
@@ -55,4 +55,35 @@
 			<!-- <QuestionsCard questions={questionSet} /> -->
 		{/each}
 	</div>
-</Card>
+</Card.Root>
+
+{#snippet domainCard(district: any)}
+	<Card.Root
+		class={[
+			district.memberSchoolsCount === 0 ? 'pointer-events-none cursor-not-allowed opacity-50' : '',
+			'transition-shadow duration-300 hover:shadow-lg'
+		]}
+	>
+		<Card.Header>
+			<Card.Title>{district.name}</Card.Title>
+			<Card.Description class={[district.memberSchoolsCount === 0 ? 'text-red-700' : '']}>
+				Schools {district.memberSchoolsCount}
+			</Card.Description>
+		</Card.Header>
+		<Card.Content class="flex items-center gap-3 p-4 ">
+			<a
+				class="border-input bg-background ring-offset-background hover:bg-accent hover:text-accent-foreground focus-visible:ring-ring inline-flex h-10 grow items-center justify-center rounded-md border px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50"
+				href={`${page.url.pathname}/${district.id}`}>View District</a
+			>
+			{#if district.questionsTotal && district.pointsTotal}
+				<div class="flex grow flex-col gap-2">
+					<p class="">Assessment Progress</p>
+					<Progress
+						barBgColor="bg-green-700"
+						value={(district.pointsTotal / district.questionsTotal) * 100}
+					/>
+				</div>
+			{/if}
+		</Card.Content>
+	</Card.Root>
+{/snippet}

@@ -774,3 +774,43 @@ export async function createAssessment({
 
 	return newSurvey || null;
 }
+
+export async function getAllTimeQuestionResponsesByDomain() {
+	const results = await db
+		.select({
+			domainId: surveyDomains.id,
+			domainName: surveyDomains.name,
+			pointsTotal:
+				sql`sum(case when ${surveyQuestionsResponses.isValidSubdomainGroup} = true then ${surveyQuestionsResponses.response} else 0 end)`.mapWith(
+					Number
+				),
+			questionsTotal: sql`count(${surveyQuestionsResponses.response})`.mapWith(Number)
+		})
+		.from(surveyQuestionsResponses)
+		.leftJoin(surveys, eq(surveys.id, surveyQuestionsResponses.surveyId))
+		.leftJoin(surveyQuestions, eq(surveyQuestions.id, surveyQuestionsResponses.questionId))
+		.leftJoin(surveySubDomains, eq(surveySubDomains.id, surveyQuestions.subDomainId))
+		.leftJoin(surveyDomains, eq(surveyDomains.id, surveySubDomains.domainId))
+		.groupBy(surveyDomains.id)
+		.orderBy(surveyDomains.id);
+
+	return results || [];
+}
+export async function getAllTimeQuestionResponsesStatsByQuestion() {
+	const results = await db
+		.select({
+			questionId: surveyQuestions.id,
+			domainId: surveySubDomains.domainId,
+			pointsTotal:
+				sql`sum(case when ${surveyQuestionsResponses.isValidSubdomainGroup} = true then ${surveyQuestionsResponses.response} else 0 end)`.mapWith(
+					Number
+				),
+			questionsTotal: sql`count(${surveyQuestionsResponses.response})`.mapWith(Number)
+		})
+		.from(surveyQuestionsResponses)
+		.leftJoin(surveyQuestions, eq(surveyQuestions.id, surveyQuestionsResponses.questionId))
+		.leftJoin(surveySubDomains, eq(surveySubDomains.id, surveyQuestions.subDomainId))
+		.groupBy(surveyQuestions.id, surveySubDomains.domainId)
+		.orderBy(surveyQuestions.id);
+	return results || [];
+}
