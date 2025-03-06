@@ -13,6 +13,7 @@
 	import SuperDebug from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { dev } from '$app/environment';
+	import { LoaderCircle } from 'lucide-svelte';
 
 	let { page, data, token } = $props();
 	const { name, email, inviteId } = decodeAdminUserInviteToken(token);
@@ -20,7 +21,7 @@
 		dataType: 'json',
 		validators: zodClient(inviteNewUserSchema)
 	});
-	const { form: formData, enhance, message } = form;
+	const { form: formData, enhance, message, delayed } = form;
 
 	$effect(() => {
 		$formData.name = name;
@@ -62,7 +63,14 @@
 		<Form.FieldErrors />
 	</Form.Field>
 
-	<Form.Button type="submit" class="m-2 ml-auto w-fit">Send Invite</Form.Button>
+	<Form.Button type="submit" class="m-2 ml-auto w-fit">
+		{#if $delayed}
+			<LoaderCircle class="animate-spin" />
+			Sending...
+		{:else}
+			Send Invite
+		{/if}</Form.Button
+	>
 
 	{#if dev}
 		<SuperDebug data={$formData} />

@@ -3,8 +3,8 @@
 	import { applyAction, deserialize, enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
 	import DemographicsAndSurveyForm from '$lib/components/forms/demographics-and-survey-form.svelte';
-	import NativeDemographicsSurveyForm from '$lib/components/forms/demographics-survey-form.svelte';
-	import NativeSurveyFormTemplate from '$lib/components/forms/native-survey-form-template.svelte';
+	import NativeDemographicsSurveyForm from '$lib/components/forms/NOTUSINGdemographics-survey-form.svelte';
+	import NativeSurveyFormTemplate from '$lib/components/forms/NOTUSINGnative-survey-form-template.svelte';
 
 	import Card from '$lib/components/ui/card/card.svelte';
 
@@ -104,8 +104,8 @@
 		{currDomain}
 		{currSubDomain}
 		{assessmentToken}
-		bind:handleNext={next}
-		bind:handlePrev={previous}
+		handleNext={next}
+		handlePrev={previous}
 		{isFirstQuestion}
 		{isLastQuestion}
 	/>

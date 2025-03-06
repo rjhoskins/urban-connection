@@ -1,6 +1,7 @@
 <script lang="ts">
 	/** @type {{ data: import('./$types').PageData, form: import('./$types').ActionData }} */
 	import * as Form from '$lib/components/ui/form/index.js';
+	import { LoaderCircle } from 'lucide-svelte';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import * as Card from '$lib/components/ui/card';
 	import { superForm } from 'sveltekit-superforms';
@@ -13,15 +14,9 @@
 	let { page, data } = $props();
 
 	const form = superForm(data.form, {
-		dataType: 'json',
 		validators: zodClient(inviteNewUserSchema)
 	});
-	const { form: formData, enhance, message } = form;
-
-	$effect(() => {
-		// $formData.name = name;
-		// $formData.email = email;
-	});
+	const { form: formData, enhance, message, delayed } = form;
 </script>
 
 <Card.Root class="w-96 max-w-6xl">
@@ -64,7 +59,14 @@
 				<Form.FieldErrors />
 			</Form.Field>
 
-			<Form.Button type="submit" class="m-2">Send Invite</Form.Button>
+			<Form.Button type="submit" class="m-2">
+				{#if $delayed}
+					<LoaderCircle class="animate-spin" />
+					Sending...
+				{:else}
+					Send Invite
+				{/if}
+			</Form.Button>
 
 			{#if dev}
 				<SuperDebug data={$formData} />

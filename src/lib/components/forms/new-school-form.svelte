@@ -11,6 +11,7 @@
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { Switch } from '../ui/switch';
 	import { dev } from '$app/environment';
+	import { LoaderCircle } from 'lucide-svelte';
 
 	let { isDistrict = $bindable(), data } = $props();
 	const { districts } = data;
@@ -19,7 +20,7 @@
 	const form = superForm(data.form, {
 		validators: zodClient(createSchoolSchema)
 	});
-	const { form: formData, enhance, message } = form;
+	const { form: formData, enhance, message, delayed } = form;
 
 	$effect(() => {
 		$formData.isDistrict = isDistrict;
@@ -139,7 +140,14 @@
 				<Form.FieldErrors />
 			</Form.Field>
 
-			<Form.Button>Submit</Form.Button>
+			<Form.Button>
+				{#if $delayed}
+					<LoaderCircle class="animate-spin" />
+					Submitting...
+				{:else}
+					Submit
+				{/if}
+			</Form.Button>
 		</form>
 	</Card.Content>
 	{#if dev}

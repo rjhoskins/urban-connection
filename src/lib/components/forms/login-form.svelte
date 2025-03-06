@@ -5,6 +5,7 @@
 	import { createNewUserOrLoginSchema } from '$lib/schema.js';
 	/** @type {{ data: import('./$types').PageData, form: import('./$types').ActionData }} */
 	import { Field, Control, Label, FieldErrors, Description } from 'formsnap';
+	import { LoaderCircle } from 'lucide-svelte';
 	import { superForm } from 'sveltekit-superforms';
 	import SuperDebug from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
@@ -14,7 +15,7 @@
 	const form = superForm(data.form, {
 		validators: zodClient(createNewUserOrLoginSchema)
 	});
-	const { form: formData, enhance, message } = form;
+	const { form: formData, enhance, message, delayed } = form;
 </script>
 
 <Card.Root class="mx-auto max-w-6xl min-w-96">
@@ -61,7 +62,14 @@
 				<FieldErrors class="text-red-700" />
 			</Field>
 			<div class="flex gap-4">
-				<Button class="grow" type="submit" variant="default">Login</Button>
+				<Button class="grow" type="submit" variant="default">
+					{#if $delayed}
+						<LoaderCircle class="animate-spin" />
+						Logging In...
+					{:else}
+						Log In
+					{/if}
+				</Button>
 			</div>
 			{#if dev}
 				<SuperDebug data={$formData} />

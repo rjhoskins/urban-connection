@@ -7,7 +7,6 @@
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import * as Card from '$lib/components/ui/card';
 	import { userInviteHTMLEmailTemplateSchema } from '$lib/schema.js';
-	import { decodeAdminUserInviteToken } from '$lib/utils';
 	import { superForm } from 'sveltekit-superforms';
 	import SuperDebug from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
