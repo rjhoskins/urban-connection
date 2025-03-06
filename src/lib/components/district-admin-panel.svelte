@@ -34,21 +34,21 @@
 
 <Card.Root class="mx-auto max-w-6xl">
 	<Card.Header>
-		<Card.Title class="p-6">Hello, {displayName}</Card.Title>
+		<p class="text-primary/50 -mb-2">Manage District</p>
+		<Card.Title class="mt-0! py-4">{district.name}</Card.Title>
 		<!-- <Card.Description>Card Description</Card.Description> -->
 	</Card.Header>
 	<hr class="bg-primary" />
-	<Card.Content>
-		{#each adminData.slice(0, 3) as item (item.title)}
-			{@render dashItem(item)}
-		{/each}
 
-		<hr class="bg-primary" />
+	{#each adminData.slice(0, 3) as item (item.title)}
+		{@render dashItem(item)}
+	{/each}
 
-		{#each adminData.slice(3, adminData.length) as item (item.title)}
-			{@render dashItem(item)}
-		{/each}
-	</Card.Content>
+	<hr class="bg-primary" />
+
+	{#each adminData.slice(3, adminData.length) as item (item.title)}
+		{@render dashItem(item)}
+	{/each}
 </Card.Root>
 
 {#snippet dashItem(item: any)}

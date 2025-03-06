@@ -1,4 +1,7 @@
-import { getLoggedInSchoolAdminsSchool } from '$lib/server/queries';
+import {
+	getLoggedInDistrictAdminsDistrict,
+	getLoggedInSchoolAdminsSchool
+} from '$lib/server/queries';
 import type { PageServerLoad } from './$types';
 import { redirect } from '@sveltejs/kit';
 
@@ -12,11 +15,12 @@ export const load: PageServerLoad = (async (event) => {
 	let dataFunc: () => Promise<any> = async () => {
 		return null;
 	};
-	if (event.locals.user.role !== 'district_admin') {
+	if (event.locals.user.role === 'school_admin') {
 		dataFunc = async () => getLoggedInSchoolAdminsSchool(user.id);
 	}
-
-	console.log('getLoggedInSchoolAdminsSchool', await getLoggedInSchoolAdminsSchool(user.id));
+	if (event.locals.user.role === 'district_admin') {
+		dataFunc = async () => getLoggedInDistrictAdminsDistrict(user.id);
+	}
 
 	return {
 		data: await dataFunc()

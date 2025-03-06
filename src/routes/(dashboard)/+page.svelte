@@ -20,10 +20,10 @@
 		<UCAdminPanel displayName={data.user?.name} />
 	{:else if data.user.role == 'district_admin'}
 		<h1 class="my-6 text-center text-3xl">{data.user?.name} | Admin Panel</h1>
-		<DistrictAdminPanel displayName={data.user?.name} district={data.loggedInAdminDistrict} />
+		<DistrictAdminPanel displayName={data.user?.name} district={data.data} />
 	{:else if data.user.role == 'school_admin'}
 		<h1 class="my-6 text-center text-3xl">{data.user?.name} | Admin Panel</h1>
-		<SchooladminAdminPanel displayName={data.user?.name} school={data.loggedInAdminSchool} />
+		<SchooladminAdminPanel displayName={data.user?.name} school={data.data} />
 	{:else}{/if}
 	<!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->
 </div>

@@ -542,6 +542,21 @@ export async function getLoggedInSchoolAdminsSchool(userId: string) {
 	if (dev) console.log('getSchoolForSchoolAdmin res => ', res);
 	return res || null;
 }
+export async function getLoggedInDistrictAdminsDistrict(userId: string) {
+	const [res] = await db
+		.select({
+			id: districts.id,
+			name: districts.name,
+			createdAt: districts.createdAt,
+			createdBy: districts.createdBy
+		})
+		.from(districts)
+		.innerJoin(districtAdmins, eq(districtAdmins.districtId, districtAdmins.id))
+		.where(eq(districtAdmins.userId, userId));
+
+	if (dev) console.log('getSchoolForSchoolAdmin res => ', res);
+	return res || null;
+}
 
 export async function getSchoolForSuperAdmin(schoolId: number) {
 	const [res] = await db
