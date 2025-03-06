@@ -11,19 +11,19 @@
 		{
 			title: 'View Organization',
 			url: '/schools',
-			description: 'View Teachers of the organization.',
+			description: 'View  organization & results by teacher.',
 			icon: Eye
 		},
 		{
-			title: 'Invite Participants',
+			title: 'Send Assessment Invitation',
 			url: '/schools/invite',
-			description: 'Send email invitations to Assessment participants',
+			description: 'Send email invitation to take the Assessment.',
 			icon: Send
 		},
 		{
 			title: 'View Assessment Results',
-			url: '/schools/assessments',
-			description: 'View completed Assessment results for the organization',
+			url: '/schools/results',
+			description: 'View completed Assessment Total results for the organization',
 			icon: List
 		}
 	];

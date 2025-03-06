@@ -12,6 +12,7 @@
 	<meta name="description" content="This is where the description goes for SEO" />
 </svelte:head>
 
-<div class="grid h-full place-content-center">
-	<InviteCoAdminForm {data} {page} />
-</div>
+<section class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+	<h1 class="text-center text-3xl font-bold text-gray-900">Results for this school</h1>
+	<div class="content-wrapper">what results go here?</div>
+</section>
