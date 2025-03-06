@@ -3,16 +3,16 @@
 	import { List, UserRoundPlus, Eye, Send } from 'lucide-svelte';
 	const schoolAdminPanelAdminData = [
 		{
-			title: 'Invite Administrator',
-			url: '/schools/invite-coadmin',
-			description: 'Send email invitation to administrator.',
-			icon: UserRoundPlus
-		},
-		{
 			title: 'View Organization',
 			url: '/schools',
 			description: 'View  organization & results by teacher.',
 			icon: Eye
+		},
+		{
+			title: 'Invite Administrator',
+			url: '/schools/invite-coadmin',
+			description: 'Send email invitation to administrator.',
+			icon: UserRoundPlus
 		},
 		{
 			title: 'Send Assessment Invitation',
