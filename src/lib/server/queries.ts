@@ -573,7 +573,7 @@ export async function getSchoolForSuperAdmin(schoolId: number) {
 	return res || null;
 }
 
-export async function getSchoolForDistrictAdmin(schoolId: number) {
+export async function getSchoolForDistrictAdmin(userId: string, schoolId: number) {
 	const [res] = await db
 		.select({
 			id: schools.id,
@@ -582,9 +582,10 @@ export async function getSchoolForDistrictAdmin(schoolId: number) {
 			createdBy: schools.createdBy
 		})
 		.from(schools)
-		.innerJoin(districtAdmins, eq(districtAdmins.districtId, schools.districtId))
-		.where(eq(schools.isActive, true));
-
+		.leftJoin(districtAdmins, eq(districtAdmins.districtId, schools.districtId))
+		.where(
+			and(eq(schools.isActive, true), eq(schools.id, schoolId), eq(districtAdmins.userId, userId))
+		);
 	if (dev) console.log('getSchoolForSuperAdmin res => ', res);
 	return res || null;
 }

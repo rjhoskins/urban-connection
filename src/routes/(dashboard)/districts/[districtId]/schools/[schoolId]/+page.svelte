@@ -26,7 +26,7 @@
 		<div class="top flex justify-between">
 			<div class="left space-y-3">
 				<p class=" text-2xl font-semibold">{school.name} | Dashboard</p>
-				<div class="flex justify-between">
+				<div class="flex justify-between gap-6">
 					{#if adminData.length === 1}
 						<p class=" text-2xl">Administrator</p>
 					{:else}

@@ -3,13 +3,13 @@
 	import Progress from './ui/progress/progress.svelte';
 	let { school, page, isNested = false } = $props();
 	const { name, id, surveyCount, pointsTotal, questionsTotal } = school;
-	const totalAssessmentScorePercentage = Math.floor((pointsTotal / questionsTotal) * 100);
+	const totalAssessmentScorePercentage = Math.floor((pointsTotal / questionsTotal) * 100) || 0;
 </script>
 
 <Card.Root class="transition-shadow duration-300 ease-in-out hover:shadow-lg">
 	<Card.Header>
 		<Card.Title>{name}</Card.Title>
-		<Card.Description class="flex gap-4 text-primary/50">
+		<Card.Description class="text-primary/50 flex gap-4">
 			{#if surveyCount}
 				<p>Assessments {surveyCount}</p>
 			{/if}
@@ -17,7 +17,7 @@
 	</Card.Header>
 	<Card.Content class="flex items-center gap-3 p-4 ">
 		<a
-			class="inline-flex h-10 grow items-center justify-center whitespace-nowrap rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+			class="border-input bg-background ring-offset-background hover:bg-accent hover:text-accent-foreground focus-visible:ring-ring inline-flex h-10 grow items-center justify-center rounded-md border px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50"
 			href={isNested ? `${page.url.pathname}/schools/${id}` : `${page.url.pathname}/${id}`}
 			>View School</a
 		>
