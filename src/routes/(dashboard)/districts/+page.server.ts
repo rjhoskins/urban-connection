@@ -3,6 +3,10 @@ import { getDistrictAdminsDistrictIdByUserId, getDistrictSurveyTotals } from '$l
 import { error, redirect } from '@sveltejs/kit';
 
 export const load = (async (event) => {
+	console.log(
+		'/DISTRICTS event ==================================>',
+		event.url.searchParams.get('view')
+	);
 	console.log('event.locals.user', event.locals.user);
 	if (!event.locals.user) {
 		throw redirect(302, '/auth/login');
@@ -13,10 +17,11 @@ export const load = (async (event) => {
 	if (event.locals.user.role === 'district_admin') {
 		// throw redirect(302, '/auth/login');
 		const districtRes = await getDistrictAdminsDistrictIdByUserId(event.locals.user.id);
-		console.log('districtId==========================================', districtRes?.id);
-		if (!districtRes) {
-			error(403, 'not authorized');
-		}
+		// console.log('districtId========================', districtRes?.id);
+		if (!districtRes) error(403, 'not authorized');
+		if (event.url.searchParams.get('view') === 'results')
+			throw redirect(302, `districts/${districtRes.id}/results`);
+
 		throw redirect(302, `districts/${districtRes.id}`);
 	}
 

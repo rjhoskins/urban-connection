@@ -1,12 +1,5 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import { getFlash } from 'sveltekit-flash-message';
-	import { page } from '$app/state';
-
-	const flash = getFlash(page);
-	// function showMessage() {
-	// 	$flash = { type: 'error', message: 'flashy ' };
-	// }
 
 	let { data }: { data: PageData } = $props();
 	import UCAdminPanel from '$lib/components/uc-admin-panel.svelte';
@@ -27,7 +20,7 @@
 		<UCAdminPanel displayName={data.user?.name} />
 	{:else if data.user.role == 'district_admin'}
 		<h1 class="my-6 text-center text-3xl">{data.user?.name} | Admin Panel</h1>
-		<DistrictAdminPanel />
+		<DistrictAdminPanel displayName={data.user?.name} district={data.loggedInAdminDistrict} />
 	{:else if data.user.role == 'school_admin'}
 		<h1 class="my-6 text-center text-3xl">{data.user?.name} | Admin Panel</h1>
 		<SchooladminAdminPanel displayName={data.user?.name} school={data.loggedInAdminSchool} />

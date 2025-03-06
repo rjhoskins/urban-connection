@@ -1,43 +1,51 @@
 <script lang="ts">
 	import * as Card from '$lib/components/ui/card';
-	import { LayoutGrid, List, PenTool, Slice, UserRoundPlus } from 'lucide-svelte';
+	import { LayoutGrid, List, PenTool, Send, UserRoundPlus, Eye } from 'lucide-svelte';
 
 	const adminData = [
 		{
-			title: 'View  Dashboard',
+			title: 'View  Organization',
 			url: '/districts',
 			description: 'View dashboard and manage district.',
-			icon: LayoutGrid
+			icon: Eye
 		},
 		{
-			title: '',
-			url: '/schools',
-			description: 'Send email invitation to administrator.',
-			icon: LayoutGrid
+			title: 'Send Assessment Invitation',
+			url: '/districts',
+			description: 'Navigate to a school to add an additional administrator.',
+			icon: Send
+		},
+		{
+			title: 'Invite School Admin Invitation',
+			url: '/districts',
+			description: 'Navigate to a school to send an assessment to a teacher.',
+			icon: UserRoundPlus
+		},
+		{
+			title: 'View Assessment Results',
+			url: '/districts?&view=results',
+			description: 'View assessment results for the your district.',
+			icon: List
 		}
-		// {
-		// 	title: 'Manage Assessments',
-		// 	url: '/districts/manage-assessments',
-		// 	description: 'Edit, view, and manage assessment',
-		// 	icon: PenTool
-		// }
 	];
+
+	let { displayName, district } = $props();
 </script>
 
 <Card.Root class="mx-auto max-w-6xl">
 	<Card.Header>
-		<Card.Title class="p-6">Hello,</Card.Title>
+		<Card.Title class="p-6">Hello, {displayName}</Card.Title>
 		<!-- <Card.Description>Card Description</Card.Description> -->
 	</Card.Header>
 	<hr class="bg-primary" />
 	<Card.Content>
-		{#each adminData.slice(0, 2) as item (item.title)}
+		{#each adminData.slice(0, 3) as item (item.title)}
 			{@render dashItem(item)}
 		{/each}
 
 		<hr class="bg-primary" />
 
-		{#each adminData.slice(2, adminData.length) as item (item.title)}
+		{#each adminData.slice(3, adminData.length) as item (item.title)}
 			{@render dashItem(item)}
 		{/each}
 	</Card.Content>

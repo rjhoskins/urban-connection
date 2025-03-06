@@ -4,16 +4,6 @@ import { zod } from 'sveltekit-superforms/adapters';
 import type { PageServerLoad, Actions } from './$types.js';
 import { fail } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';
-import {
-	createAdminUserInviteToken,
-	generateUserId,
-	handleLogFlashReturnFormError
-} from '$lib/utils';
-import { nanoid } from 'nanoid';
-import { setFlash } from 'sveltekit-flash-message/server';
-import { eq, and } from 'drizzle-orm';
-import { users, schoolAdmins, adminUserInvites, schools } from '$lib/server/db/schema';
-import db from '$lib/server/db/index.js';
 
 export const load: PageServerLoad = async (event) => {
 	// console.log('PageServerLoad => ', event.locals.user);
