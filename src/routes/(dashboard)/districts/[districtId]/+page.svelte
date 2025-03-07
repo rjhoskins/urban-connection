@@ -4,6 +4,7 @@
 	import { page } from '$app/state';
 	import SchoolCard from '$lib/components/school-card.svelte';
 	import Card from '$lib/components/ui/card/card.svelte';
+	import { Button } from '$lib/components/ui/button';
 
 	interface School {
 		id: string;
@@ -28,24 +29,25 @@
 
 <section class=" container grid max-w-6xl p-4 py-8">
 	<div class="left space-y-3 pt-3">
-		{#if adminData}
-			<Card class="p-4">
-				{#if !Array.isArray(adminData)}
-					<p class=" text-2xl">District Administrator</p>
-					<AdminContactDetailsCard admin={adminData} />
-				{:else}
-					<!-- just in case  -->
-					<p class=" text-2xl">Administrators</p>
-					{#each adminData as admin, idx (idx)}
-						<AdminContactDetailsCard {admin} />
-					{/each}
-				{/if}
-			</Card>
-		{:else}
-			<Card class="p-4">
-				<p class=" text-xl font-semibold">No Admins Found</p>
-			</Card>
-		{/if}
+		<Card class=" flex justify-between p-4">
+			{#if adminData}
+				<div class="">
+					{#if !Array.isArray(adminData)}
+						<p class="text-2xl">District Administrator</p>
+						<AdminContactDetailsCard admin={adminData} />
+					{:else if adminData.length > 0}
+						<p class="text-2xl">Administrators</p>
+						{#each adminData as admin, idx (idx)}
+							<AdminContactDetailsCard {admin} />
+						{/each}
+					{:else}
+						<p class="text-xl font-semibold">No Admins Found</p>
+					{/if}
+				</div>
+			{/if}
+
+			<Button href={`${page.url.pathname}/results`} class="ml-auto">View Results</Button>
+		</Card>
 	</div>
 	<div class=" grid-cols-schools-fluid grid max-w-6xl gap-4 py-8">
 		{#each memberSurveyData as school (school.id)}

@@ -11,24 +11,28 @@
 	<h1 class="my-6 text-center text-3xl">{districtData.name} All Time Totals</h1>
 	<div class=" p-4">
 		<div class="grid grid-cols-2 gap-4">
-			{#each domainData as domain (domain.domainId)}
-				<ul class="space-y-4">
-					{@render domainCard({
-						id: domain.domainId ?? 0,
-						domainName: domain.domainName ?? '',
-						pointsTotal: domain.pointsTotal,
-						questionsTotal: domain.questionsTotal
-					})}
-					{#each questionsData.filter((q) => q.domainId === domain.domainId) as question (question.questionId)}
-						{@render questionCard({
-							questionId: question.questionId ?? 0,
-							domainId: question.domainId ?? 0,
-							pointsTotal: question.pointsTotal,
-							questionsTotal: question.questionsTotal
+			{#if domainData.length !== 0}
+				{#each domainData as domain (domain.domainId)}
+					<ul class="space-y-4">
+						{@render domainCard({
+							id: domain.domainId ?? 0,
+							domainName: domain.domainName ?? '',
+							pointsTotal: domain.pointsTotal,
+							questionsTotal: domain.questionsTotal
 						})}
-					{/each}
-				</ul>
-			{/each}
+						{#each questionsData.filter((q) => q.domainId === domain.domainId) as question (question.questionId)}
+							{@render questionCard({
+								questionId: question.questionId ?? 0,
+								domainId: question.domainId ?? 0,
+								pointsTotal: question.pointsTotal,
+								questionsTotal: question.questionsTotal
+							})}
+						{/each}
+					</ul>
+				{/each}
+			{:else}
+				<p class="text-center">No data available</p>
+			{/if}
 		</div>
 	</div>
 </section>
