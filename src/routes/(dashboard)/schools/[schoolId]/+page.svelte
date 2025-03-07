@@ -34,22 +34,20 @@
 					{:else}
 						<p class=" text-2xl">Administrators</p>
 					{/if}
-					<Button href={`${page.url.origin}/schools/invite-coadmin`} class=""
-						>Add School Admin</Button
-					>
 				</div>
 				{#each adminData as admin (admin.adminEmail)}
 					<AdminContactDetailsCard {admin} />
 				{/each}
 			</div>
 			<div class="right md:min-w-96">
+				<Button href={`${page.url.pathname}/results`} class="mb-4">View Results</Button>
+				<Button href={`${page.url.pathname}/invite-coadmin`} class="">Add School Admin</Button>
+				<Button href={`${page.url.pathname}/send-assessment`} class="mb-4">Send Assessment</Button>
 				<div class="flex items-center justify-between">
 					<div class="flex gap-2">
 						<p>Total Surveys:</p>
 						<p>{totalSurveys}</p>
 					</div>
-					<Button href={`${page.url.pathname}/send-assessment`} class="mb-4">Send Assessment</Button
-					>
 				</div>
 				<p>Sent</p>
 				<Progress barBgColor="bg-red-700" value={surveysNotStartedPercentage} />

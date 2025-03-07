@@ -41,14 +41,3 @@ export const load = async (event) => {
 		schools: data
 	};
 };
-
-export const actions: Actions = {
-	default: async (event) => {
-		console.log('default event => ', event);
-		// if (!form.valid) {
-		// 	return message(form, 'Invalid form');
-		// }
-		console.log('form => ');
-		// return form;
-	}
-};

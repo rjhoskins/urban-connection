@@ -43,21 +43,8 @@ export const actions: Actions = {
 			});
 		}
 
-		const [loggedInUserRes] = await db
-			.select()
-			.from(users)
-			.where(eq(users.id, event.locals.user.id));
-		console.log('loggedInUserRes => ', loggedInUserRes);
+		const schoolId = parseInt(event.params.schoolId);
 
-		if (!loggedInUserRes) {
-			return handleLogFlashReturnFormError({
-				type: 'error',
-				form,
-				message: 'Check the form and try again',
-				status: 404,
-				event
-			});
-		}
 		const [existingUser] = await db.select().from(users).where(eq(users.username, form.data.email));
 
 		if (existingUser) {

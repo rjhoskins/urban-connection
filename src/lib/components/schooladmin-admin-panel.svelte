@@ -22,7 +22,7 @@
 		},
 		{
 			title: 'View Assessment Results',
-			url: '/schools?&view=reults',
+			url: '/schools?&view=results',
 			description: 'View completed Assessment Total results for the organization',
 			icon: List
 		}
