@@ -812,6 +812,7 @@ export async function getAllTimeQuestionResponsesByDomain() {
 
 	return results || [];
 }
+
 export async function getAllTimeQuestionResponsesStatsByQuestion() {
 	const results = await db
 		.select({
@@ -829,4 +830,122 @@ export async function getAllTimeQuestionResponsesStatsByQuestion() {
 		.groupBy(surveyQuestions.id, surveySubDomains.domainId)
 		.orderBy(surveyQuestions.id);
 	return results || [];
+}
+
+export async function getAllTimeQuestionResponsesByDomainForDistrict(districtId: number) {
+	const results = await db
+		.select({
+			domainId: surveyDomains.id,
+			domainName: surveyDomains.name,
+			pointsTotal:
+				sql`sum(case when ${surveyQuestionsResponses.isValidSubdomainGroup} = true then ${surveyQuestionsResponses.response} else 0 end)`.mapWith(
+					Number
+				),
+			questionsTotal: sql`count(${surveyQuestionsResponses.response})`.mapWith(Number)
+		})
+		.from(surveyQuestionsResponses)
+		.leftJoin(surveys, eq(surveys.id, surveyQuestionsResponses.surveyId))
+		.leftJoin(schools, eq(schools.id, surveys.schoolId))
+		.leftJoin(districts, eq(districts.id, schools.districtId))
+		.leftJoin(surveyQuestions, eq(surveyQuestions.id, surveyQuestionsResponses.questionId))
+		.leftJoin(surveySubDomains, eq(surveySubDomains.id, surveyQuestions.subDomainId))
+		.leftJoin(surveyDomains, eq(surveyDomains.id, surveySubDomains.domainId))
+		.where(eq(districts.id, districtId))
+		.groupBy(surveyDomains.id)
+		.orderBy(surveyDomains.id);
+
+	return results || [];
+}
+
+export async function getAllTimeQuestionResponsesStatsByQuestionForDistrict(districtId: number) {
+	const results = await db
+		.select({
+			questionId: surveyQuestions.id,
+			domainId: surveySubDomains.domainId,
+			pointsTotal:
+				sql`sum(case when ${surveyQuestionsResponses.isValidSubdomainGroup} = true then ${surveyQuestionsResponses.response} else 0 end)`.mapWith(
+					Number
+				),
+			questionsTotal: sql`count(${surveyQuestionsResponses.response})`.mapWith(Number)
+		})
+		.from(surveyQuestionsResponses)
+		.leftJoin(surveys, eq(surveys.id, surveyQuestionsResponses.surveyId))
+		.leftJoin(schools, eq(schools.id, surveys.schoolId))
+		.leftJoin(districts, eq(districts.id, schools.districtId))
+		.leftJoin(surveyQuestions, eq(surveyQuestions.id, surveyQuestionsResponses.questionId))
+		.leftJoin(surveySubDomains, eq(surveySubDomains.id, surveyQuestions.subDomainId))
+		.where(eq(districts.id, districtId))
+		.groupBy(surveyQuestions.id, surveySubDomains.domainId)
+		.orderBy(surveyQuestions.id);
+	return results || [];
+}
+
+export async function getAllTimeQuestionResponsesByDomainForSchool(schoolId: number) {
+	const results = await db
+		.select({
+			domainId: surveyDomains.id,
+			domainName: surveyDomains.name,
+			pointsTotal:
+				sql`sum(case when ${surveyQuestionsResponses.isValidSubdomainGroup} = true then ${surveyQuestionsResponses.response} else 0 end)`.mapWith(
+					Number
+				),
+			questionsTotal: sql`count(${surveyQuestionsResponses.response})`.mapWith(Number)
+		})
+		.from(surveyQuestionsResponses)
+		.leftJoin(surveys, eq(surveys.id, surveyQuestionsResponses.surveyId))
+		.leftJoin(schools, eq(schools.id, surveys.schoolId))
+		.leftJoin(surveyQuestions, eq(surveyQuestions.id, surveyQuestionsResponses.questionId))
+		.leftJoin(surveySubDomains, eq(surveySubDomains.id, surveyQuestions.subDomainId))
+		.leftJoin(surveyDomains, eq(surveyDomains.id, surveySubDomains.domainId))
+		.where(eq(schools.id, schoolId))
+		.groupBy(surveyDomains.id)
+		.orderBy(surveyDomains.id);
+
+	return results || [];
+}
+
+export async function getAllTimeQuestionResponsesStatsByQuestionForSchool(schoolId: number) {
+	const results = await db
+		.select({
+			questionId: surveyQuestions.id,
+			domainId: surveySubDomains.domainId,
+			pointsTotal:
+				sql`sum(case when ${surveyQuestionsResponses.isValidSubdomainGroup} = true then ${surveyQuestionsResponses.response} else 0 end)`.mapWith(
+					Number
+				),
+			questionsTotal: sql`count(${surveyQuestionsResponses.response})`.mapWith(Number)
+		})
+		.from(surveyQuestionsResponses)
+		.leftJoin(surveys, eq(surveys.id, surveyQuestionsResponses.surveyId))
+		.leftJoin(schools, eq(schools.id, surveys.schoolId))
+		.leftJoin(surveyQuestions, eq(surveyQuestions.id, surveyQuestionsResponses.questionId))
+		.leftJoin(surveySubDomains, eq(surveySubDomains.id, surveyQuestions.subDomainId))
+		.where(eq(schools.id, schoolId))
+		.groupBy(surveyQuestions.id, surveySubDomains.domainId)
+		.orderBy(surveyQuestions.id);
+	return results || [];
+}
+
+export async function getDistrictDetailsById(districtId: number) {
+	const [results] = await db
+		.select({
+			id: districts.id,
+			name: districts.name
+		})
+		.from(districts)
+		.where(eq(districts.id, districtId));
+
+	return results || null;
+}
+
+export async function getSchoolDetailsById(schoolId: number) {
+	const [results] = await db
+		.select({
+			id: schools.id,
+			name: schools.name
+		})
+		.from(schools)
+		.where(eq(schools.id, schoolId));
+
+	return results || null;
 }

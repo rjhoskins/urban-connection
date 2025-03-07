@@ -1,6 +1,6 @@
 /** @type {import('./$types').PageServerLoad} */
 
-import { redirect, type Actions } from '@sveltejs/kit';
+import { error, redirect, type Actions } from '@sveltejs/kit';
 import {
 	getSchoolIDForSchoolAdmin,
 	getSchoolsForDistrictAdmin,
@@ -17,8 +17,10 @@ export const load = async (event) => {
 	switch (event.locals.user.role) {
 		case 'school_admin': {
 			const schoolId = await getSchoolIDForSchoolAdmin(event.locals.user.id);
-			console.log('school_admin user REDIRECT => ', event.locals.user);
-			return redirect(302, `/schools/${schoolId}`);
+			if (!schoolId) error(403, 'not authorized');
+			if (event.url.searchParams.get('view') === 'results') {
+				throw redirect(302, `schools/${schoolId}/results`);
+			} else return redirect(302, `/schools/${schoolId}`);
 		}
 		case 'super_admin': {
 			data = await getSchoolsWithSurveyCountAndScoreData();

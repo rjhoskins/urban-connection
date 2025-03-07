@@ -4,11 +4,11 @@
 	import { Progress } from '$lib/components/ui/progress';
 
 	let { data }: { data: PageData } = $props();
-	const { districtData, domainData, questionsData } = data;
+	const { schoolData, domainData, questionsData } = data;
 </script>
 
 <section class=" mx-auto grid max-w-7xl gap-4 p-2 lg:p-8">
-	<h1 class="my-6 text-center text-3xl">{districtData.name} All Time Totals</h1>
+	<h1 class="my-6 text-center text-3xl">{schoolData.name} All Time Totals</h1>
 	<div class=" p-4">
 		<div class="grid grid-cols-2 gap-4">
 			{#each domainData as domain (domain.domainId)}
