@@ -18,6 +18,9 @@
 		? (surveysNotStarted / totalSurveys) * 100
 		: 0;
 	const surveysCompletedPercentage = surveysCompleted ? (surveysCompleted / totalSurveys) * 100 : 0;
+	const totalPoints = memberData.reduce((acc, member) => acc + member.pointsTotal, 0);
+	const totaPossiblePoints = memberData.reduce((acc, member) => acc + member.questionsTotal, 0);
+	const totalPointsPercentage = Math.floor((totalPoints / totaPossiblePoints) * 100) || 0;
 </script>
 
 <!-- <pre>{JSON.stringify(surveyResultsData, null, 2)}</pre> -->
@@ -39,7 +42,7 @@
 					<AdminContactDetailsCard {admin} />
 				{/each}
 			</div>
-			<div class="right md:min-w-96">
+			<div class="right space-y-3 md:min-w-96">
 				<Button href={`${page.url.pathname}/results`} class="mb-4">View Results</Button>
 				<Button href={`${page.url.pathname}/invite-coadmin`} class="">Add School Admin</Button>
 				<Button href={`${page.url.pathname}/send-assessment`} class="mb-4">Send Assessment</Button>
@@ -49,10 +52,21 @@
 						<p>{totalSurveys}</p>
 					</div>
 				</div>
-				<p>Sent</p>
-				<Progress barBgColor="bg-red-700" value={surveysNotStartedPercentage} />
-				<p>Completed</p>
-				<Progress barBgColor="bg-green-700" value={surveysCompletedPercentage} />
+				<div class="">
+					<p>Sent</p>
+					<Progress barBgColor="bg-red-700" value={surveysNotStartedPercentage} />
+				</div>
+				<div class="">
+					<p>Completed</p>
+					<Progress barBgColor="bg-green-700" value={surveysCompletedPercentage} />
+				</div>
+				<div class="">
+					<p class="flex justify-between">
+						<span>Total Score</span>
+						<span>{totalPointsPercentage}% </span>
+					</p>
+					<Progress barBgColor="bg-green-700" value={totalPointsPercentage} />
+				</div>
 			</div>
 		</div>
 	</Card.Root>
@@ -68,3 +82,5 @@
 		{/if}
 	</div>
 </section>
+
+<pre>{JSON.stringify(data, null, 2)}</pre>

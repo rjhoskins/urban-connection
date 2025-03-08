@@ -14,9 +14,6 @@ export const load = async (event) => {
 	if (!event.locals.user) {
 		throw redirect(302, '/auth/login');
 	}
-	// if (event.locals.user.role === 'school_admin') {
-	// 	throw error(401, '/unauthorized');
-	// }
 
 	const schoolId = parseInt(event.params.schoolId);
 	const userId = event.locals.user.id;
@@ -32,24 +29,20 @@ export const load = async (event) => {
 	};
 
 	if (event.locals.user.role === 'school_admin') {
-		if (userId) {
-			schoolDataFunc = () => getSchoolForSchoolAdmin(userId, schoolId);
-			adminDataFunc = async () => getSchoolAdminBySchoolId(schoolId);
-			memberDataFunc = async () =>
-				getSchoolMemberSurveyTotalsForSchoolAndDistrictAdminBySchool(schoolId);
-		}
+		redirect(302, '/schools/' + schoolId);
 	}
 	if (event.locals.user.role === 'district_admin') {
 		const userId = event.locals.user.id;
 		if (userId) {
-			schoolDataFunc = () => getSchoolForDistrictAdmin(userId, schoolId);
+			schoolDataFunc = async () => getSchoolForDistrictAdmin(userId, schoolId);
 			adminDataFunc = async () => getSchoolAdminBySchoolId(schoolId);
 			memberDataFunc = async () =>
 				getSchoolMemberSurveyTotalsForSchoolAndDistrictAdminBySchool(schoolId);
 		}
 	}
 	if (event.locals.user.role === 'super_admin') {
-		schoolDataFunc = () => getSchoolForSuperAdmin(schoolId);
+		console.log('super admin!!!!!!!!!!!!!!!!!!!!!!!!!!====================');
+		schoolDataFunc = async () => getSchoolForSuperAdmin(schoolId);
 		adminDataFunc = async () => getSchoolAdminBySchoolId(schoolId);
 		memberDataFunc = async () => getSchoolMemberSurveyTotalsForSuperUser(schoolId);
 	}

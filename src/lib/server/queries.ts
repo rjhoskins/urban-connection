@@ -388,7 +388,7 @@ export async function getSchoolMemberSurveyTotalsForSchoolAndDistrictAdminByScho
 		.groupBy(surveys.id, schools.id)
 		.where(eq(schools.id, schoolId))
 		.orderBy(surveys.createdAt);
-	if (dev) console.log('getSchoolMemberSurveyTotals res => ', res);
+	if (dev) console.log('getSchoolMemberSurveyTotalsForSchoolAndDistrictAdminBySchool res => ', res);
 
 	return res || null;
 }
@@ -441,7 +441,8 @@ export async function getSchoolMemberSurveyTotalsForSchoolAndDistrictAdminByDist
 		.groupBy(schools.id, schools.name)
 		.where(eq(schools.districtId, districtId)) // school /district /whatever
 		.orderBy(schools.createdAt);
-	if (dev) console.log('getSchoolMemberSurveyTotals res => ', res);
+	if (dev)
+		console.log('getSchoolMemberSurveyTotalsForSchoolAndDistrictAdminByDistrict res => ', res);
 	return res || null;
 }
 
