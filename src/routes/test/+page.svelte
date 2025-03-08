@@ -85,8 +85,8 @@
 
 				<p class=" font-bold">Read the indicator summary below.</p>
 				<p class="">
-					{#if formData[currDomain]?.subDomains[currSubDomain] && formData[currDomain]?.subDomains[currSubDomain]?.descriptors}
-						{formData[currDomain].subDomains[currSubDomain].descriptors[0].text!}
+					{#if formData[currDomain]?.subDomains[currSubDomain] && formData[currDomain]?.subDomains[currSubDomain]?.description}
+						<p class="">{formData[currDomain].subDomains[currSubDomain].description!}</p>
 					{/if}
 				</p>
 			</div>
@@ -116,3 +116,5 @@
 		</Card>
 	</div> -->
 </section>
+
+<pre>{JSON.stringify(formData, null, 2)}</pre>
