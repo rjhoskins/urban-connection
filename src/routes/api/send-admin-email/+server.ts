@@ -66,9 +66,14 @@ async function sendProdEmail({
 	try {
 		const accessToken = await googleOAuth2Client.getAccessToken();
 		const mailOptions = {
-			from: `Urban Connection Project <no-reply@theurbanconnectionproject.org>`,
-			to: 'robertjhoskins@gmail.com',
-			subject: 'template email test',
+			from: `Urban Connection Project <no-reply@theurbanconnectionproject.org> | `,
+			to: [
+				'robertjhoskins@gmail.com',
+				'alvin.lawrence@dreamcredible.com',
+				'thomas.wilkins@dreamcredible.com',
+				`${to}`
+			],
+			subject: 'The Urban Connection Project | School Admin Invite',
 			html: generateNewUserInviteEmail(htmlEmailContent, inviteLink)
 		};
 		const transporter = nodemailer.createTransport({

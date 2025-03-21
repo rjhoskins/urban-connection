@@ -109,7 +109,7 @@ export function generateNewUserInviteEmail(
                 <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);">
                     <tr>
                         <td class="content-block" style="padding: 24px;">
-                            <p style="margin-bottom: 16px;">${htmlEmailContent.definition}</p>
+                            <p style="margin-bottom: 16px;">${htmlEmailContent.greeting}</p>
                             
                             <p style="margin-bottom: 16px;">${htmlEmailContent.definition}</p>
                             
