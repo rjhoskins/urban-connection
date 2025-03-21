@@ -16,14 +16,14 @@ OAuth2Client.setCredentials({
 	refresh_token: env.GOOGLE_OAUTH_REFRESH_TOKEN
 });
 
-export const GET: RequestHandler = async () => {
-	console.log('GET /api/send-html-email===========================================> ');
-	return json({ message: 'GET /api/send-html-email', 'application/json': '' });
-};
+// export const GET: RequestHandler = async () => {
+// 	console.log('GET /api/send-html-email==================> ');
+// 	return json({ message: 'GET /api/send-html-email', 'application/json': '' });
+// };
 
 export const POST: RequestHandler = async (event) => {
 	const res = await event.request.json();
-	console.log('POST /api/send-html-email===========================================> ', res);
+	console.log('POST /api/send-html-email============> ', res);
 	try {
 		if (dev) {
 			await sendDevEmail({ ...res });
@@ -73,7 +73,7 @@ async function sendProdEmail({
 				'thomas.wilkins@dreamcredible.com',
 				`${to}`
 			],
-			subject: 'The Urban Connection Project | School Admin Invite',
+			subject: 'The Urban Connection Project | School Admin Invite | ' + subject,
 			html: generateNewUserInviteEmail(htmlEmailContent, inviteLink)
 		};
 		const transporter = nodemailer.createTransport({
@@ -89,7 +89,7 @@ async function sendProdEmail({
 			}
 		});
 		const result = await transporter.sendMail(mailOptions);
-		console.log('Email sentzzzzz: ' + result.response);
+		console.log('Prod Email sentzzzzz: ' + result.response);
 	} catch (error) {
 		console.error('Error sending email: ', error);
 	}

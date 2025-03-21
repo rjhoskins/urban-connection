@@ -111,6 +111,19 @@ export const actions: Actions = {
 
 				return newUser;
 			});
+
+			event.fetch('/api/send-admin-email', {
+				method: 'POST',
+				headers: {
+					'content-type': 'application/json'
+				},
+				body: JSON.stringify({
+					to: form.data.email,
+					subject: 'You have been invited to join the platform',
+					inviteLink: `${event.url.origin}/auth/register?inviteToken=${inviteToken}`,
+					htmlEmailContent: htmlTemplate.template
+				})
+			});
 		} catch (error) {
 			const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
 			const UnexpectedErrorMsg = 'Unexpected error: ' + errorMessage;
@@ -118,19 +131,6 @@ export const actions: Actions = {
 			setFlash({ type: 'error', message: UnexpectedErrorMsg }, event.cookies);
 			return message(form, { status: 'error', text: UnexpectedErrorMsg });
 		}
-
-		event.fetch('/api/send-admin-email', {
-			method: 'POST',
-			headers: {
-				'content-type': 'application/json'
-			},
-			body: JSON.stringify({
-				to: form.data.email,
-				subject: 'You have been invited to join the platform',
-				inviteLink: `${event.url.origin}/auth/register?inviteToken=${inviteToken}`,
-				htmlEmailContent: htmlTemplate.template
-			})
-		});
 
 		const registerLink = `${event.url.origin}/auth/register?inviteToken=${inviteToken}`;
 		setFlash(
