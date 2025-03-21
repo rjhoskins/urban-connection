@@ -28,7 +28,6 @@ export const load: PageServerLoad = async (event) => {
 };
 export const actions: Actions = {
 	default: async (event) => {
-		console.log('aaaaand action!!! => ');
 		if (!event.locals.user) return redirect(302, '/auth/login');
 		// console.log('default => ', event.locals.user);
 
@@ -59,9 +58,10 @@ export const actions: Actions = {
 		}
 
 		let inviteToken = '';
+		const htmlTemplate = await getLatestHtmlTemplateData();
+		if (!htmlTemplate) throw new Error('Failed to get html template data');
 
 		try {
-			console.log('create form trying... ======================> ', form);
 			const result = await db.transaction(async (trx) => {
 				const [loggedInUsersSchoolRes] = await trx
 					.select({ schoolId: schoolAdmins.schoolId })
@@ -86,9 +86,6 @@ export const actions: Actions = {
 				console.log('inviteRes => ', inviteRes);
 				if (!inviteRes) throw new Error('Failed to create invite');
 
-				const htmlTemplate = await getLatestHtmlTemplateData();
-				if (!htmlTemplate) throw new Error('Failed to get html template data');
-
 				inviteToken = createAdminUserInviteToken(form.data.name, form.data.email, inviteRes.id);
 
 				const [newUser] = await trx
@@ -111,18 +108,7 @@ export const actions: Actions = {
 				if (!newSchoolAdminRes) throw new Error('Failed to associate user with school');
 				console.log('newSchoolAdminRes => ', newSchoolAdminRes);
 				// throw new Error('test error');
-				event.fetch('/api/send-admin-email', {
-					method: 'POST',
-					headers: {
-						'content-type': 'application/json'
-					},
-					body: JSON.stringify({
-						to: form.data.email,
-						subject: 'You have been invited to join the platform',
-						inviteLink: `${event.url.origin}/auth/register?inviteToken=${inviteToken}`,
-						htmlEmailContent: htmlTemplate.template
-					})
-				});
+
 				return newUser;
 			});
 		} catch (error) {
@@ -132,6 +118,19 @@ export const actions: Actions = {
 			setFlash({ type: 'error', message: UnexpectedErrorMsg }, event.cookies);
 			return message(form, { status: 'error', text: UnexpectedErrorMsg });
 		}
+
+		event.fetch('/api/send-admin-email', {
+			method: 'POST',
+			headers: {
+				'content-type': 'application/json'
+			},
+			body: JSON.stringify({
+				to: form.data.email,
+				subject: 'You have been invited to join the platform',
+				inviteLink: `${event.url.origin}/auth/register?inviteToken=${inviteToken}`,
+				htmlEmailContent: htmlTemplate.template
+			})
+		});
 
 		const registerLink = `${event.url.origin}/auth/register?inviteToken=${inviteToken}`;
 		setFlash(
