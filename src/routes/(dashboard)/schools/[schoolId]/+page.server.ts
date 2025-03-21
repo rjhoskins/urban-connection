@@ -1,12 +1,10 @@
 /** @type {import('./$types').PageServerLoad} */
 import { error, redirect } from '@sveltejs/kit';
 import {
+	getLoggedInSchoolAdminsSchool,
 	getSchoolAdminBySchoolId,
-	getSchoolForDistrictAdmin,
 	getSchoolForSchoolAdmin,
-	getSchoolForSuperAdmin,
 	getSchoolMemberSurveyTotalsForSchoolAndDistrictAdminBySchool,
-	getSchoolMemberSurveyTotalsForSuperUser,
 	getSurveyData
 } from '$lib/server/queries';
 
@@ -16,11 +14,15 @@ export const load = async (event) => {
 	}
 
 	if (event.locals.user.role !== 'school_admin') {
-		throw redirect(302, '/auth/login');
+		throw redirect(401, '/auth/login');
 	}
 
-	const schoolId = parseInt(event.params.schoolId);
 	const userId = event.locals.user.id;
+	const schoolAdminsSchool = await getLoggedInSchoolAdminsSchool(userId);
+	if (!schoolAdminsSchool) {
+		throw error(404, 'School not found');
+	}
+	const schoolId = schoolAdminsSchool.id;
 
 	return {
 		adminData: await getSchoolAdminBySchoolId(schoolId),

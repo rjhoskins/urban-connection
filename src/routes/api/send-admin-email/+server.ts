@@ -66,7 +66,7 @@ async function sendProdEmail({
 	try {
 		const accessToken = await googleOAuth2Client.getAccessToken();
 		const mailOptions = {
-			from: `Urban Connection Project <no-reply@theurbanconnectionproject.org> | `,
+			from: `Urban Connection Project <no-reply@theurbanconnectionproject.org>`,
 			to: [
 				'robertjhoskins@gmail.com',
 				'alvin.lawrence@dreamcredible.com',
