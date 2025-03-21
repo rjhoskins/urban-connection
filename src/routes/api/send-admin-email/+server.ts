@@ -29,7 +29,7 @@ export const POST: RequestHandler = async (event) => {
 			await sendDevEmail({ ...res });
 			return json({ status: 'success', message: 'Dev Email sent' });
 		} else {
-			await sendProdEmail({ ...res, OAuth2Client });
+			await sendProdEmail({ ...res, googleOAuth2Client: OAuth2Client });
 			return json({ status: 'success', message: 'Prod Email sent?' });
 		}
 	} catch (error) {

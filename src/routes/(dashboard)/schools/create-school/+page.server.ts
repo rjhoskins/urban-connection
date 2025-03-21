@@ -149,7 +149,7 @@ export const actions: Actions = {
 		setFlash(
 			{
 				type: 'success',
-				message: `School successfully created: school admin invite link => \n${event.url.origin}/auth/register?inviteToken=${inviteToken}`
+				message: `School successfully created, now invite ${form.data.adminName} to join the school`
 			},
 			event.cookies
 		);
@@ -157,7 +157,7 @@ export const actions: Actions = {
 			'school admin invite token => ',
 			`${event.url.origin}/auth/register?inviteToken=${inviteToken}`
 		);
-		// todo: email inviteToken to user
-		// redirect(303, `/schools/invite?inviteToken=${inviteToken}`);
+
+		redirect(303, `/schools/invite?inviteToken=${inviteToken}`);
 	}
 };
