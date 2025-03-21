@@ -11,7 +11,7 @@
 	</Card.Header>
 	<Card.Content class="space-y-3">
 		<p>{data.greeting}</p>
-		<p>
+		<p class="max-w-prose">
 			{data.definition}
 		</p>
 		<ul class="list-inside list-disc">
