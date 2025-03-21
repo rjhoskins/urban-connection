@@ -166,7 +166,7 @@
 		<!-- END editor -->
 	</Card.Content>
 {:else}
-	<HtmlEmailTextPreview data={$emailForm} {page} {token} />
+	<HtmlEmailTextPreview data={$emailForm} {token} />
 {/if}
 
 <pre>{JSON.stringify(data, null, 2)}</pre>

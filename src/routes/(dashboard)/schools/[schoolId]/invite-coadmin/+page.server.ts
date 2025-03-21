@@ -14,6 +14,7 @@ import { setFlash } from 'sveltekit-flash-message/server';
 import { eq, and } from 'drizzle-orm';
 import { users, schoolAdmins, adminUserInvites, schools } from '$lib/server/db/schema';
 import db from '$lib/server/db/index.js';
+import { getLatestHtmlTemplateData } from '$lib/server/queries.js';
 
 export const load: PageServerLoad = async (event) => {
 	// console.log('PageServerLoad => ', event.locals.user);
@@ -23,7 +24,7 @@ export const load: PageServerLoad = async (event) => {
 
 	const form = await superValidate(zod(inviteNewUserSchema));
 
-	return { form };
+	return { form, schoolAdminHtmlTemplate: await getLatestHtmlTemplateData() };
 };
 export const actions: Actions = {
 	default: async (event) => {

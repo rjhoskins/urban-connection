@@ -32,7 +32,7 @@
 </script>
 
 {#if !canEditForm}
-	<HtmlEmailTextPreview data={data.emailForm.data} {page} {token} />
+	<HtmlEmailTextPreview data={data.emailForm.data} {token} />
 {/if}
 
 <form class="flex flex-col gap-3" method="POST" action="?/invite" use:enhance>

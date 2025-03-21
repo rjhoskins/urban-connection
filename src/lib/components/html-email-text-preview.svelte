@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import * as Card from '$lib/components/ui/card';
-	let { data, page, token } = $props();
+	let { data, token = 'tbd' } = $props();
 </script>
 
 {#if data && browser}
