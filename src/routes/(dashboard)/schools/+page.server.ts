@@ -18,6 +18,11 @@ export const load = async (event) => {
 		case 'school_admin': {
 			const schoolId = await getSchoolIDForSchoolAdmin(event.locals.user.id);
 			if (!schoolId) error(403, 'not authorized');
+
+			if (event.url.searchParams.get('view') === 'invite') {
+				console.log('redirecting to invite-coadmin ===============>');
+				throw redirect(302, `schools/${schoolId}/invite-coadmin`);
+			}
 			if (event.url.searchParams.get('view') === 'results') {
 				throw redirect(302, `schools/${schoolId}/results`);
 			} else return redirect(302, `/schools/${schoolId}`);

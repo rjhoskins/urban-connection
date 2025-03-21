@@ -10,7 +10,7 @@
 		},
 		{
 			title: 'Invite Administrator',
-			url: '/schools/invite-coadmin',
+			url: '/schools?&view=invite',
 			description: 'Send email invitation to administrator.',
 			icon: UserRoundPlus
 		},

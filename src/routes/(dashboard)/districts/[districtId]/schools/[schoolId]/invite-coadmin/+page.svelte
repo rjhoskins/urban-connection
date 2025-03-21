@@ -15,3 +15,4 @@
 <div class="grid h-full place-content-center">
 	<InviteCoAdminForm {data} {page} />
 </div>
+<pre>{JSON.stringify(data, null, 2)}</pre>
