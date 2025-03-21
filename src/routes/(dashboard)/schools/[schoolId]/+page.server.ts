@@ -16,7 +16,7 @@ export const load = async (event) => {
 	}
 
 	if (event.locals.user.role !== 'school_admin') {
-		throw redirect(401, '/auth/login');
+		throw redirect(302, '/auth/login');
 	}
 
 	const schoolId = parseInt(event.params.schoolId);

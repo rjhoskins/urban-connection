@@ -9,7 +9,7 @@
 	import HtmlEmailUserInviteForm from '$lib/components/forms/html-email-user-invite-form.svelte';
 
 	let { data } = $props();
-	const { token } = data;
+	const { token, canEditForm } = data;
 	const { name, email, inviteId } = decodeAdminUserInviteToken(token || '');
 	let pageHTMLEmail = $state();
 	let pageIsEditing = $state(false);
@@ -28,10 +28,21 @@
 	<!-- <pre class="sizes">{JSON.stringify(pageIsEditing, null, 2)}</pre> -->
 	<Card.Root class="m-6 lg:lg:w-[65ch]">
 		<Card.Content>
-			<HtmlEmailUserInviteForm bind:formisEditing={pageIsEditing} {token} {page} {data} />
-			{#if !pageIsEditing}
-				<InviteUserByEmailForm {data} {token} {page} />
+			{#if canEditForm}
+				<HtmlEmailUserInviteForm
+					bind:formisEditing={pageIsEditing}
+					{token}
+					{page}
+					{data}
+					{canEditForm}
+				/>
+				{#if !pageIsEditing}
+					<InviteUserByEmailForm {data} {token} {page} {canEditForm} />
+				{/if}
+			{:else}
+				<InviteUserByEmailForm {data} {token} {page} {canEditForm} />
 			{/if}
 		</Card.Content>
+		<!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->
 	</Card.Root>
 </div>

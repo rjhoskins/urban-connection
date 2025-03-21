@@ -14,8 +14,9 @@
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { dev } from '$app/environment';
 	import { LoaderCircle } from 'lucide-svelte';
+	import HtmlEmailTextPreview from '../html-email-text-preview.svelte';
 
-	let { page, data, token } = $props();
+	let { page, data, token, canEditForm } = $props();
 	const { name, email, inviteId } = decodeAdminUserInviteToken(token);
 	const form = superForm(data.inviteForm, {
 		dataType: 'json',
@@ -29,6 +30,10 @@
 		$formData.inviteId = inviteId;
 	});
 </script>
+
+{#if !canEditForm}
+	<HtmlEmailTextPreview data={data.emailForm.data} {page} {token} />
+{/if}
 
 <form class="flex flex-col gap-3" method="POST" action="?/invite" use:enhance>
 	<!-- name -->
@@ -78,4 +83,5 @@
 	{#if $message}
 		<div class="message text-red-700">{$message}</div>
 	{/if}
+	<!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->
 </form>

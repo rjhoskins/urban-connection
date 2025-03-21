@@ -7,61 +7,22 @@
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 	import * as Card from '$lib/components/ui/card';
 	import { schoolAdminUserInviteHTMLEmailTemplateSchema } from '$lib/schema.js';
-	import { defaults, superForm } from 'sveltekit-superforms';
+	import { superForm } from 'sveltekit-superforms';
 	import SuperDebug from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import HtmlEmailTextPreview from '../html-email-text-preview.svelte';
 	import { dev } from '$app/environment';
-	import type { ActionResult } from '@sveltejs/kit';
-	import { deserialize } from '$app/forms';
-	import toast from 'svelte-french-toast';
 
-	let { formisEditing = $bindable(), data, token, page, canEditForm } = $props();
+	let { formisEditing = $bindable(), data, token, page } = $props();
 
-	const thisForm = superForm(
-		defaults(data.emailForm.data || {}, zodClient(schoolAdminUserInviteHTMLEmailTemplateSchema)),
-		{
-			SPA: true,
-			dataType: 'json',
-			resetForm: false,
-			clearOnSubmit: 'errors-and-message',
-			validators: zodClient(schoolAdminUserInviteHTMLEmailTemplateSchema),
-			onSubmit: async ({ action }) => {
-				const results = schoolAdminUserInviteHTMLEmailTemplateSchema.safeParse($emailForm);
-
-				if (!results.success) {
-					console.log('results.error ===>', results.error);
-					toast.error('Form has errors');
-					return;
-				}
-				const htmlTemplateFormData = new FormData();
-				for (const [key, value] of Object.entries($emailForm)) {
-					if (Array.isArray(value)) {
-						// For arrays, append each item with the same key
-						for (const item of value) {
-							htmlTemplateFormData.append(key, item);
-						}
-					} else {
-						htmlTemplateFormData.append(key, String(value));
-					}
-				}
-				console.log('htmlTemplateFormData ===>', htmlTemplateFormData);
-				const response = await fetch(action, {
-					method: 'POST',
-					body: htmlTemplateFormData,
-					headers: {
-						'x-sveltekit-action': 'true'
-					}
-				});
-				const result: ActionResult = deserialize(await response.text());
-				console.log('handleSubmit result ===>', result);
-			},
-			onUpdate: async ({ form }) => {
-				// if (!form.valid) return;
-				// console.log('onUpdate form.data ===>', form.data);
-			}
-		}
-	);
+	const thisForm = superForm(data.emailForm.data.template, {
+		dataType: 'json',
+		validators: zodClient(schoolAdminUserInviteHTMLEmailTemplateSchema),
+		invalidateAll: false
+		// onSubmit({ jsonData }) {
+		// 	console.log('jsonData ===>', jsonData);
+		// }
+	});
 	const {
 		form: emailForm,
 		errors: emailErrors,
@@ -72,13 +33,6 @@
 	} = thisForm;
 
 	let newKeyPoint = $state('');
-
-	emailForm.update(
-		($emailForm) => {
-			return $emailForm;
-		},
-		{ taint: 'untaint-form' }
-	);
 </script>
 
 <!-- <pre>{JSON.stringify(page, null, 2)}</pre> -->
@@ -108,7 +62,7 @@
 				<Form.Control>
 					{#snippet children({ props })}
 						<Form.Label class="">Greeting</Form.Label>
-						<Input type="text" bind:value={$emailForm.greeting} />
+						<Input type="text" bind:value={$emailForm.template.greeting} />
 					{/snippet}
 				</Form.Control>
 				<Form.FieldErrors />
@@ -119,22 +73,21 @@
 				<Form.Control>
 					{#snippet children({ props })}
 						<Form.Label class="">Definition</Form.Label>
-						<Textarea {...props} bind:value={$emailForm.definition} />
+						<Textarea {...props} bind:value={$emailForm.template.definition} />
 					{/snippet}
 				</Form.Control>
 				<Form.FieldErrors />
 			</Form.Field>
-
-			<!-- keyPoints -->
-
 			<ul class="flex flex-col gap-1.5">
-				{#each $emailForm.keyPoints as keyPoint (keyPoint)}
+				{#each $emailForm.template.keyPoints as keyPoint (keyPoint)}
 					<li class="flex items-center gap-x-4 p-1">
 						{keyPoint}
 						<Button
 							class=""
 							onclick={() =>
-								($emailForm.keyPoints = $emailForm.keyPoints.filter((el: any) => el !== keyPoint))}
+								($emailForm.template.keyPoints = $emailForm.template.keyPoints.filter(
+									(el: any) => el !== keyPoint
+								))}
 							size="icon"
 							variant="outline"><X /></Button
 						>
@@ -144,8 +97,8 @@
 
 			<!-- keyPoints -->
 
-			<Form.Field class=" space-y-1" form={thisForm} name="keyPoints">
-				<input type="hidden" name="keyPoints" value={$emailForm.keyPoints} />
+			<Form.Field class=" space-y-1" form={thisForm} name="keyPoints[]">
+				<input type="hidden" name="keyPoints[]" value={$emailForm.template.keyPoints} />
 				<Form.FieldErrors />
 			</Form.Field>
 			<Form.Field class=" space-y-1" form={thisForm} name="newKeyPoint">
@@ -153,23 +106,10 @@
 					{#snippet children({ props })}
 						<Form.Label class="">KeyPoints</Form.Label>
 						<div class="flex gap-4 py-2">
-							<Input
-								type="text"
-								{...props}
-								onkeyup={(e) => {
-									if (e.key === 'Enter') {
-										e.preventDefault();
-										console.log('Enter key pressed');
-										$emailForm.keyPoints = [...$emailForm.keyPoints, newKeyPoint];
-										newKeyPoint = '';
-										return false;
-									}
-								}}
-								bind:value={newKeyPoint}
-							/>
+							<Input type="text" {...props} bind:value={newKeyPoint} />
 							<Button
 								onclick={() => {
-									$emailForm.keyPoints = [...$emailForm.keyPoints, newKeyPoint];
+									$emailForm.template.keyPoints = [...$emailForm.template.keyPoints, newKeyPoint];
 									newKeyPoint = '';
 								}}>Add</Button
 							>
@@ -184,7 +124,7 @@
 				<Form.Control>
 					{#snippet children({ props })}
 						<Form.Label class="">Closing</Form.Label>
-						<Input type="text" {...props} bind:value={$emailForm.closing} />
+						<Input type="text" {...props} bind:value={$emailForm.template.closing} />
 					{/snippet}
 				</Form.Control>
 				<Form.FieldErrors />
@@ -194,7 +134,7 @@
 				<Form.Control>
 					{#snippet children({ props })}
 						<Form.Label class="">Call To Action</Form.Label>
-						<Input type="text" {...props} bind:value={$emailForm.callToAction} />
+						<Input type="text" {...props} bind:value={$emailForm.template.callToAction} />
 					{/snippet}
 				</Form.Control>
 				<Form.FieldErrors />
@@ -205,7 +145,7 @@
 				<Form.Control>
 					{#snippet children({ props })}
 						<Form.Label class="">Registration Link Text</Form.Label>
-						<Input type="text" {...props} bind:value={$emailForm.registrationLinkText} />
+						<Input type="text" {...props} bind:value={$emailForm.template.registrationLinkText} />
 					{/snippet}
 				</Form.Control>
 				<Form.FieldErrors />
@@ -229,4 +169,4 @@
 	<HtmlEmailTextPreview data={$emailForm} {page} {token} />
 {/if}
 
-<!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->
+<pre>{JSON.stringify(data, null, 2)}</pre>

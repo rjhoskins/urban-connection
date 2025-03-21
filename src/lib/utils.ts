@@ -77,6 +77,7 @@ export function generateNewUserInviteEmail(
 	htmlEmailContent: UserInviteHTMLEmailTemplateType,
 	inviteLink: string
 ) {
+	console.log('htmlEmailContent  ====> ', htmlEmailContent);
 	return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -108,7 +109,7 @@ export function generateNewUserInviteEmail(
                 <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);">
                     <tr>
                         <td class="content-block" style="padding: 24px;">
-                            <p style="margin-bottom: 16px;">${htmlEmailContent.greeting}</p>
+                            <p style="margin-bottom: 16px;">${htmlEmailContent.definition}</p>
                             
                             <p style="margin-bottom: 16px;">${htmlEmailContent.definition}</p>
                             

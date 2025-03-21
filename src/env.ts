@@ -12,6 +12,10 @@ const stringBoolean = z.coerce
 
 const EnvSchema = z.object({
 	DATABASE_URL: z.string(),
+	GOOGLE_OAUTH_CLIENT_ID: z.string(),
+	GOOGLE_OAUTH_CLIENT_SECRET: z.string(),
+	GOOGLE_OAUTH_REDIRECT_URI: z.string(),
+	GOOGLE_OAUTH_REFRESH_TOKEN: z.string(),
 	// LOCAL_DATABASE_URL: z.string(),
 	// MAILTRAP_HOST: z.string(),
 	// MAILTRAP_PORT: z.coerce.number(),

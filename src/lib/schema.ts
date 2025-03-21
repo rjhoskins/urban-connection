@@ -56,14 +56,16 @@ export const sendAssessmentInviteSchem = z.object({
 		.max(256, { message: 'name should not be an essay' }),
 	email: z.string().email({ message: 'invalid email' })
 });
-export const userInviteHTMLEmailTemplateSchema = z.object({
+export const schoolAdminUserInviteHTMLEmailTemplateSchema = z.object({
 	greeting: z.string().nonempty({ message: 'Greeting text is required' }),
 	definition: z.string().nonempty({ message: 'Definition text is required' }),
 	keyPoints: z
-		.array(z.string())
-		.min(2, { message: 'At least two key point(s) are required' })
+		.string()
+		.array()
+		.nonempty({ message: 'Key points are required' })
+		.min(2, { message: 'At least two key points are required' })
 		.max(8, { message: 'No more than eight key points are allowed' }),
-	closing: z.string().nonempty({ message: 'Closingtext is required' }),
+	closing: z.string().nonempty({ message: 'Closing text is required' }),
 	callToAction: z.string().nonempty({ message: 'call To Action text is required' }),
 	registrationLinkText: z.string().nonempty({ message: 'Link text text is required' })
 });
@@ -152,7 +154,9 @@ export const createSchoolSchema = z
 const UserRoleSchema = z.enum(['Master', 'District', 'School_Admin']);
 
 type UserRole = z.infer<typeof UserRoleSchema>;
-export type UserInviteHTMLEmailTemplateType = z.infer<typeof userInviteHTMLEmailTemplateSchema>;
+export type UserInviteHTMLEmailTemplateType = z.infer<
+	typeof schoolAdminUserInviteHTMLEmailTemplateSchema
+>;
 // export type CreateSchoolSchemaFormSchema = typeof createSchoolSchema;
 // export type CreateSchoolSchemaFormSchema = typeof createSchoolSchema;
 
