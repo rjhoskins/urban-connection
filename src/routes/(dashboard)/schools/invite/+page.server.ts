@@ -89,22 +89,11 @@ export const actions: Actions = {
 				event
 			});
 		}
-		console.log(
-			'invite link => ',
-			`/auth/register?inviteToken=${createAdminUserInviteToken(form.data.name, form.data.email, form.data.inviteId)}`
-		);
 
 		setFlash({ type: 'success', message: 'Invite sent!' }, event.cookies);
 		redirect(302, '/');
 	},
 	email: async (event) => {
-		// const data = await event.request.formData();
-		// const keyPoints = data.get('keyPoints');
-		// for (const [key, value] of data.entries()) {
-		// 	console.log('key, value', key, value);
-		// }
-
-		// console.log('keyPoints ==================> ', keyPoints);
 		const form = await superValidate(
 			event.request,
 			zod(schoolAdminUserInviteHTMLEmailTemplateSchema)
