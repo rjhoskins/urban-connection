@@ -26,11 +26,10 @@ export const load: PageServerLoad = async (event) => {
 
 	return { form, invitSchoolAdminHtmlTemplate: await getLatestHtmlTemplateData() };
 };
+
 export const actions: Actions = {
 	default: async (event) => {
-		console.log('aaaaand action!!! => ');
 		if (!event.locals.user) return redirect(302, '/auth/login');
-		console.log('default => ', event.locals.user);
 
 		const form = await superValidate(event, zod(inviteNewUserSchema));
 
@@ -44,7 +43,6 @@ export const actions: Actions = {
 			});
 		}
 		const schoolId = parseInt(event.params.schoolId);
-		console.log('schoolId => ', schoolId);
 
 		const [existingUser] = await db.select().from(users).where(eq(users.username, form.data.email));
 
@@ -59,6 +57,7 @@ export const actions: Actions = {
 		}
 
 		let inviteToken = '';
+		const htmlTemplate = await getLatestHtmlTemplateData();
 
 		try {
 			const result = await db.transaction(async (trx) => {
@@ -99,26 +98,35 @@ export const actions: Actions = {
 				// throw new Error('testing error');
 				return newUser;
 			});
+
+			const res = await event.fetch('/api/send-admin-email', {
+				method: 'POST',
+				headers: {
+					'content-type': 'application/json'
+				},
+				body: JSON.stringify({
+					to: form.data.email,
+					subject: 'You have been invited to join the platform',
+					inviteLink: `${event.url.origin}/auth/register?inviteToken=${inviteToken}`,
+					htmlEmailContent: htmlTemplate?.template
+				})
+			});
+			if (!res.ok) {
+				const errorMessage = await res.text();
+				throw new Error(`Failed to send email: ${errorMessage}`);
+			}
 		} catch (error) {
 			const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
-			setFlash({ type: 'error', message: errorMessage }, event.cookies);
-			return message(form, 'Unexpected error: ' + errorMessage, { status: 500 });
-			console.log('error => ', form, 'Unexpected error: ' + errorMessage);
+			const UnexpectedErrorMsg = 'Unexpected error: ' + errorMessage;
+			console.log('error => ', form, UnexpectedErrorMsg);
+			setFlash({ type: 'error', message: UnexpectedErrorMsg }, event.cookies);
+			return message(form, { status: 'error', text: UnexpectedErrorMsg });
 		}
 
 		const registerLink = `/auth/register?inviteToken=${inviteToken}`;
-		setFlash(
-			{
-				type: 'success',
-				message: `Invite successfully created \n  ${registerLink}`
-			},
-			event.cookies
-		);
-
+		setFlash({ type: 'success', message: 'Invite sent!' }, event.cookies);
 		console.log('register =>', `/auth/register?inviteToken=${inviteToken}`);
 
 		return redirect(302, './');
 	}
 };
-
-function createCoadminInvite() {}

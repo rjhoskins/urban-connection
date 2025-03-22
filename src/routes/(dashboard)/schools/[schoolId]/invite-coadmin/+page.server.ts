@@ -17,7 +17,6 @@ import db from '$lib/server/db/index.js';
 import { getLatestHtmlTemplateData } from '$lib/server/queries.js';
 
 export const load: PageServerLoad = async (event) => {
-	// console.log('PageServerLoad => ', event.locals.user);
 	if (!event.locals.user) return redirect(302, '/auth/login');
 	const user = event.locals.user;
 	if (!user) return fail(400, { message: 'User not authenticated' });
@@ -29,7 +28,6 @@ export const load: PageServerLoad = async (event) => {
 export const actions: Actions = {
 	default: async (event) => {
 		if (!event.locals.user) return redirect(302, '/auth/login');
-		// console.log('default => ', event.locals.user);
 
 		const form = await superValidate(event, zod(inviteNewUserSchema));
 
@@ -137,14 +135,7 @@ export const actions: Actions = {
 		}
 
 		const registerLink = `${event.url.origin}/auth/register?inviteToken=${inviteToken}`;
-		setFlash(
-			{
-				type: 'success',
-				message: `Invite successfully sent admin invite\n  ${registerLink}`
-			},
-			event.cookies
-		);
-
+		setFlash({ type: 'success', message: 'Invite sent!' }, event.cookies);
 		console.log('register link =>', registerLink);
 
 		return redirect(302, './');

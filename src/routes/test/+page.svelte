@@ -109,12 +109,4 @@
 		{isFirstQuestion}
 		{isLastQuestion}
 	/>
-
-	<!-- <div class="flex flex-col gap-4 p-4">
-		<Card class="flex max-w-prose gap-4 p-2">
-			<div class="right w-full"></div>
-		</Card>
-	</div> -->
 </section>
-
-<pre>{JSON.stringify(formData, null, 2)}</pre>
