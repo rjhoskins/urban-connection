@@ -49,7 +49,7 @@
 			<Button href={`${page.url.pathname}/results`} class="ml-auto">View Results</Button>
 		</Card>
 	</div>
-	<div class=" grid-cols-schools-fluid grid max-w-6xl gap-4 py-8">
+	<div class=" grid-cols-three-fluid grid max-w-6xl gap-4 py-8">
 		{#each memberSurveyData as school (school.id)}
 			<SchoolCard isNested {page} {school} />
 		{/each}

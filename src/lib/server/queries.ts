@@ -17,7 +17,7 @@ import {
 	surveyStatusEnum
 } from '$lib/server/db/schema';
 import type { PostgresJsQueryResultHKT } from 'drizzle-orm/postgres-js';
-import type { PgTransaction } from 'drizzle-orm/pg-core';
+import type { PgEnum, PgTransaction } from 'drizzle-orm/pg-core';
 import db from './db';
 import type { AdminInvite, CreateUser, UserInviteHTMLEmailTemplateType } from '$lib/schema';
 import { transformSurveyData } from '$lib/utils';
@@ -235,13 +235,14 @@ export async function generateQuestionnaire() {
 	return transformSurveyData(res);
 }
 
-export async function getLatestHtmlTemplateData(): Promise<{
-	template: UserInviteHTMLEmailTemplateType;
-} | null> {
+export async function getLatestHtmlTemplateData(
+	type: 'admin_invite' | 'assessment_invite' | null = 'admin_invite'
+) {
 	const [res] = await db
 		.select({ template: htmlEmailTemplates.template })
 		.from(htmlEmailTemplates)
 		.orderBy(desc(htmlEmailTemplates.createdAt), desc(htmlEmailTemplates.id))
+		.where(eq(htmlEmailTemplates.type, type as unknown as 'admin_invite' | 'assessment_invite'))
 		.limit(1);
 	return res ? { template: res.template as UserInviteHTMLEmailTemplateType } : null;
 }

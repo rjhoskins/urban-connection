@@ -16,7 +16,8 @@ const config: Config = {
 		},
 		extend: {
 			gridTemplateColumns: {
-				'schools-fluid': 'repeat(auto-fit, minmax(300px, 3fr))'
+				'three-fluid': 'repeat(auto-fit, minmax(300px, 3fr))',
+				'golden-cols': 'minmax(0px, 1fr) minmax(0px,1.618fr)'
 			},
 			colors: {
 				border: 'hsl(var(--border) / <alpha-value>)',

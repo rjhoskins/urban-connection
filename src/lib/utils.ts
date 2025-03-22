@@ -73,7 +73,7 @@ export function handleLogFlashReturnFormError({
 	return message(form, { status: type, text: messageText.toString() });
 }
 
-export function generateNewUserInviteEmail(
+export function generateInviteEmail(
 	htmlEmailContent: UserInviteHTMLEmailTemplateType,
 	inviteLink: string
 ) {
