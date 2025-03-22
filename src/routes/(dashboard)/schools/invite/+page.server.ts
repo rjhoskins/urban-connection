@@ -67,7 +67,7 @@ export const actions: Actions = {
 					event
 				});
 			}
-			event.fetch('/api/send-admin-email', {
+			const res = await event.fetch('/api/send-admin-email', {
 				method: 'POST',
 				headers: {
 					'content-type': 'application/json'
@@ -79,6 +79,10 @@ export const actions: Actions = {
 					htmlEmailContent: htmlTemplate.template
 				})
 			});
+			if (!res.ok) {
+				const errorMessage = await res.text();
+				throw new Error(`Failed to send email: ${errorMessage}`);
+			}
 		} catch (error) {
 			const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
 			return handleLogFlashReturnFormError({
