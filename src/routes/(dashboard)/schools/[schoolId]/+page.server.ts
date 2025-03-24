@@ -3,6 +3,7 @@ import { error, redirect } from '@sveltejs/kit';
 import {
 	getLoggedInSchoolAdminsSchool,
 	getSchoolAdminBySchoolId,
+	getSchoolDetailsById,
 	getSchoolForSchoolAdmin,
 	getSchoolMemberSurveyTotalsForSchoolAndDistrictAdminBySchool,
 	getSurveyData
@@ -13,20 +14,23 @@ export const load = async (event) => {
 		throw redirect(302, '/auth/login');
 	}
 
-	if (event.locals.user.role !== 'school_admin') {
-		throw redirect(401, '/auth/login');
-	}
+	// if (event.locals.user.role !== 'school_admin') {
+	// 	throw redirect(401, '/auth/login');
+	// }
 
-	const userId = event.locals.user.id;
-	const schoolAdminsSchool = await getLoggedInSchoolAdminsSchool(userId);
-	if (!schoolAdminsSchool) {
+	let schoolId = parseInt(event.params.schoolId);
+	const school = getSchoolDetailsById(schoolId);
+	if (!school) {
 		throw error(404, 'School not found');
 	}
-	const schoolId = schoolAdminsSchool.id;
+
+	// if (schoolAdminId !== event.locals.user.id && event.locals.user.role !== 'district_admin' && event.locals.user.role !== 'super_admin') { {
+	// 	throw error(401, 'Unauthorized');
+	// }
 
 	return {
 		adminData: await getSchoolAdminBySchoolId(schoolId),
-		school: await getSchoolForSchoolAdmin(userId, schoolId),
+		school,
 		surveyData: await getSurveyData(schoolId),
 		memberData: await getSchoolMemberSurveyTotalsForSchoolAndDistrictAdminBySchool(schoolId)
 	};
