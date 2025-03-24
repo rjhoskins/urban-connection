@@ -232,10 +232,19 @@ export async function generateQuestionnaire() {
 		.innerJoin(surveySubDomains, eq(surveyQuestions.subDomainId, surveySubDomains.id))
 		.innerJoin(surveyDomains, eq(surveyDomains.id, surveySubDomains.domainId));
 
+	//@ts-ignore
 	return transformSurveyData(res);
 }
 
-export async function getLatestHtmlTemplateData(
+export async function getHtmlTemplateTypes() {
+	const hmlTemplateTypes = await db
+		.select({ type: htmlEmailTemplates.type })
+		.from(htmlEmailTemplates)
+		.groupBy(htmlEmailTemplates.type);
+	return hmlTemplateTypes || null;
+}
+
+export async function getLatestHtmlTemplateDataByType(
 	type: 'admin_invite' | 'assessment_invite' | null = 'admin_invite'
 ) {
 	const [res] = await db
@@ -247,8 +256,18 @@ export async function getLatestHtmlTemplateData(
 	return res ? { template: res.template as UserInviteHTMLEmailTemplateType } : null;
 }
 
-export async function updateHtmlTemplateData(data: { template: UserInviteHTMLEmailTemplateType }) {
-	const htmlEmailRes = await db.insert(htmlEmailTemplates).values({ template: data }).returning();
+export async function updateHtmlTemplateData({
+	data,
+	type = 'admin_invite'
+}: {
+	data: UserInviteHTMLEmailTemplateType;
+	type?: 'admin_invite' | 'assessment_invite';
+}) {
+	const htmlEmailRes = await db
+		.update(htmlEmailTemplates)
+		.set({ template: data })
+		.where(eq(htmlEmailTemplates.type, type as unknown as 'admin_invite' | 'assessment_invite'))
+		.returning();
 	return htmlEmailRes || null;
 }
 

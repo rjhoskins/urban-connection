@@ -14,7 +14,7 @@ import { setFlash } from 'sveltekit-flash-message/server';
 import { eq, and } from 'drizzle-orm';
 import { users, schoolAdmins, adminUserInvites, schools } from '$lib/server/db/schema';
 import db from '$lib/server/db/index.js';
-import { getLatestHtmlTemplateData } from '$lib/server/queries.js';
+import { getLatestHtmlTemplateDataByType } from '$lib/server/queries.js';
 
 export const load: PageServerLoad = async (event) => {
 	if (!event.locals.user) return redirect(302, '/auth/login');
@@ -23,7 +23,7 @@ export const load: PageServerLoad = async (event) => {
 
 	const form = await superValidate(zod(inviteNewUserSchema));
 
-	return { form, schoolAdminHtmlTemplate: await getLatestHtmlTemplateData() };
+	return { form, schoolAdminHtmlTemplate: await getLatestHtmlTemplateDataByType() };
 };
 export const actions: Actions = {
 	default: async (event) => {
@@ -56,7 +56,7 @@ export const actions: Actions = {
 		}
 
 		let inviteToken = '';
-		const htmlTemplate = await getLatestHtmlTemplateData();
+		const htmlTemplate = await getLatestHtmlTemplateDataByType();
 		if (!htmlTemplate) throw new Error('Failed to get html template data');
 
 		try {

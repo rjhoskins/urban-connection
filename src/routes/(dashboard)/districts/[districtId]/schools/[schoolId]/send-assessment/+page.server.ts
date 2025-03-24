@@ -5,14 +5,14 @@ import type { PageServerLoad, Actions } from './$types.js';
 import { createAssessmentInviteToken, handleLogFlashReturnFormError } from '$lib/utils.js';
 import { setFlash } from 'sveltekit-flash-message/server';
 import { redirect } from '@sveltejs/kit';
-import { createAssessment, getLatestHtmlTemplateData } from '$lib/server/queries';
+import { createAssessment, getLatestHtmlTemplateDataByType } from '$lib/server/queries';
 
 export const load: PageServerLoad = async (event) => {
 	const form = await superValidate(zod(sendAssessmentInviteSchem));
 
 	return {
 		form,
-		assessmentInviteHtmlTemplate: await getLatestHtmlTemplateData('assessment_invite')
+		assessmentInviteHtmlTemplate: await getLatestHtmlTemplateDataByType('assessment_invite')
 	};
 };
 
@@ -33,7 +33,8 @@ export const actions: Actions = {
 		}
 
 		try {
-			const assessmentInviteHtmlTemplate = await getLatestHtmlTemplateData('assessment_invite');
+			const assessmentInviteHtmlTemplate =
+				await getLatestHtmlTemplateDataByType('assessment_invite');
 			if (!assessmentInviteHtmlTemplate) {
 				throw new Error('No assessment invite template found');
 			}

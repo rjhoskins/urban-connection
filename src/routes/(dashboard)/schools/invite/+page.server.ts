@@ -16,17 +16,17 @@ import {
 	decodeAdminUserInviteToken,
 	handleLogFlashReturnFormError
 } from '$lib/utils';
-import { eq, or, desc } from 'drizzle-orm';
+
 import { setFlash } from 'sveltekit-flash-message/server';
 import { INITIAL_HTML_DATA } from '$lib/constants.js';
 import { htmlEmailTemplates } from '$lib/server/db/schema/index.js';
-import { getLatestHtmlTemplateData } from '$lib/server/queries';
+import { getLatestHtmlTemplateDataByType } from '$lib/server/queries';
 
 export const load: PageServerLoad = async (event) => {
 	const token = event.url.searchParams.get('inviteToken');
 	// console.log('token => ', token);
 
-	const htmlTemplate = await getLatestHtmlTemplateData();
+	const htmlTemplate = await getLatestHtmlTemplateDataByType();
 	console.log('loaded htmlTemplate => ', htmlTemplate);
 	const inviteForm = await superValidate(zod(inviteNewUserSchema));
 	const emailForm = await superValidate(zod(schoolAdminUserInviteHTMLEmailTemplateSchema));
@@ -57,7 +57,7 @@ export const actions: Actions = {
 			});
 		}
 		try {
-			const htmlTemplate = await getLatestHtmlTemplateData();
+			const htmlTemplate = await getLatestHtmlTemplateDataByType();
 			if (!htmlTemplate) {
 				return handleLogFlashReturnFormError({
 					type: 'error',

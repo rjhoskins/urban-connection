@@ -14,7 +14,7 @@ import { setFlash } from 'sveltekit-flash-message/server';
 import { eq, and } from 'drizzle-orm';
 import { users, schoolAdmins, adminUserInvites, schools } from '$lib/server/db/schema';
 import db from '$lib/server/db/index.js';
-import { getLatestHtmlTemplateData } from '$lib/server/queries.js';
+import { getLatestHtmlTemplateDataByType } from '$lib/server/queries.js';
 
 export const load: PageServerLoad = async (event) => {
 	console.log('invite-coadmin PageServerLoad => ', event.locals.user);
@@ -24,7 +24,7 @@ export const load: PageServerLoad = async (event) => {
 
 	const form = await superValidate(zod(inviteNewUserSchema));
 
-	return { form, invitSchoolAdminHtmlTemplate: await getLatestHtmlTemplateData() };
+	return { form, invitSchoolAdminHtmlTemplate: await getLatestHtmlTemplateDataByType() };
 };
 
 export const actions: Actions = {
@@ -57,7 +57,7 @@ export const actions: Actions = {
 		}
 
 		let inviteToken = '';
-		const htmlTemplate = await getLatestHtmlTemplateData();
+		const htmlTemplate = await getLatestHtmlTemplateDataByType();
 
 		try {
 			const result = await db.transaction(async (trx) => {

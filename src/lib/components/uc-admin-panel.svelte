@@ -1,6 +1,13 @@
 <script lang="ts">
 	import * as Card from '$lib/components/ui/card';
-	import { LayoutGrid, List, PenTool, Slice, UserRoundPlus } from 'lucide-svelte';
+	import {
+		LayoutGrid,
+		List,
+		PenTool,
+		Slice,
+		UserRoundPlus,
+		NotepadTextDashed
+	} from 'lucide-svelte';
 
 	const adminData = [
 		{
@@ -26,6 +33,12 @@
 			url: '/results',
 			description: 'View completed assessment results for all schools',
 			icon: List
+		},
+		{
+			title: 'Edit HTML Email Template text',
+			url: '/templates',
+			description: 'Edit the text for the email template',
+			icon: NotepadTextDashed
 		}
 		// {
 		// 	title: 'Manage Assessments',

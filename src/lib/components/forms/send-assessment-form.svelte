@@ -27,7 +27,7 @@
 	inviteText = $formData.inviteText;
 </script>
 
-<Card.Root class="sizes">
+<Card.Root class="">
 	<Card.Header>
 		<Card.Title>Send Assessment</Card.Title>
 	</Card.Header>

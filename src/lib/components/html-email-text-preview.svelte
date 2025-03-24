@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import * as Card from '$lib/components/ui/card';
-	let { data, token = 'tbd' } = $props();
+	let { data, token = 'tbd', disableLink } = $props();
 </script>
 
 {#if data && browser}
 	<Card.Header class="Header">
 		<!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->
-		<Card.Title>Invite Text Preview</Card.Title>
+		<Card.Title>Text Preview</Card.Title>
 	</Card.Header>
 	<Card.Content class="space-y-3">
 		<p>{data.greeting}</p>
@@ -24,8 +24,9 @@
 		<p>
 			{data.callToAction}
 			<a
+				class={[disableLink && 'pointer-events-none', 'text-blue-700 underline']}
 				href={`${window.location.origin}/auth/register?inviteToken=${token}`}
-				class=" text-lg text-blue-700 underline">{data.registrationLinkText}</a
+				>{data.registrationLinkText}</a
 			>
 		</p>
 	</Card.Content>
