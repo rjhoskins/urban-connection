@@ -23,6 +23,14 @@ export const load = async (event) => {
 				console.log('redirecting to invite-coadmin ===============>');
 				throw redirect(302, `schools/${schoolId}/invite-coadmin`);
 			}
+			if (event.url.searchParams.get('view') === 'assessment') {
+				console.log('redirecting to invite-coadmin ===============>');
+				throw redirect(302, `schools/${schoolId}/send-assessment`);
+			}
+			if (event.url.searchParams.get('view') === 'invite') {
+				console.log('redirecting to invite-coadmin ===============>');
+				throw redirect(302, `schools/${schoolId}/invite-coadmin`);
+			}
 			if (event.url.searchParams.get('view') === 'results') {
 				throw redirect(302, `schools/${schoolId}/results`);
 			} else return redirect(302, `/schools/${schoolId}`);

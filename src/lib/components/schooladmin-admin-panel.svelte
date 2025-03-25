@@ -16,7 +16,7 @@
 		},
 		{
 			title: 'Send Assessment Invitation',
-			url: '/schools/invite',
+			url: '/schools/?&view=assessment',
 			description: 'Send email invitation to take the Assessment.',
 			icon: Send
 		},
