@@ -19,7 +19,7 @@ export const load = async (event) => {
 	// }
 
 	let schoolId = parseInt(event.params.schoolId);
-	const school = getSchoolDetailsById(schoolId);
+	const school = await getSchoolDetailsById(schoolId);
 	if (!school) {
 		throw error(404, 'School not found');
 	}
