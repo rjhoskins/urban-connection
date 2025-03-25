@@ -11,8 +11,7 @@
 	<title>The Urban Connection Project</title>
 	<meta name="description" content="This is where the description goes for SEO" />
 </svelte:head>
-<h1 class="sr-only">Admin Panel</h1>
-<div class="hi grid h-full place-content-center">
+<div class="hi grid h-full place-content-center pb-6">
 	{#if !data.user}
 		<p class="my-6 text-center text-3xl">Please sign in</p>
 	{:else if data.user.role == 'super_admin'}

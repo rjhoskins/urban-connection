@@ -32,8 +32,8 @@
 	});
 </script>
 
-<section class="py-8">
-	<h1 class="text-center text-4xl">HTML Email Templates</h1>
+<section class="">
+	<h1 class="my-6 text-center text-4xl">HTML Email Templates</h1>
 	<div class="grid-cols-three-fluid mx-auto grid max-w-7xl gap-4 p-2">
 		{#each combinedData as template, idx (`template.title-${idx}`)}
 			{@render templateCard(template)}

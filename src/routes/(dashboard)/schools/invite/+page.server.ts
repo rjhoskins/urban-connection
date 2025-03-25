@@ -67,7 +67,7 @@ export const actions: Actions = {
 					event
 				});
 			}
-			const res = await event.fetch('/api/send-admin-email', {
+			const res = await event.fetch('/api/send-admin-email-invite', {
 				method: 'POST',
 				headers: {
 					'content-type': 'application/json'
