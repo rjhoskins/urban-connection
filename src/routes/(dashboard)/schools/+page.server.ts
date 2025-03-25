@@ -25,7 +25,7 @@ export const load = async (event) => {
 			}
 			if (event.url.searchParams.get('view') === 'assessment') {
 				console.log('redirecting to invite-coadmin ===============>');
-				throw redirect(302, `schools/${schoolId}/send-assessment`);
+				throw redirect(302, `/schools/${schoolId}/send-assessment`);
 			}
 			if (event.url.searchParams.get('view') === 'invite') {
 				console.log('redirecting to invite-coadmin ===============>');
