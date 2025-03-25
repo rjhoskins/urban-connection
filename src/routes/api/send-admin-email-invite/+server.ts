@@ -67,12 +67,7 @@ async function sendProdEmail({
 		const accessToken = await googleOAuth2Client.getAccessToken();
 		const mailOptions = {
 			from: `Urban Connection Project <no-reply@theurbanconnectionproject.org>`,
-			to: [
-				'robertjhoskins@gmail.com',
-				'alvin.lawrence@dreamcredible.com',
-				'thomas.wilkins@dreamcredible.com',
-				`${to}`
-			],
+			to: ['robertjhoskins@gmail.com', 'thomas.wilkins@dreamcredible.com', `${to}`],
 			subject: 'The Urban Connection Project | School Admin Invite | ' + subject,
 			html: generateInviteEmail(htmlEmailContent, inviteLink)
 		};
