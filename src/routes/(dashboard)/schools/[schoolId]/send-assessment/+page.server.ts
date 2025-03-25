@@ -5,7 +5,7 @@ import type { PageServerLoad, Actions } from './$types.js';
 import { createAssessmentInviteToken, handleLogFlashReturnFormError } from '$lib/utils.js';
 import { setFlash } from 'sveltekit-flash-message/server';
 import { redirect } from '@sveltejs/kit';
-import { createAssessment } from '$lib/server/queries';
+import { createAssessment, getLatestHtmlTemplateDataByType } from '$lib/server/queries';
 
 export const load: PageServerLoad = async (event) => {
 	const form = await superValidate(zod(sendAssessmentInviteSchem));
@@ -30,6 +30,11 @@ export const actions: Actions = {
 
 		let surveyId;
 		try {
+			const assessmentInviteHtmlTemplate =
+				await getLatestHtmlTemplateDataByType('assessment_invite');
+			if (!assessmentInviteHtmlTemplate) {
+				throw new Error('No assessment invite template found');
+			}
 			// create survey
 			surveyId = await createAssessment({
 				recipientName: form.data.name,
@@ -37,6 +42,33 @@ export const actions: Actions = {
 				schoolId: parseInt(event.params.schoolId),
 				sentBy: event.locals.user.id
 			});
+
+			const assessmentToken = createAssessmentInviteToken({
+				name: form.data.name,
+				email: form.data.email,
+				surveyId: surveyId!.id,
+				schoolId: parseInt(event.params.schoolId)
+			});
+
+			const inviteLink = `${event.url.origin}/test?assessmentToken=${assessmentToken}`;
+			console.log(`inviteLink => , ${inviteLink}`);
+
+			const res = await event.fetch('/api/send-assessment-invite', {
+				method: 'POST',
+				headers: {
+					'content-type': 'application/json'
+				},
+				body: JSON.stringify({
+					to: form.data.email,
+					subject: 'You have been invited to take an assessment',
+					inviteLink,
+					htmlEmailContent: assessmentInviteHtmlTemplate?.template
+				})
+			});
+			if (!res.ok) {
+				const errorMessage = await res.text();
+				throw new Error(`Failed to send email: ${errorMessage}`);
+			}
 		} catch (error) {
 			return handleLogFlashReturnFormError({
 				type: 'error',
