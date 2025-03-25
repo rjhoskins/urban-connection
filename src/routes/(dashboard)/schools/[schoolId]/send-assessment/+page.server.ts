@@ -10,7 +10,10 @@ import { createAssessment, getLatestHtmlTemplateDataByType } from '$lib/server/q
 export const load: PageServerLoad = async (event) => {
 	const form = await superValidate(zod(sendAssessmentInviteSchem));
 
-	return { form };
+	return {
+		form,
+		assessmentInviteHtmlTemplate: await getLatestHtmlTemplateDataByType('assessment_invite')
+	};
 };
 export const actions: Actions = {
 	default: async (event) => {

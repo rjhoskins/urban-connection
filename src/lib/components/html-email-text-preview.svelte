@@ -7,7 +7,7 @@
 {#if data && browser}
 	<Card.Header class="Header">
 		<!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->
-		<Card.Title>Text Preview</Card.Title>
+		<Card.Title>HTML Email Template Text Preview</Card.Title>
 	</Card.Header>
 	<Card.Content class="space-y-3">
 		<p>{data.greeting}</p>
