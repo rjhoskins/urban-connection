@@ -13,9 +13,9 @@ import { redirect, type RequestEvent } from '@sveltejs/kit';
 import { setFlash } from 'sveltekit-flash-message/server';
 
 export async function load(event: RequestEvent) {
-	if (!event.locals.user) {
-		return redirect(302, '/auth/login');
-	}
+	// if (!event.locals.user) {
+	// 	return redirect(302, '/auth/login');
+	// }
 	const assessmentToken = await event.url.searchParams.get('assessmentToken');
 	const decodedeAssessmentToken = decodeAssessmentInviteToken(assessmentToken as string);
 	const { name, email, surveyId, schoolId } = decodedeAssessmentToken;
