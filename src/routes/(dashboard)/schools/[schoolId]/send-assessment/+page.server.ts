@@ -86,14 +86,8 @@ export const actions: Actions = {
 			schoolId: parseInt(event.params.schoolId)
 		});
 		console.log(`assessmentToken => , ${assessmentToken}`);
+		setFlash({ type: 'success', message: 'Assessment invite sent' }, event.cookies);
 
-		setFlash(
-			{
-				type: 'success',
-				message: 'Assessment invite sent=>\n' + `/test?assessmentToken=${assessmentToken}`
-			},
-			event.cookies
-		);
 		redirect(303, './');
 	}
 };

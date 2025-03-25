@@ -79,7 +79,7 @@ export const actions = {
 				event.cookies
 			);
 		} finally {
-			setFlash({ type: 'success', message: 'Survy Completed Thank you!' }, event.cookies);
+			setFlash({ type: 'success', message: 'Assessment Completed Thank you!' }, event.cookies);
 			throw redirect(303, '/thank-you');
 		}
 	}
