@@ -19,40 +19,9 @@
 
 <!-- <pre>{JSON.stringify(domainIdsArr, null, 2)}</pre> -->
 <!-- <pre>{JSON.stringify(surveyResultsData, null, 2)}</pre> -->
-<h1 class="sr-only">View {school.name} Survey Detail</h1>
+<h1 class=" py-3 text-center text-2xl">Survey Totals</h1>
 
 <section class=" mx-auto grid max-w-7xl gap-4 p-2 lg:p-8">
-	<Card.Root class=" p-4">
-		<div class="top flex justify-between">
-			<div class="left space-y-3">
-				<p class=" text-2xl font-semibold">{school.name} | Dashboard</p>
-				{#if adminData.length === 1}
-					<p class=" text-2xl">Administrator</p>
-				{:else}
-					<p class=" text-2xl">Administrators</p>
-				{/if}
-				{#each adminData as admin (admin.adminEmail)}
-					<AdminContactDetailsCard {admin} />
-				{/each}
-			</div>
-			<div class="right space-y-3 md:min-w-96">
-				<div class="flex items-center justify-between">
-					<div class="flex gap-2">
-						<p>Total Surveys:</p>
-						<p>{totalSurveys}</p>
-					</div>
-				</div>
-				<div class="space-y-2">
-					<p>Not Started</p>
-					<Progress barBgColor="bg-red-700" value={surveysNotStartedPercentage} />
-				</div>
-				<div class="space-y-2">
-					<p>Completed</p>
-					<Progress barBgColor="bg-green-700" value={surveysCompletedPercentage} />
-				</div>
-			</div>
-		</div>
-	</Card.Root>
 	{#if domainIds.size > 0}
 		<div class="grid grid-cols-2 gap-4">
 			{#each domainIds as domainId (domainId)}

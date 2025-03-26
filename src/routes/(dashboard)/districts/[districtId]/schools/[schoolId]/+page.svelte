@@ -21,7 +21,7 @@
 
 <h1 class="sr-only">Manage {school.name} School</h1>
 
-<section class=" mx-auto grid max-w-7xl gap-4 p-2 lg:p-8">
+<section class=" sizes mx-auto grid max-w-7xl gap-4 p-2 lg:p-8">
 	<Card.Root class=" p-4">
 		<div class="top flex justify-between">
 			<div class="left space-y-3">

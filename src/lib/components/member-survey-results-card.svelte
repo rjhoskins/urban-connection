@@ -2,8 +2,9 @@
 	import * as Card from '$lib/components/ui/card';
 	import Progress from './ui/progress/progress.svelte';
 	import { page } from '$app/state';
+	import { browser } from '$app/environment';
 
-	let { member, idx } = $props();
+	let { member, idx, school } = $props();
 	const { id, name, email, pointsTotal, questionsTotal } = member;
 	const progress = $derived.by(() => {
 		if (pointsTotal && questionsTotal) {
@@ -14,23 +15,25 @@
 	});
 </script>
 
-<Card.Root class="transition-shadow duration-300 ease-in-out hover:shadow-lg">
-	<Card.Header>
-		<Card.Title>{name ? name : `Teacher ${idx + 1}`}</Card.Title>
-		<Card.Description class="flex gap-4 text-primary/50">{email ? email : null}</Card.Description>
-	</Card.Header>
-	<Card.Content class="flex items-center gap-3 p-4 ">
-		<a
-			class="inline-flex h-10 grow items-center justify-center whitespace-nowrap rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
-			href={`${page.url.pathname}/surveys/${id}`}>View Results</a
-		>
-		<div class="flex grow flex-col gap-2">
-			<div class="flex justify-between">
-				<p>Total Assessment Score:</p>
-				<p>{Math.floor(progress)}%</p>
+{#if browser}
+	<Card.Root class="transition-shadow duration-300 ease-in-out hover:shadow-lg">
+		<Card.Header>
+			<Card.Title>{name ? name : `Teacher ${idx + 1}`}</Card.Title>
+			<Card.Description class="text-primary/50 flex gap-4">{email ? email : null}</Card.Description>
+		</Card.Header>
+		<Card.Content class="flex items-center gap-3 p-4 ">
+			<a
+				class="border-input bg-background ring-offset-background hover:bg-accent hover:text-accent-foreground focus-visible:ring-ring inline-flex h-10 grow items-center justify-center rounded-md border px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50"
+				href={`${window.location.origin}/schools/${school.id}/surveys/${id}`}>View Results</a
+			>
+			<div class="flex grow flex-col gap-2">
+				<div class="flex justify-between">
+					<p>Total Assessment Score:</p>
+					<p>{Math.floor(progress)}%</p>
+				</div>
+				<Progress barBgColor="bg-green-700" value={progress} />
 			</div>
-			<Progress barBgColor="bg-green-700" value={progress} />
-		</div>
-	</Card.Content>
-	<!-- <pre>{JSON.stringify(page.url, null, 2)}</pre> -->
-</Card.Root>
+		</Card.Content>
+		<!-- <pre>{JSON.stringify(page.url, null, 2)}</pre> -->
+	</Card.Root>
+{/if}

@@ -7,35 +7,32 @@
 	const { schoolData, domainData, questionsData } = data;
 </script>
 
-<section class=" mx-auto grid max-w-7xl gap-4 p-2 lg:p-8">
-	<h1 class="my-6 text-center text-3xl">{schoolData.name} All Time Totals</h1>
-	<div class=" p-4">
-		<div class="grid grid-cols-2 gap-4">
-			{#if domainData.length !== 0}
-				{#each domainData as domain (domain.domainId)}
-					<ul class="space-y-4">
-						{@render domainCard({
-							id: domain.domainId ?? 0,
-							domainName: domain.domainName ?? '',
-							pointsTotal: domain.pointsTotal,
-							questionsTotal: domain.questionsTotal
-						})}
-						{#each questionsData.filter((q) => q.domainId === domain.domainId) as question (question.questionId)}
-							{@render questionCard({
-								questionId: question.questionId ?? 0,
-								domainId: question.domainId ?? 0,
-								pointsTotal: question.pointsTotal,
-								questionsTotal: question.questionsTotal
-							})}
-						{/each}
-					</ul>
+<h1 class="py-3 text-center text-2xl">All Time Totals</h1>
+
+<div class="grid grid-cols-2 gap-4">
+	{#if domainData.length !== 0}
+		{#each domainData as domain (domain.domainId)}
+			<ul class="space-y-4">
+				{@render domainCard({
+					id: domain.domainId ?? 0,
+					domainName: domain.domainName ?? '',
+					pointsTotal: domain.pointsTotal,
+					questionsTotal: domain.questionsTotal
+				})}
+				{#each questionsData.filter((q) => q.domainId === domain.domainId) as question (question.questionId)}
+					{@render questionCard({
+						questionId: question.questionId ?? 0,
+						domainId: question.domainId ?? 0,
+						pointsTotal: question.pointsTotal,
+						questionsTotal: question.questionsTotal
+					})}
 				{/each}
-			{:else}
-				<p>No data available</p>
-			{/if}
-		</div>
-	</div>
-</section>
+			</ul>
+		{/each}
+	{:else}
+		<p>No data available</p>
+	{/if}
+</div>
 
 <!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->
 

@@ -18,10 +18,9 @@
 	<!-- <meta name="description" content="This is where the description goes for SEO" /> -->
 </svelte:head>
 
-<section class="h-full">
-	<h1 class="sr-only">Send Assessment</h1>
-
+<section class="grid h-full">
 	<div class="grid h-full place-content-center">
+		<h1 class="py-4 pb-4 text-center text-3xl font-bold">Send Assessment</h1>
 		<div class="lg:grid-cols-golden-cols grid gap-6">
 			<SendAssessmentForm {data} />
 			<Card.Root>
