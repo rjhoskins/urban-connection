@@ -62,6 +62,20 @@ export async function findIfActiveUserExists({
 		);
 	return results?.passwordHash ? { ...results, passwordHash: results.passwordHash } : null;
 }
+export async function findIfUserExistsById({
+	username
+}: {
+	username: string;
+}): Promise<{ id: string; username: string } | null> {
+	const [user] = await db
+		.select({
+			id: users.id,
+			username: users.username
+		})
+		.from(users)
+		.where(eq(users.username, username));
+	return user || null;
+}
 
 export async function findUnusedInviteByInviteId({ inviteId }: { inviteId: string }) {
 	const [existingUnusedInvite] = await db
@@ -959,13 +973,19 @@ export async function getDistrictDetailsById(districtId: number) {
 	return results || null;
 }
 
-export async function getSchoolDetailsById(schoolId: number) {
-	const [results] = await db
-		.select({
-			id: schools.id,
-			name: schools.name
-		})
+export async function getSchoolDetailsById(
+	schoolId: number,
+	trx?: PgTransaction<PostgresJsQueryResultHKT, any, any>
+) {
+	const retVals = {
+		id: schools.id,
+		name: schools.name,
+		districtId: schools.districtId
+	};
+	const queryBuilder = trx ? trx.select(retVals) : db.select(retVals);
+	const [results] = await queryBuilder
 		.from(schools)
+		.leftJoin(districts, eq(districts.id, schools.districtId))
 		.where(eq(schools.id, schoolId));
 
 	return results || null;

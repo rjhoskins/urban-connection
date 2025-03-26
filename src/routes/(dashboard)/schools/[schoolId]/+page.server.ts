@@ -1,10 +1,8 @@
 /** @type {import('./$types').PageServerLoad} */
 import { error, redirect } from '@sveltejs/kit';
 import {
-	getLoggedInSchoolAdminsSchool,
 	getSchoolAdminBySchoolId,
 	getSchoolDetailsById,
-	getSchoolForSchoolAdmin,
 	getSchoolMemberSurveyTotalsForSchoolAndDistrictAdminBySchool,
 	getSurveyData
 } from '$lib/server/queries';
