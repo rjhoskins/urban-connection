@@ -4,6 +4,8 @@
 	import { Button } from '$lib/components/ui/button';
 	import Card from '$lib/components/ui/card/card.svelte';
 	import type { ActionResult } from '@sveltejs/kit';
+	import { updateFlash } from 'sveltekit-flash-message';
+	import { page } from '$app/state';
 
 	let {
 		demoAndSurveyformData = $bindable(),
@@ -11,7 +13,7 @@
 		currSubDomain,
 		handleNext = $bindable(),
 		handlePrev = $bindable(),
-		isFirstQuestion,
+		isDemographicsQuestions,
 		isLastQuestion,
 		assessmentToken
 	} = $props();
@@ -49,8 +51,22 @@
 		event.preventDefault();
 
 		const form = event.currentTarget.closest('form');
+		console.log('handleIntermediateSubmit', form);
 		const data = new FormData(form!);
-		handleFormDataChange({ event, data });
+
+		if (!form?.action) throw new Error('Form action is required');
+		const response = await fetch(form.action, {
+			method: 'POST',
+			body: data
+		});
+		const result: ActionResult = deserialize(await response.text());
+		console.log('handleIntermediateSubmit RESULT', result);
+		if (result.type === 'success' && result?.data?.isDemographics) {
+			// rerun all `load` functions, following the successful update
+			await updateFlash(page);
+		}
+
+		// handleFormDataChange({ event, data });
 
 		handleNext();
 	}
@@ -92,6 +108,14 @@
 <!-- <pre>{JSON.stringify(demoAndSurveyformData[currDomain].subDomains[currSubDomain], null, 2)}</pre> -->
 <Card class="max-w-prose  p-4 shadow-md">
 	<form method="POST" id={'demoAndSurveyForm'} class=" flex flex-col gap-2">
+		{#if isDemographicsQuestions}
+			<!-- ostensibly the first survey Q -->
+			<input type="hidden" name="isDemographics" value="true" />
+		{/if}
+
+		{#if isLastQuestion}
+			<input type="hidden" name="isLastQuestion" value="true" />
+		{/if}
 		<input type="hidden" name="assessmentToken" value={assessmentToken} />
 
 		{#if demoAndSurveyformData[currDomain].subDomains[currSubDomain].name.toLowerCase() == 'demographics'}
@@ -107,7 +131,7 @@
 								id={field.fieldName}
 								name={field.fieldName}
 								bind:value={demoAndSurveyformData[field.fieldName]}
-								class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pl-3 pr-8 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+								class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
 							>
 								<option value="" disabled selected>Select a subject</option>
 								{#each field.options as option (option)}
@@ -146,7 +170,7 @@
 								maxlength="256"
 								inputmode={field.type === 'number' ? 'numeric' : undefined}
 								min={field.type === 'number' ? '1' : undefined}
-								class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+								class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
 							/>
 						</div>
 					</div>
@@ -165,18 +189,20 @@
 							<input
 								type="radio"
 								name={`domainId=${demoAndSurveyformData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}|subDomainId=${demoAndSurveyformData[currDomain].subDomains[currSubDomain].id}|qId=${demoAndSurveyformData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}`}
-								bind:group={demoAndSurveyformData[currDomain].subDomains[currSubDomain].questions[
-									questionIdx
-								].value}
+								bind:group={
+									demoAndSurveyformData[currDomain].subDomains[currSubDomain].questions[questionIdx]
+										.value
+								}
 								value={1}
 								class="h-4 w-4 border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
 							/>
 							<input
 								type="hidden"
 								name={`domainId=${demoAndSurveyformData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}|subDomainId=${demoAndSurveyformData[currDomain].subDomains[currSubDomain].id}|qId=${demoAndSurveyformData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}`}
-								bind:group={demoAndSurveyformData[currDomain].subDomains[currSubDomain].questions[
-									questionIdx
-								].value}
+								bind:group={
+									demoAndSurveyformData[currDomain].subDomains[currSubDomain].questions[questionIdx]
+										.value
+								}
 								value={demoAndSurveyformData[currDomain].subDomains[currSubDomain].questions[
 									questionIdx
 								].value
@@ -191,9 +217,10 @@
 							<input
 								type="radio"
 								name={`domainId=${demoAndSurveyformData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}|subDomainId=${demoAndSurveyformData[currDomain].subDomains[currSubDomain].id}|qId=${demoAndSurveyformData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}`}
-								bind:group={demoAndSurveyformData[currDomain].subDomains[currSubDomain].questions[
-									questionIdx
-								].value}
+								bind:group={
+									demoAndSurveyformData[currDomain].subDomains[currSubDomain].questions[questionIdx]
+										.value
+								}
 								value={0}
 								class="h-4 w-4 border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
 							/>

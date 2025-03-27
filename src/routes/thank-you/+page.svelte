@@ -8,10 +8,10 @@
 	<div class="mx-auto max-w-2xl">
 		<h1 class="py py-8 text-center text-5xl font-bold">Thank You!</h1>
 		<Card class="space-y-4 p-6">
-			<h2>Thank you for taking the time to participate in the survey!</h2>
+			<h2>Thank you for taking the time to participate in the Assessment!</h2>
 			<p>
-				Your survey is helping to bring positive change across schools in your area. Your results
-				are being tabulated.
+				Your psrticipation is helping to bring positive change across schools in your area. Your
+				results are being tabulated.
 			</p>
 		</Card>
 	</div>

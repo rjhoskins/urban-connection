@@ -646,22 +646,44 @@ export async function getDistricts() {
 
 export async function addDemographicsData(values: CreateDemographicsResponseInput) {
 	if (dev) console.log('addDemographicsData values => ', values);
+	if (!values.surveyId || !values.schoolId) {
+		throw new Error('surveyId and schoolId are required');
+	}
 	const [newDemo] = await db
 		.insert(surveyDemographics)
-		.values({ ...values })
+		.values({
+			surveyId: values.surveyId,
+			schoolId: values.schoolId,
+			yearsTeaching: values.yearsTeaching,
+			subjectTaught: values.subjectTaught
+		})
+		.onConflictDoUpdate({
+			target: [surveyDemographics.surveyId, surveyDemographics.schoolId],
+			set: {
+				subjectTaught: sql`excluded.subject_taught`,
+				yearsTeaching: sql`excluded.years_teaching`
+			}
+		})
 		.returning({ id: surveyDemographics.id });
 
 	return newDemo;
 }
 
 export async function addQuestionsData(values: CreateQuestionResponseInput) {
-	if (dev) console.log('addDemographicsData values => ', values);
-	const [newDemoData] = await db
+	if (dev) console.log('addQuestionsData values => ', values);
+	const [newQuestionData] = await db
 		.insert(surveyQuestionsResponses)
 		.values([...values])
-		.returning({ id: surveyQuestionsResponses.id });
-
-	return newDemoData;
+		.onConflictDoUpdate({
+			target: [surveyQuestionsResponses.surveyId, surveyQuestionsResponses.questionId],
+			set: {
+				surveyId: sql`excluded.survey_id`,
+				questionId: sql`excluded.question_id`,
+				isValidSubdomainGroup: sql`excluded.is_valid_subdomain_group`,
+				response: sql`excluded.response`
+			}
+		});
+	return newQuestionData;
 }
 
 export async function setSurveyStatus({
@@ -990,3 +1012,11 @@ export async function getSchoolDetailsById(
 
 	return results || null;
 }
+
+export const getSurveyById = async (surveyId: number) => {
+	const [res] = await db
+		.select({ id: surveys.id, status: surveys.status })
+		.from(surveys)
+		.where(eq(surveys.id, surveyId));
+	return res || null;
+};

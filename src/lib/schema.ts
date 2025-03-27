@@ -163,9 +163,9 @@ export type UserInviteHTMLEmailTemplateType = z.infer<
 export const themes = ['light', 'dark'] as const;
 export const languages = ['en', 'es', 'fr'] as const;
 export const errorPageList = [
-	"I promise not to peek at surveys I'm not supposed to see",
-	'I understand that some surveys are double top secret',
-	"I'll be patient and wait for surveys I'm authorized to take"
+	"I promise not to peek at assessments I'm not supposed to see",
+	'I understand that some assessments are double top secret',
+	"I'll be patient and wait for assessments I'm authorized to take"
 ] as const;
 export const allergies = ['peanuts', 'dairy', 'gluten', 'soy', 'shellfish'] as const;
 export const colors = {

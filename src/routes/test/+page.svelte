@@ -8,23 +8,23 @@
 
 	import Card from '$lib/components/ui/card/card.svelte';
 
-	import {
-		TEST_RUBRIC_DATA2,
-		RUBRIC_DATA,
-		TEST_COMBINED_WITH_DEMOGRAPHICS,
-		demographicsData
-	} from '$lib/constants';
-
 	let { data } = $props();
 	const { assessmentToken, surveyData } = data;
-	let formData = $state([demographicsData, ...surveyData]);
+	let formData = $state(surveyData);
 	let currDomain = $state(0);
 	let currSubDomain = $state(0);
+	const isDemographicsQuestions = $derived(
+		formData[currDomain].subDomains[currSubDomain].name.toLowerCase() === 'demographics'
+	);
 	let isFirstQuestion = $derived(currDomain === 0 && currSubDomain === 0);
 
 	let isLastQuestion = $derived(
 		formData.length == currDomain + 1 && formData[currDomain].subDomains.length == currSubDomain + 1
 	);
+
+	$effect(() => {
+		console.log('formData', formData);
+	});
 
 	const promptText =
 		'Now, considering the information you read in the indicator summary, determine if each of the descriptors below are represented at your school. It is important to note that Descriptor scoring is not a measurement of perfection. If a descriptor is an expectation regularly expressed and supported by administration, select Yes. Othenelse, select No. Select Next after answering each descriptor.';
@@ -69,7 +69,7 @@
 		>
 	{:else}
 		<div class="flex gap-8">
-			<div class=" space-y-3">
+			<div class="space-y-3">
 				<h2 class="text-right text-3xl font-bold">
 					<p class=" flex justify-end gap-2">
 						<span class="block font-normal">Domain: </span>{formData[currDomain].name}
@@ -91,7 +91,7 @@
 				</p>
 			</div>
 			<div class="aspect-w-16 aspect-h-9">
-				{@html '<iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ?si=6nBY3o9cLboe4jEd" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>'}
+				{@html '<iframe width="560" height="315" src="https://www.youtube.com/embed/ZrL_n3d6YOY?si=HvRNagTqeH0VsTx_" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>'}
 			</div>
 		</div>
 		<Card class="p-2">
@@ -106,7 +106,7 @@
 		{assessmentToken}
 		handleNext={next}
 		handlePrev={previous}
-		{isFirstQuestion}
+		{isDemographicsQuestions}
 		{isLastQuestion}
 	/>
 </section>

@@ -4,7 +4,7 @@
 	import Footer from '$lib/components/layout/footer.svelte';
 	import Navbar from '$lib/components/layout/navbar.svelte';
 
-	import { getFlash, initFlash } from 'sveltekit-flash-message';
+	import { initFlash } from 'sveltekit-flash-message';
 	import { page } from '$app/state';
 
 	const flash = initFlash(page, {
