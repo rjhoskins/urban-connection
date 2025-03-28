@@ -7,16 +7,25 @@
 	import NativeSurveyFormTemplate from '$lib/components/forms/NOTUSINGnative-survey-form-template.svelte';
 
 	import Card from '$lib/components/ui/card/card.svelte';
+	import { onMount } from 'svelte';
+
+	// http://localhost:5173/test?assessmentToken=RHVzdHl8ZHVzdHlAZW1haWwuY29tfDM2fDMz
 
 	let { data } = $props();
-	const { assessmentToken, surveyData } = data;
-	let formData = $state(surveyData);
+	const {
+		assessmentToken,
+		surveyQuestions,
+		currDemgraphicsData,
+		currAssessmentData,
+		lastAnsweredDomain,
+		lastAnsweredSubdomainId
+	} = data;
+	let formData = $state(surveyQuestions);
 	let currDomain = $state(0);
 	let currSubDomain = $state(0);
 	const isDemographicsQuestions = $derived(
 		formData[currDomain].subDomains[currSubDomain].name.toLowerCase() === 'demographics'
 	);
-	let isFirstQuestion = $derived(currDomain === 0 && currSubDomain === 0);
 
 	let isLastQuestion = $derived(
 		formData.length == currDomain + 1 && formData[currDomain].subDomains.length == currSubDomain + 1
@@ -24,6 +33,23 @@
 
 	$effect(() => {
 		console.log('formData', formData);
+		console.log('demgraphicsData', currDemgraphicsData);
+		// console.log('assessmentData', currAssessmentData);
+		// const xformed = applySurveyResponsesToSurvey(formData, surveyQuestions);
+		// console.log('xformed', xformed);
+	});
+	onMount(() => {
+		console.log('mounted');
+		if (lastAnsweredDomain && lastAnsweredSubdomainId) {
+			const domainIndex = formData.findIndex((domain) => domain.id === lastAnsweredDomain);
+			const subDomainIndex = formData[domainIndex].subDomains.findIndex(
+				(subDomain: { id: number }) => subDomain.id === lastAnsweredSubdomainId
+			);
+			currDomain = domainIndex;
+			currSubDomain = subDomainIndex;
+
+			//need to hack in demo data too, not sure why...
+		}
 	});
 
 	const promptText =
@@ -109,4 +135,6 @@
 		{isDemographicsQuestions}
 		{isLastQuestion}
 	/>
+
+	<!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->
 </section>

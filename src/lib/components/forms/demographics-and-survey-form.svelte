@@ -18,27 +18,6 @@
 		assessmentToken
 	} = $props();
 
-	let currFormData = $state(new FormData());
-
-	function handleFormDataChange({
-		event,
-		data
-	}: {
-		event: MouseEvent & { currentTarget: EventTarget & (HTMLButtonElement | HTMLAnchorElement) };
-		data: FormData;
-	}) {
-		const newFormData = new FormData();
-		for (const [key, value] of currFormData.entries()) {
-			newFormData.append(key, value);
-		}
-		for (const [key, value] of data.entries()) {
-			newFormData.append(key, value);
-		}
-
-		currFormData = newFormData;
-		// console.log('viewable-form', Object.fromEntries(currFormData));
-	}
-
 	async function handleIntermediateSubmit(
 		event:
 			| (MouseEvent & {
@@ -66,8 +45,6 @@
 			await updateFlash(page);
 		}
 
-		// handleFormDataChange({ event, data });
-
 		handleNext();
 	}
 
@@ -86,12 +63,12 @@
 		const form = event.currentTarget.closest('form');
 		const data = new FormData(form!);
 
-		handleFormDataChange({ event, data });
+		// handleFormDataChange({ event, data });
 
 		if (!form?.action) throw new Error('Form action is required');
 		const response = await fetch(form.action, {
 			method: 'POST',
-			body: currFormData
+			body: data
 		});
 
 		const result: ActionResult = deserialize(await response.text());
@@ -120,7 +97,7 @@
 
 		{#if demoAndSurveyformData[currDomain].subDomains[currSubDomain].name.toLowerCase() == 'demographics'}
 			<!-- demographics inputs -->
-			{#each demoAndSurveyformData[currDomain].subDomains[currSubDomain].fields as field (field.placeholder)}
+			{#each demoAndSurveyformData[currDomain].subDomains[currSubDomain].fields as field, i (field.placeholder)}
 				{#if field.type === 'select'}
 					<div>
 						<label for={field.fieldName} class="block text-sm/6 font-medium text-gray-900"
@@ -130,7 +107,9 @@
 							<select
 								id={field.fieldName}
 								name={field.fieldName}
-								bind:value={demoAndSurveyformData[field.fieldName]}
+								bind:value={
+									demoAndSurveyformData[currDomain].subDomains[currSubDomain].fields[i].value
+								}
 								class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
 							>
 								<option value="" disabled selected>Select a subject</option>
@@ -163,7 +142,9 @@
 						<div class="mt-2">
 							<input
 								name={field.fieldName}
-								bind:value={demoAndSurveyformData[field.fieldName]}
+								bind:value={
+									demoAndSurveyformData[currDomain].subDomains[currSubDomain].fields[i].value
+								}
 								placeholder={field.placeholder}
 								type={field.type}
 								id={field.fieldName}
@@ -231,8 +212,11 @@
 			{/each}
 		{/if}
 		<div class="flex gap-8 pt-2">
-			<Button type="button" disabled={isFirstQuestion} onclick={() => handlePrev()} class="w-fit"
-				>Previous</Button
+			<Button
+				type="button"
+				disabled={isDemographicsQuestions}
+				onclick={() => handlePrev()}
+				class="w-fit">Previous</Button
 			>
 			{#if isLastQuestion}
 				<Button type="submit" onclick={(e) => handleFinish(e)} class="w-fit">Finish</Button>

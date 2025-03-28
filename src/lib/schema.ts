@@ -226,5 +226,12 @@ export const createUserSchema = z.object({
 	phone: z.string().optional()
 });
 
+export const AssessmentTokenInviteSchema = z.object({
+	name: z.string().min(1, 'Name is required'),
+	email: z.string().email('Invalid email format'),
+	surveyId: z.string().min(1, 'Survey ID is required'),
+	schoolId: z.string().min(1, 'School ID is required')
+});
+
 export type AdminInvite = z.infer<typeof adminInviteSchema>;
 export type CreateUser = z.infer<typeof createUserSchema>;

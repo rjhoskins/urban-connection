@@ -1,8 +1,11 @@
 import { demographicsData } from '$lib/constants.js';
+import { AssessmentTokenInviteSchema } from '$lib/schema';
 import {
 	addDemographicsData,
 	addQuestionsData,
 	generateQuestionnaire,
+	getAssessmentDataBySurveyId,
+	getDemographicsDataBySurveyId,
 	getSurveyById,
 	setSurveyStatus
 } from '$lib/server/queries';
@@ -10,8 +13,12 @@ import {
 	type CreateDemographicsResponseInput,
 	parseAndTransformCreateDemographicsData
 } from '$lib/types/survey';
-import { decodeAssessmentInviteToken, transformSurveyQuestionsResponses } from '$lib/utils.js';
-import { redirect, type RequestEvent } from '@sveltejs/kit';
+import {
+	applySurveyResponsesToQuestionsAndGetCurrentPositions,
+	decodeAssessmentInviteToken,
+	transformSurveyQuestionsResponses
+} from '$lib/utils.js';
+import { error, redirect, type RequestEvent } from '@sveltejs/kit';
 import { is } from 'drizzle-orm';
 import { setFlash } from 'sveltekit-flash-message/server';
 import { message } from 'sveltekit-superforms';
@@ -19,33 +26,56 @@ import { message } from 'sveltekit-superforms';
 export async function load(event: RequestEvent) {
 	const assessmentToken = await event.url.searchParams.get('assessmentToken');
 	const decodedeAssessmentToken = decodeAssessmentInviteToken(assessmentToken as string);
+
 	const { name, email, surveyId, schoolId } = decodedeAssessmentToken;
-	let assessmentProgress = [];
+	const tokenParseRes = AssessmentTokenInviteSchema.safeParse({ name, email, surveyId, schoolId });
+	if (!tokenParseRes.success) {
+		setFlash({ type: 'error', message: 'Invalid token' }, event.cookies);
+		error(401, {
+			message: 'Invalid token'
+		});
+	}
+	// console.log('assessmentToken ====> ', tokenParseRes.data);
 
 	const currAssessment = await getSurveyById(parseInt(surveyId));
 	if (!currAssessment) {
-		throw new Error('Invalid survey id');
-	} else console.log('currAssessment ====> ', currAssessment);
-	if (currAssessment.status === 'completed') {
-		// todo: figue this out
+		setFlash({ type: 'error', message: 'Invalid survey id' }, event.cookies);
+		throw redirect(401, '/');
+	} else if (currAssessment.status === 'completed') {
 		setFlash({ type: 'error', message: 'Assessment already completed' }, event.cookies);
 		throw redirect(303, '/thank-you');
 	}
 
-	// console.log(`load Token===== assessmentToken `, assessmentToken);
+	let surveyQuestions = await generateQuestionnaire();
+	let currDemgraphicsData = await getDemographicsDataBySurveyId(parseInt(surveyId));
+	let currAssessmentData = await getAssessmentDataBySurveyId(parseInt(surveyId));
+	surveyQuestions = [demographicsData, ...surveyQuestions];
+	let lastAnsweredDomain;
+	let lastAnsweredSubdomainId;
 
-	// console.log(`load Token===== name `, name);
-	// console.log(`load Token===== email `, email);
-	// console.log(`load Token===== surveyId `, parseInt(surveyId));
-	// console.log(`load Token===== schoolId `, parseInt(schoolId));
-
-	let surveyData = await generateQuestionnaire();
-	// console.log('surveyData ====> ', surveyData);
-	surveyData = [demographicsData, ...surveyData];
+	if (currAssessment.status === 'started') {
+		// console.log('currAssessment.status STARTED LOAD THAT DATA! ====> ', currAssessment.status);
+		const {
+			surveyQuestionsCopy,
+			lastAnsweredDomain: lastDomain,
+			lastAnsweredSubdomainId: lastSubdomain
+		} = applySurveyResponsesToQuestionsAndGetCurrentPositions({
+			surveyQuestions,
+			currDemgraphicsData,
+			currAssessmentData
+		});
+		surveyQuestions = surveyQuestionsCopy;
+		lastAnsweredDomain = lastDomain;
+		lastAnsweredSubdomainId = lastSubdomain;
+	}
 
 	return {
+		currDemgraphicsData,
+		currAssessmentData,
 		assessmentToken,
-		surveyData
+		surveyQuestions,
+		lastAnsweredDomain,
+		lastAnsweredSubdomainId
 	};
 }
 

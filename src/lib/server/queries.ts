@@ -1020,3 +1020,26 @@ export const getSurveyById = async (surveyId: number) => {
 		.where(eq(surveys.id, surveyId));
 	return res || null;
 };
+export const getDemographicsDataBySurveyId = async (surveyId: number) => {
+	const [res] = await db
+		.select({
+			subjectTaught: surveyDemographics.subjectTaught,
+			yearsTeaching: surveyDemographics.yearsTeaching
+		})
+		.from(surveyDemographics)
+		.where(eq(surveyDemographics.surveyId, surveyId));
+	if (dev) console.log('getDemographicsDataBySurveyId => ', res);
+	return res || null;
+};
+
+export const getAssessmentDataBySurveyId = async (surveyId: number) => {
+	const res = await db
+		.select({
+			questionId: surveyQuestionsResponses.questionId,
+			response: surveyQuestionsResponses.response
+		})
+		.from(surveyQuestionsResponses)
+		.where(eq(surveyQuestionsResponses.surveyId, surveyId));
+	if (dev) console.log('getAssessmentDataBySurveyId => ', res);
+	return res || null;
+};

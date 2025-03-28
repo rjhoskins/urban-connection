@@ -249,9 +249,76 @@ export function transformSurveyQuestionsResponses(data: SurveyResponseData): Tra
 			response: item.response
 		};
 	});
-	console.log(
-		'TESTtransformedSurveyQuestionsResponses  ====> ',
-		transformedSurveyQuestionsResponses
-	);
+	// console.log('transformSurveyQuestionsResponses  ====> ', transformedSurveyQuestionsResponses);
 	return transformedSurveyQuestionsResponses as TransformedResponse[];
+}
+
+export function applySurveyResponsesToQuestionsAndGetCurrentPositions({
+	surveyQuestions,
+	currDemgraphicsData,
+	currAssessmentData
+}: {
+	surveyQuestions: any[];
+	currDemgraphicsData: any;
+	currAssessmentData: any[];
+}) {
+	let surveyQuestionsCopy = JSON.parse(JSON.stringify(surveyQuestions));
+	// console.log('questionsCopy  ====> ', surveyQuestionsCopy);
+	// console.log('currDemgraphicsData  ====> ', currDemgraphicsData);
+	// console.log('currAssessmentData  ====> ', currAssessmentData);
+
+	let lastAnsweredDomain;
+	let lastAnsweredSubdomainId;
+	let domainIdsArr: any[] = [];
+	let subdomainIdsArr: any[] = [];
+	surveyQuestionsCopy.forEach((domain: any) => {
+		domainIdsArr.push(domain.id);
+		if (domain.type === 'demographics') {
+			// console.log('demographics  ====> ');
+			domain.subDomains.forEach((subdomain: any) => {
+				subdomain.fields.forEach((field: any) => {
+					if (field.fieldName) {
+						field.value = currDemgraphicsData[field.fieldName] || null;
+					}
+				});
+			});
+			return;
+		} else {
+			domain.subDomains.forEach((subdomain: any, idx: number) => {
+				subdomainIdsArr.push(subdomain.id);
+				subdomain.questions.forEach((question: any) => {
+					const questionHasResponse = currAssessmentData.some(
+						(response: any) => response.questionId === question.id
+					);
+
+					if (questionHasResponse) {
+						lastAnsweredSubdomainId = subdomain.id;
+						// console.log('lastAnsweredSubdomainId  ====> ', lastAnsweredSubdomainId);
+						// console.log('question  ====> ', question);
+						lastAnsweredDomain = domain.id;
+						// console.log('lastAnsweredDomain  ====> ', lastAnsweredDomain);
+
+						const foundResponse = currAssessmentData.find(
+							(response: any) => response.questionId === question.id
+						);
+
+						const questionResponse = foundResponse ? foundResponse.response : null;
+						// console.log('questionResponse  ====> ', questionResponse);
+						if (questionResponse === 1 || questionResponse === 0) {
+							question.value = questionResponse;
+						} else {
+							question.value = null;
+						}
+						// question.value = questionResponse || null;
+					}
+				});
+			});
+		}
+	});
+	const nextDomainId = 0;
+	const nextSubdomainId = 0;
+	// console.log('domainIdsArr  ====> ', domainIdsArr);
+	// console.log('subdomainIdsArr  ====> ', subdomainIdsArr);
+
+	return { surveyQuestionsCopy, lastAnsweredDomain, lastAnsweredSubdomainId };
 }
