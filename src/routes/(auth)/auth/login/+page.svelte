@@ -6,8 +6,14 @@
 	let { data } = $props();
 </script>
 
-<h1 class="sr-only">Login</h1>
+<section class="grid-cols-golden-cols grid h-screen overflow-hidden">
+	<div class="col-start-2 grid place-content-center bg-[#8B7BC4] lg:col-start-1">
+		<LoginForm {data} />
+	</div>
 
-<div class="grid h-full place-items-center">
-	<LoginForm {data} />
-</div>
+	<img
+		class="col-start-1 row-start-1 h-full w-full object-fill lg:col-start-2"
+		alt="city with school"
+		src="/img/city-with-school.png"
+	/>
+</section>

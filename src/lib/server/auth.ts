@@ -2,7 +2,7 @@ import type { RequestEvent } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import { sha256 } from '@oslojs/crypto/sha2';
 import { encodeBase64url, encodeHexLowerCase } from '@oslojs/encoding';
-import { InsertSession } from './db/schema/sessions';
+import type { InsertSession } from './db/schema/sessions';
 
 import { db } from './db';
 import { sessions, users } from './db/schema';
@@ -84,6 +84,8 @@ export async function invalidateSession(sessionId: string) {
 export function setSessionTokenCookie(event: RequestEvent, token: string, expiresAt: string) {
 	event.cookies.set(sessionCookieName, token, {
 		expires: new Date(expiresAt),
+		httpOnly: true,
+		// secure: true,
 		path: '/'
 	});
 }

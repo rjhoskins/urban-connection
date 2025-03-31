@@ -25,6 +25,7 @@
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.2.7",
+		"@lucide/svelte": "^0.486.0",
 		"@playwright/test": "^1.50.1",
 		"@sveltejs/adapter-netlify": "^4.4.2",
 		"@sveltejs/kit": "^2.18.0",

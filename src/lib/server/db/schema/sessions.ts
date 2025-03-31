@@ -1,5 +1,5 @@
 import { relations } from 'drizzle-orm';
-import { pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { pgTable, timestamp, varchar, boolean } from 'drizzle-orm/pg-core';
 import users from './users';
 
 const sessions = pgTable('sessions', {
@@ -7,7 +7,8 @@ const sessions = pgTable('sessions', {
 	userId: varchar('user_id', { length: 256 })
 		.notNull()
 		.references(() => users.id),
-	expiresAt: timestamp('expires_at', { withTimezone: true, mode: 'string' }).notNull()
+	currentSessionHasExpiresAt: boolean('current_session_has_expires_at').default(false),
+	expiresAt: timestamp('expires_at', { withTimezone: true, mode: 'string' })
 });
 
 export const sessionsRelations = relations(sessions, ({ one }) => ({
