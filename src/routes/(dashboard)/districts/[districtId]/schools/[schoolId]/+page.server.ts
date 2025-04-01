@@ -5,9 +5,9 @@ import {
 	getSchoolForDistrictAdmin,
 	getSchoolForSchoolAdmin,
 	getSchoolForSuperAdmin,
-	getSchoolMemberSurveyTotalsForSchoolAndDistrictAdminBySchool,
-	getSchoolMemberSurveyTotalsForSuperUser,
-	getSurveyData
+	getSchoolMemberAssessmentTotalsForSchoolAndDistrictAdminBySchool,
+	getSchoolMemberAssessmentTotalsForSuperUser,
+	getAssessmentData
 } from '$lib/server/queries';
 
 export const load = async (event) => {
@@ -37,20 +37,20 @@ export const load = async (event) => {
 			schoolDataFunc = async () => getSchoolForDistrictAdmin(userId, schoolId);
 			adminDataFunc = async () => getSchoolAdminBySchoolId(schoolId);
 			memberDataFunc = async () =>
-				getSchoolMemberSurveyTotalsForSchoolAndDistrictAdminBySchool(schoolId);
+				getSchoolMemberAssessmentTotalsForSchoolAndDistrictAdminBySchool(schoolId);
 		}
 	}
 	if (event.locals.user.role === 'super_admin') {
 		console.log('super admin!!!!!!!!!!!!!!!!!!!!!!!!!!====================');
 		schoolDataFunc = async () => getSchoolForSuperAdmin(schoolId);
 		adminDataFunc = async () => getSchoolAdminBySchoolId(schoolId);
-		memberDataFunc = async () => getSchoolMemberSurveyTotalsForSuperUser(schoolId);
+		memberDataFunc = async () => getSchoolMemberAssessmentTotalsForSuperUser(schoolId);
 	}
 
 	return {
 		adminData: await adminDataFunc(),
 		school: await schoolDataFunc(),
-		surveyData: await getSurveyData(schoolId),
+		assessmentData: await getAssessmentData(schoolId),
 		memberData: await memberDataFunc()
 	};
 };

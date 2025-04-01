@@ -3,7 +3,7 @@ import { relations, sql } from 'drizzle-orm';
 import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 import { timestamps, userRolesEnum } from './db-utils';
 
-import { invitesEnum } from './invites';
+import { invitesEnum } from './userInvites';
 import users from './users';
 import schools from './schools';
 import districts from './districts';

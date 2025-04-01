@@ -4,19 +4,19 @@ import {
 	addDemographicsData,
 	addQuestionsData,
 	generateQuestionnaire,
-	getAssessmentDataBySurveyId,
-	getDemographicsDataBySurveyId,
-	getSurveyById,
-	setSurveyStatus
+	getAssessmentDataByAssessmentId,
+	getDemographicsDataByAssessmentId,
+	getAssessmentById,
+	setAssessmentStatus
 } from '$lib/server/queries';
 import {
 	type CreateDemographicsResponseInput,
 	parseAndTransformCreateDemographicsData
-} from '$lib/types/survey';
+} from '$lib/types/assessment';
 import {
-	applySurveyResponsesToQuestionsAndGetCurrentPositions,
+	applyAssessmentResponsesToQuestionsAndGetCurrentPositions,
 	decodeAssessmentInviteToken,
-	transformSurveyQuestionsResponses
+	transformAssessmentQuestionsResponses
 } from '$lib/utils.js';
 import { error, redirect, type RequestEvent } from '@sveltejs/kit';
 import { is } from 'drizzle-orm';
@@ -27,8 +27,13 @@ export async function load(event: RequestEvent) {
 	const assessmentToken = await event.url.searchParams.get('assessmentToken');
 	const decodedeAssessmentToken = decodeAssessmentInviteToken(assessmentToken as string);
 
-	const { name, email, surveyId, schoolId } = decodedeAssessmentToken;
-	const tokenParseRes = AssessmentTokenInviteSchema.safeParse({ name, email, surveyId, schoolId });
+	const { name, email, assessmentId, schoolId } = decodedeAssessmentToken;
+	const tokenParseRes = AssessmentTokenInviteSchema.safeParse({
+		name,
+		email,
+		assessmentId,
+		schoolId
+	});
 	if (!tokenParseRes.success) {
 		setFlash({ type: 'error', message: 'Invalid token' }, event.cookies);
 		error(401, {
@@ -37,34 +42,34 @@ export async function load(event: RequestEvent) {
 	}
 	// console.log('assessmentToken ====> ', tokenParseRes.data);
 
-	const currAssessment = await getSurveyById(parseInt(surveyId));
+	const currAssessment = await getAssessmentById(parseInt(assessmentId));
 	if (!currAssessment) {
-		setFlash({ type: 'error', message: 'Invalid survey id' }, event.cookies);
+		setFlash({ type: 'error', message: 'Invalid assessment id' }, event.cookies);
 		throw redirect(401, '/');
 	} else if (currAssessment.status === 'completed') {
 		setFlash({ type: 'error', message: 'Assessment already completed' }, event.cookies);
 		throw redirect(303, '/thank-you');
 	}
 
-	let surveyQuestions = await generateQuestionnaire();
-	let currDemgraphicsData = await getDemographicsDataBySurveyId(parseInt(surveyId));
-	let currAssessmentData = await getAssessmentDataBySurveyId(parseInt(surveyId));
-	surveyQuestions = [demographicsData, ...surveyQuestions];
+	let assessmentQuestions = await generateQuestionnaire();
+	let currDemgraphicsData = await getDemographicsDataByAssessmentId(parseInt(assessmentId));
+	let currAssessmentData = await getAssessmentDataByAssessmentId(parseInt(assessmentId));
+	assessmentQuestions = [demographicsData, ...assessmentQuestions];
 	let lastAnsweredDomain;
 	let lastAnsweredSubdomainId;
 
 	if (currAssessment.status === 'started') {
 		// console.log('currAssessment.status STARTED LOAD THAT DATA! ====> ', currAssessment.status);
 		const {
-			surveyQuestionsCopy,
+			assessmentQuestionsCopy,
 			lastAnsweredDomain: lastDomain,
 			lastAnsweredSubdomainId: lastSubdomain
-		} = applySurveyResponsesToQuestionsAndGetCurrentPositions({
-			surveyQuestions,
+		} = applyAssessmentResponsesToQuestionsAndGetCurrentPositions({
+			assessmentQuestions,
 			currDemgraphicsData,
 			currAssessmentData
 		});
-		surveyQuestions = surveyQuestionsCopy;
+		assessmentQuestions = assessmentQuestionsCopy;
 		lastAnsweredDomain = lastDomain;
 		lastAnsweredSubdomainId = lastSubdomain;
 	}
@@ -73,7 +78,7 @@ export async function load(event: RequestEvent) {
 		currDemgraphicsData,
 		currAssessmentData,
 		assessmentToken,
-		surveyQuestions,
+		assessmentQuestions,
 		lastAnsweredDomain,
 		lastAnsweredSubdomainId
 	};
@@ -88,14 +93,14 @@ export const actions = {
 
 		const decodedeAssessmentToken = decodeAssessmentInviteToken(assessmentToken as string);
 
-		const { name, email, surveyId, schoolId } = decodedeAssessmentToken;
+		const { name, email, assessmentId, schoolId } = decodedeAssessmentToken;
 		try {
 			if (data.isDemographics) {
 				const { assessmentToken, subjectTaught, yearsTeaching, ...assessmentData } = data;
 				const demosParseResult = parseAndTransformCreateDemographicsData.safeParse({
 					yearsTeaching: parseInt(String(data.yearsTeaching))!,
 					schoolId: parseInt(String(schoolId))!,
-					surveyId: parseInt(String(surveyId))!,
+					assessmentId: parseInt(String(assessmentId))!,
 					subjectTaught: String(subjectTaught)
 				});
 
@@ -104,18 +109,18 @@ export const actions = {
 					demosParseResult.data;
 
 				await addDemographicsData(parseAndCheckedDemographicsResponse);
-				await setSurveyStatus({ surveyId: parseInt(surveyId), status: 'started' });
+				await setAssessmentStatus({ assessmentId: parseInt(assessmentId), status: 'started' });
 			} else {
-				// survey questions
-				const transformedSurveyQuestionsResponses = transformSurveyQuestionsResponses({
-					surveyId: parseInt(surveyId),
+				// assessment questions
+				const transformedAssessmentQuestionsResponses = transformAssessmentQuestionsResponses({
+					assessmentId: parseInt(assessmentId),
 					...data
 				});
 
-				addQuestionsData(transformedSurveyQuestionsResponses);
+				addQuestionsData(transformedAssessmentQuestionsResponses);
 
 				if (data.isLastQuestion) {
-					setSurveyStatus({ surveyId: parseInt(surveyId), status: 'completed' });
+					setAssessmentStatus({ assessmentId: parseInt(assessmentId), status: 'completed' });
 				}
 			}
 		} catch (error) {

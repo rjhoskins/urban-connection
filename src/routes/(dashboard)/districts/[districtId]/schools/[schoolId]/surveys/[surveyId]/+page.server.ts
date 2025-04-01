@@ -3,9 +3,9 @@ import {
 	getSchoolForDistrictAdmin,
 	getSchoolForSchoolAdmin,
 	getSchoolForSuperAdmin,
-	getSingleSurveyResultsDataForSchoolAndDistrictAdmin,
-	getSingleSurveyResultsDataForSuperAdmin,
-	getSurveyData
+	getSingleAssessmentResultsDataForSchoolAndDistrictAdmin,
+	getSingleAssessmentResultsDataForSuperAdmin,
+	getAssessmentData
 } from '$lib/server/queries';
 import { error, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
@@ -19,7 +19,7 @@ export const load: PageServerLoad = async (event) => {
 	}
 
 	const schoolId = parseInt(event.params.schoolId);
-	const surveyId = parseInt(event.params.surveyId);
+	const assessmentId = parseInt(event.params.assessmentId);
 	const userId = event.locals.user.id;
 
 	let dataFunc: () => Promise<any> = async () => {
@@ -28,7 +28,7 @@ export const load: PageServerLoad = async (event) => {
 	let adminDataFunc: () => Promise<any> = async () => {
 		return null;
 	};
-	let surveyResultsDataFunc: () => Promise<any> = async () => {
+	let assessmentResultsDataFunc: () => Promise<any> = async () => {
 		return null;
 	};
 
@@ -37,20 +37,21 @@ export const load: PageServerLoad = async (event) => {
 		if (userId) {
 			dataFunc = () => getSchoolForDistrictAdmin(schoolId);
 			adminDataFunc = () => getSchoolAdminBySchoolId(schoolId);
-			surveyResultsDataFunc = () => getSingleSurveyResultsDataForSchoolAndDistrictAdmin(surveyId);
+			assessmentResultsDataFunc = () =>
+				getSingleAssessmentResultsDataForSchoolAndDistrictAdmin(assessmentId);
 		}
 	}
 
 	if (event.locals.user && event.locals.user.role === 'super_admin') {
 		dataFunc = () => getSchoolForSuperAdmin(schoolId);
 		adminDataFunc = async () => getSchoolAdminBySchoolId(schoolId);
-		surveyResultsDataFunc = () => getSingleSurveyResultsDataForSuperAdmin(surveyId);
+		assessmentResultsDataFunc = () => getSingleAssessmentResultsDataForSuperAdmin(assessmentId);
 	}
 
 	return {
 		adminData: await adminDataFunc(),
 		school: await dataFunc(),
-		surveyData: await getSurveyData(schoolId),
-		surveyResultsData: await surveyResultsDataFunc()
+		assessmentData: await getAssessmentData(schoolId),
+		assessmentResultsData: await assessmentResultsDataFunc()
 	};
 };

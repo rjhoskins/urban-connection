@@ -3,8 +3,8 @@ import {
 	getSchoolForDistrictAdmin,
 	getSchoolForSchoolAdmin,
 	getSchoolForSuperAdmin,
-	getSingleSurveyResultsDataForSchoolAndDistrictAdmin,
-	getSurveyData
+	getSingleAssessmentResultsDataForSchoolAndDistrictAdmin,
+	getAssessmentData
 } from '$lib/server/queries';
 import { error, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
@@ -15,7 +15,7 @@ export const load = async (event) => {
 	}
 
 	const schoolId = parseInt(event.params.schoolId);
-	const surveyId = parseInt(event.params.surveyId);
+	const assessmentId = parseInt(event.params.assessmentId);
 	const userId = event.locals.user.id;
 
 	let dataFunc: () => Promise<any> = async () => {
@@ -46,7 +46,8 @@ export const load = async (event) => {
 	return {
 		adminData: await adminDataFunc(),
 		school: await dataFunc(),
-		surveyData: await getSurveyData(schoolId),
-		surveyResultsData: await getSingleSurveyResultsDataForSchoolAndDistrictAdmin(surveyId)
+		assessmentData: await getAssessmentData(schoolId),
+		assessmentResultsData:
+			await getSingleAssessmentResultsDataForSchoolAndDistrictAdmin(assessmentId)
 	};
 };

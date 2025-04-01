@@ -4,7 +4,7 @@ import { error, redirect, type Actions } from '@sveltejs/kit';
 import {
 	getSchoolIDForSchoolAdmin,
 	getSchoolsForDistrictAdmin,
-	getSchoolsWithSurveyCountAndScoreData
+	getSchoolsWithAssessmentCountAndScoreData
 } from '$lib/server/queries';
 
 export const load = async (event) => {
@@ -36,7 +36,7 @@ export const load = async (event) => {
 			} else return redirect(302, `/schools/${schoolId}`);
 		}
 		case 'super_admin': {
-			data = await getSchoolsWithSurveyCountAndScoreData();
+			data = await getSchoolsWithAssessmentCountAndScoreData();
 			break;
 		}
 		case 'district_admin': {

@@ -15,7 +15,6 @@ const schools = pgTable(
 		districtId: integer('district_id')
 			.references((): AnyPgColumn => districts.id)
 			.notNull(),
-		isActive: boolean('is_active').default(true),
 		createdBy: varchar('created_by', { length: 256 }).references((): AnyPgColumn => users.id),
 		...timestamps
 	},

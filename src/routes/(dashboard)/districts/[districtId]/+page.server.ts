@@ -2,7 +2,7 @@ import type { PageServerLoad } from './$types';
 import {
 	getDistrictAdmin,
 	getDistrictWithSchools,
-	getSchoolMemberSurveyTotalsForSchoolAndDistrictAdminByDistrict
+	getSchoolMemberAssessmentTotalsForSchoolAndDistrictAdminByDistrict
 } from '$lib/server/queries';
 import { redirect } from '@sveltejs/kit';
 
@@ -14,7 +14,7 @@ export const load = (async (event) => {
 	return {
 		district: await getDistrictWithSchools(districtId),
 		adminData: await getDistrictAdmin(districtId),
-		memberSurveyData:
-			await getSchoolMemberSurveyTotalsForSchoolAndDistrictAdminByDistrict(districtId)
+		memberAssessmentData:
+			await getSchoolMemberAssessmentTotalsForSchoolAndDistrictAdminByDistrict(districtId)
 	};
 }) satisfies PageServerLoad;

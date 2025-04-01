@@ -2,10 +2,10 @@
 	import Card from './ui/card/card.svelte';
 	import Progress from './ui/progress/progress.svelte';
 
-	let { questions: surveyResponseQuestions } = $props();
+	let { questions: assessmentResponseQuestions } = $props();
 
 	//     {
-	//   "surveyId": 1,
+	//   "assessmentId": 1,
 	//   "domainId": 7,
 	//   "domainName": "Systems",
 	//   "questionId": 9,
@@ -14,14 +14,14 @@
 	//   "subDomainId": 7,
 	//   "subName": "Systemic Expectations"
 	// }
-	const totalDomainQuestions = surveyResponseQuestions.questions.length;
-	const questionTotalPoints = surveyResponseQuestions.questions
+	const totalDomainQuestions = assessmentResponseQuestions.questions.length;
+	const questionTotalPoints = assessmentResponseQuestions.questions
 		.map((el) => el.questionResponse)
 		.reduce((acc, curr) => (acc += curr), 0);
 </script>
 
 <div class="">
-	<p>Question {surveyResponseQuestions.questionId}</p>
+	<p>Question {assessmentResponseQuestions.questionId}</p>
 
 	<Progress barBgColor="bg-green-700" value={(questionTotalPoints / totalDomainQuestions) * 100} />
 </div>

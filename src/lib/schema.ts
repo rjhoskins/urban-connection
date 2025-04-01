@@ -18,8 +18,9 @@ export const createNewUserOrLoginSchema = z.object({
 
 export const createNewUserFromInviteSchema = z
 	.object({
-		name: z.string(),
-		email: z.string().email({ message: 'invalid email' }),
+		// name: z.string(),
+		email: z.string(),
+		// .email({ message: 'invalid email' }),
 		inviteId: z.string(),
 		password: z
 			.string()
@@ -230,7 +231,7 @@ export const createUserSchema = z.object({
 export const AssessmentTokenInviteSchema = z.object({
 	name: z.string().min(1, 'Name is required'),
 	email: z.string().email('Invalid email format'),
-	surveyId: z.string().min(1, 'Survey ID is required'),
+	assessmentId: z.string().min(1, 'Assessment ID is required'),
 	schoolId: z.string().min(1, 'School ID is required')
 });
 

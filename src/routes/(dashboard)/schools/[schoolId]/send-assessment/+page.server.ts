@@ -31,15 +31,15 @@ export const actions: Actions = {
 			});
 		}
 
-		let surveyId;
+		let assessmentId;
 		try {
 			const assessmentInviteHtmlTemplate =
 				await getLatestHtmlTemplateDataByType('assessment_invite');
 			if (!assessmentInviteHtmlTemplate) {
 				throw new Error('No assessment invite template found');
 			}
-			// create survey
-			surveyId = await createAssessment({
+			// create assessment
+			assessmentId = await createAssessment({
 				recipientName: form.data.name,
 				recipientEmail: form.data.email,
 				schoolId: parseInt(event.params.schoolId),
@@ -49,7 +49,7 @@ export const actions: Actions = {
 			const assessmentToken = createAssessmentInviteToken({
 				name: form.data.name,
 				email: form.data.email,
-				surveyId: surveyId!.id,
+				assessmentId: assessmentId!.id,
 				schoolId: parseInt(event.params.schoolId)
 			});
 
@@ -85,7 +85,7 @@ export const actions: Actions = {
 		const assessmentToken = createAssessmentInviteToken({
 			name: form.data.name,
 			email: form.data.email,
-			surveyId: surveyId!.id,
+			assessmentId: assessmentId!.id,
 			schoolId: parseInt(event.params.schoolId)
 		});
 		console.log(`assessmentToken => , ${assessmentToken}`);

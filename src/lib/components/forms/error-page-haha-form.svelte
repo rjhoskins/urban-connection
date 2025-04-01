@@ -29,8 +29,8 @@
 			></Card.Title
 		>
 		<Card.Description class="text-primary text-lg">
-			Looks like you don't have the right access key for page or survey. But while you're here, why
-			not take our "Unauthorized User Survey"?</Card.Description
+			Looks like you don't have the right access key for page or assessment. But while you're here,
+			why not take our "Unauthorized User Assessment"?</Card.Description
 		>
 	</Card.Header>
 	<Card.Content>

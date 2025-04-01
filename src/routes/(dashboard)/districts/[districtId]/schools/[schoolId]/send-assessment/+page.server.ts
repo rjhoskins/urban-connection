@@ -38,21 +38,21 @@ export const actions: Actions = {
 			if (!assessmentInviteHtmlTemplate) {
 				throw new Error('No assessment invite template found');
 			}
-			// create survey
-			const surveyId = await createAssessment({
+			// create assessment
+			const assessmentId = await createAssessment({
 				recipientName: form.data.name,
 				recipientEmail: form.data.email,
 				schoolId: parseInt(event.params.schoolId),
 				sentBy: event.locals.user.id
 			});
-			if (!surveyId) {
+			if (!assessmentId) {
 				throw new Error('Failed to create assessment');
 			}
 
 			const assessmentToken = createAssessmentInviteToken({
 				name: form.data.name,
 				email: form.data.email,
-				surveyId: surveyId!.id,
+				assessmentId: assessmentId!.id,
 				schoolId: parseInt(event.params.schoolId)
 			});
 

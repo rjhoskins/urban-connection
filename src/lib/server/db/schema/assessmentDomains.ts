@@ -1,16 +1,16 @@
 import { pgTable, integer, text, varchar } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import { timestamps } from './db-utils';
-import surveySubDomains from './surveySubDomains';
+import assessmentSubDomains from './assessmentSubDomains';
 
-const surveyDomains = pgTable('survey_domains', {
+const assessmentDomains = pgTable('assessment_domains', {
 	id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
 	name: varchar('name', { length: 256 }).notNull().unique(),
 	...timestamps
 });
 
-export const surveyDomainsRelations = relations(surveyDomains, ({ one, many }) => ({
-	subDomain: many(surveySubDomains)
+export const assessmentDomainsRelations = relations(assessmentDomains, ({ one, many }) => ({
+	subDomain: many(assessmentSubDomains)
 }));
 
-export default surveyDomains;
+export default assessmentDomains;

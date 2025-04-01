@@ -4,10 +4,10 @@ import {
 	getSchoolForDistrictAdmin,
 	getSchoolForSuperAdmin,
 	getSchoolAdmin,
-	getSurveyData,
+	getAssessmentData,
 	getQuestionData,
 	getSchoolDomainResultsData,
-	getSchoolSurveyResultsData,
+	getSchoolAssessmentResultsData,
 	getLoggedInSchoolAdminsSchool
 } from '$lib/server/queries';
 import { redirect } from '@sveltejs/kit';
@@ -59,8 +59,8 @@ export const load = async (event) => {
 	return {
 		adminData: await adminDataFunc(),
 		school: await dataFunc(),
-		surveyData: await getSurveyData(userSchoolId),
-		surveyResultsData: await getSchoolSurveyResultsData(userSchoolId),
+		assessmentData: await getAssessmentData(userSchoolId),
+		assessmentResultsData: await getSchoolAssessmentResultsData(userSchoolId),
 		questionData: await getQuestionData(userSchoolId),
 		domainResultsData: await getSchoolDomainResultsData(userSchoolId)
 	};

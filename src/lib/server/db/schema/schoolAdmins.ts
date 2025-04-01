@@ -3,6 +3,7 @@ import { integer, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core';
 import schools from './schools';
 import { relations } from 'drizzle-orm';
 import users from './users';
+import { timestamps } from './db-utils';
 
 const schoolAdmins = pgTable('school_admins', {
 	id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
@@ -12,7 +13,7 @@ const schoolAdmins = pgTable('school_admins', {
 	schoolId: integer('school_id')
 		.notNull()
 		.references(() => schools.id),
-	createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull()
+	...timestamps
 });
 
 export const schoolAdminsRelations = relations(schoolAdmins, ({ one, many }) => ({

@@ -91,7 +91,7 @@ const rubricData = [
 					},
 					{
 						id: 'Cultural_Awareness_5',
-						text: 'Families and community members are regularly surveyed (at least semi-annually) to understand their experiences and perceptions of cultural inclusivity at the school',
+						text: 'Families and community members are regularly assessmented (at least semi-annually) to understand their experiences and perceptions of cultural inclusivity at the school',
 						value: null
 					}
 				]
@@ -486,7 +486,7 @@ const rubricData = [
 				descriptors: [
 					{
 						id: 'Knowledge_of_Students_1',
-						text: 'Student survey data is utilized to learn more about students interests, strengths, and challenges, both academically and non-academically, and files are regularly updated',
+						text: 'Student assessment data is utilized to learn more about students interests, strengths, and challenges, both academically and non-academically, and files are regularly updated',
 						value: null
 					},
 					{

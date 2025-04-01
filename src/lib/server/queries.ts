@@ -8,23 +8,23 @@ import {
 	users,
 	htmlEmailTemplates,
 	districts,
-	surveyQuestions,
-	surveySubDomains,
-	surveyDomains,
-	surveyDemographics,
-	surveyQuestionsResponses,
-	surveys,
-	surveyStatusEnum
+	assessmentQuestions,
+	assessmentSubDomains,
+	assessmentDomains,
+	assessmentDemographics,
+	assessmentQuestionsResponses,
+	assessments,
+	assessmentStatusEnum
 } from '$lib/server/db/schema';
 import type { PostgresJsQueryResultHKT } from 'drizzle-orm/postgres-js';
 import type { PgEnum, PgTransaction } from 'drizzle-orm/pg-core';
 import db from './db';
 import type { AdminInvite, CreateUser, UserInviteHTMLEmailTemplateType } from '$lib/schema';
-import { transformSurveyData } from '$lib/utils';
+import { transformAssessmentData } from '$lib/utils';
 import type {
 	CreateDemographicsResponseInput,
 	CreateQuestionResponseInput
-} from '$lib/types/survey';
+} from '$lib/types/assessment';
 
 export async function simpleRegisterToBeDEPRICATED(
 	{
@@ -225,29 +225,29 @@ export async function generateQuestionnaire() {
 	let res = await db
 		.select({
 			domain: {
-				id: surveyDomains.id,
-				name: surveyDomains.name,
+				id: assessmentDomains.id,
+				name: assessmentDomains.name,
 				type: sql<'domain'>`'domain'`
 			},
 			subdomain: {
-				id: surveySubDomains.id,
-				name: surveySubDomains.name,
-				description: surveySubDomains.description,
+				id: assessmentSubDomains.id,
+				name: assessmentSubDomains.name,
+				description: assessmentSubDomains.description,
 				type: sql<'sub-domain'>`'sub-domain'`
 			},
 			question: {
-				id: surveyQuestions.id,
-				text: surveyQuestions.text,
+				id: assessmentQuestions.id,
+				text: assessmentQuestions.text,
 				value: sql<boolean | null>`NULL`,
-				subdomainId: surveyQuestions.subDomainId
+				subdomainId: assessmentQuestions.subDomainId
 			}
 		})
-		.from(surveyQuestions)
-		.innerJoin(surveySubDomains, eq(surveyQuestions.subDomainId, surveySubDomains.id))
-		.innerJoin(surveyDomains, eq(surveyDomains.id, surveySubDomains.domainId));
+		.from(assessmentQuestions)
+		.innerJoin(assessmentSubDomains, eq(assessmentQuestions.subDomainId, assessmentSubDomains.id))
+		.innerJoin(assessmentDomains, eq(assessmentDomains.id, assessmentSubDomains.domainId));
 
 	//@ts-ignore
-	return transformSurveyData(res);
+	return transformAssessmentData(res);
 }
 
 export async function getHtmlTemplateTypes() {
@@ -403,31 +403,38 @@ export async function getSchoolsForSuperAdmin(): Promise<{ id: number; name: str
 	return res || null;
 }
 
-export async function getSchoolMemberSurveyTotalsForSchoolAndDistrictAdminBySchool(
+export async function getSchoolMemberAssessmentTotalsForSchoolAndDistrictAdminBySchool(
 	schoolId: number
 ): Promise<{ id: number; pointsTotal: number; questionsTotal: number }[]> {
 	const res = await db
 		.select({
-			id: surveys.id,
+			id: assessments.id,
 			pointsTotal:
-				sql`sum(case when ${surveyQuestionsResponses.isValidSubdomainGroup} = true then ${surveyQuestionsResponses.response} else 0 end)`.mapWith(
+				sql`sum(case when ${assessmentQuestionsResponses.isValidSubdomainGroup} = true then ${assessmentQuestionsResponses.response} else 0 end)`.mapWith(
 					Number
 				),
-			questionsTotal: sql`count(${surveyQuestionsResponses.response})`.mapWith(Number)
+			questionsTotal: sql`count(${assessmentQuestionsResponses.response})`.mapWith(Number)
 		})
-		.from(surveys)
-		.leftJoin(schools, eq(schools.id, surveys.schoolId))
-		.leftJoin(surveyQuestionsResponses, eq(surveys.id, surveyQuestionsResponses.surveyId))
-		.leftJoin(surveyQuestions, eq(surveyQuestions.id, surveyQuestionsResponses.questionId))
-		.groupBy(surveys.id, schools.id)
+		.from(assessments)
+		.leftJoin(schools, eq(schools.id, assessments.schoolId))
+		.leftJoin(
+			assessmentQuestionsResponses,
+			eq(assessments.id, assessmentQuestionsResponses.assessmentId)
+		)
+		.leftJoin(
+			assessmentQuestions,
+			eq(assessmentQuestions.id, assessmentQuestionsResponses.questionId)
+		)
+		.groupBy(assessments.id, schools.id)
 		.where(eq(schools.id, schoolId))
-		.orderBy(surveys.createdAt);
-	if (dev) console.log('getSchoolMemberSurveyTotalsForSchoolAndDistrictAdminBySchool res => ', res);
+		.orderBy(assessments.createdAt);
+	if (dev)
+		console.log('getSchoolMemberAssessmentTotalsForSchoolAndDistrictAdminBySchool res => ', res);
 
 	return res || null;
 }
 
-export async function getDistrictSurveyTotals(): Promise<
+export async function getDistrictAssessmentTotals(): Promise<
 	{ id: number; pointsTotal: number; questionsTotal: number }[]
 > {
 	const res = await db
@@ -438,94 +445,118 @@ export async function getDistrictSurveyTotals(): Promise<
 			// memberSchoolsCount: sum(schools.id),
 			memberSchoolsCount: sql`COUNT(DISTINCT ${schools.id})`.mapWith(Number),
 			pointsTotal:
-				sql`SUM(CASE WHEN ${surveyQuestionsResponses.isValidSubdomainGroup} = true THEN ${surveyQuestionsResponses.response} ELSE 0 END)`.mapWith(
+				sql`SUM(CASE WHEN ${assessmentQuestionsResponses.isValidSubdomainGroup} = true THEN ${assessmentQuestionsResponses.response} ELSE 0 END)`.mapWith(
 					Number
 				),
-			questionsTotal: sql`COUNT(${surveyQuestionsResponses.response})`.mapWith(Number)
+			questionsTotal: sql`COUNT(${assessmentQuestionsResponses.response})`.mapWith(Number)
 		})
 		.from(districts)
 		.leftJoin(schools, eq(schools.districtId, districts.id))
-		.leftJoin(surveys, eq(schools.id, surveys.schoolId))
-		.leftJoin(surveyQuestionsResponses, eq(surveys.id, surveyQuestionsResponses.surveyId))
-		.leftJoin(surveyQuestions, eq(surveyQuestions.id, surveyQuestionsResponses.questionId))
+		.leftJoin(assessments, eq(schools.id, assessments.schoolId))
+		.leftJoin(
+			assessmentQuestionsResponses,
+			eq(assessments.id, assessmentQuestionsResponses.assessmentId)
+		)
+		.leftJoin(
+			assessmentQuestions,
+			eq(assessmentQuestions.id, assessmentQuestionsResponses.questionId)
+		)
 		.groupBy(districts.id)
 		.orderBy(districts.id);
-	if (dev) console.log('getDistrictSurveyTotals res => ', res);
+	if (dev) console.log('getDistrictAssessmentTotals res => ', res);
 	return res || null;
 }
 
-export async function getSchoolMemberSurveyTotalsForSchoolAndDistrictAdminByDistrict(
+export async function getSchoolMemberAssessmentTotalsForSchoolAndDistrictAdminByDistrict(
 	districtId: number
 ): Promise<{ id: number; name: string; pointsTotal: number; questionsTotal: number }[]> {
 	const res = await db
 		.select({
 			id: schools.id,
 			name: schools.name,
-			surveyCount: sql`count(distinct ${surveys.id})`.mapWith(Number),
+			assessmentCount: sql`count(distinct ${assessments.id})`.mapWith(Number),
 			pointsTotal:
-				sql`sum(case when ${surveyQuestionsResponses.isValidSubdomainGroup} = true then ${surveyQuestionsResponses.response} else 0 end)`.mapWith(
+				sql`sum(case when ${assessmentQuestionsResponses.isValidSubdomainGroup} = true then ${assessmentQuestionsResponses.response} else 0 end)`.mapWith(
 					Number
 				),
-			questionsTotal: sql`count(${surveyQuestionsResponses.response})`.mapWith(Number)
+			questionsTotal: sql`count(${assessmentQuestionsResponses.response})`.mapWith(Number)
 		})
 		.from(schools)
-		.leftJoin(surveys, eq(schools.id, surveys.schoolId))
-		.leftJoin(surveyQuestionsResponses, eq(surveys.id, surveyQuestionsResponses.surveyId))
-		.leftJoin(surveyQuestions, eq(surveyQuestions.id, surveyQuestionsResponses.questionId))
+		.leftJoin(assessments, eq(schools.id, assessments.schoolId))
+		.leftJoin(
+			assessmentQuestionsResponses,
+			eq(assessments.id, assessmentQuestionsResponses.assessmentId)
+		)
+		.leftJoin(
+			assessmentQuestions,
+			eq(assessmentQuestions.id, assessmentQuestionsResponses.questionId)
+		)
 		.groupBy(schools.id, schools.name)
 		.where(eq(schools.districtId, districtId)) // school /district /whatever
 		.orderBy(schools.createdAt);
 	if (dev)
-		console.log('getSchoolMemberSurveyTotalsForSchoolAndDistrictAdminByDistrict res => ', res);
+		console.log('getSchoolMemberAssessmentTotalsForSchoolAndDistrictAdminByDistrict res => ', res);
 	return res || null;
 }
 
-export async function getSchoolMemberSurveyTotalsForSuperUser(
+export async function getSchoolMemberAssessmentTotalsForSuperUser(
 	schoolId: number
 ): Promise<{ id: number; name: string; pointsTotal: number; questionsTotal: number }[]> {
 	const res = await db
 		.select({
-			id: surveys.id,
-			name: surveys.recipientName,
-			email: surveys.recipientEmail,
+			id: assessments.id,
+			name: assessments.recipientName,
+			email: assessments.recipientEmail,
 			pointsTotal:
-				sql`sum(case when ${surveyQuestionsResponses.isValidSubdomainGroup} = true then ${surveyQuestionsResponses.response} else 0 end)`.mapWith(
+				sql`sum(case when ${assessmentQuestionsResponses.isValidSubdomainGroup} = true then ${assessmentQuestionsResponses.response} else 0 end)`.mapWith(
 					Number
 				),
-			questionsTotal: sql`count(${surveyQuestionsResponses.response})`.mapWith(Number)
+			questionsTotal: sql`count(${assessmentQuestionsResponses.response})`.mapWith(Number)
 		})
-		.from(surveys)
-		.leftJoin(schools, eq(schools.id, surveys.schoolId))
-		.leftJoin(surveyQuestionsResponses, eq(surveys.id, surveyQuestionsResponses.surveyId))
-		.leftJoin(surveyQuestions, eq(surveyQuestions.id, surveyQuestionsResponses.questionId))
-		.groupBy(surveys.id, schools.id)
+		.from(assessments)
+		.leftJoin(schools, eq(schools.id, assessments.schoolId))
+		.leftJoin(
+			assessmentQuestionsResponses,
+			eq(assessments.id, assessmentQuestionsResponses.assessmentId)
+		)
+		.leftJoin(
+			assessmentQuestions,
+			eq(assessmentQuestions.id, assessmentQuestionsResponses.questionId)
+		)
+		.groupBy(assessments.id, schools.id)
 		.where(eq(schools.id, schoolId))
-		.orderBy(surveys.createdAt);
-	if (dev) console.log('getSchoolMemberSurveyTotalsForSuperUser res => ', res);
+		.orderBy(assessments.createdAt);
+	if (dev) console.log('getSchoolMemberAssessmentTotalsForSuperUser res => ', res);
 	return res || null;
 }
 
-export async function getSchoolsWithSurveyCountAndScoreData(): Promise<
-	{ id: number; name: string; surveyCount: number }[]
+export async function getSchoolsWithAssessmentCountAndScoreData(): Promise<
+	{ id: number; name: string; assessmentCount: number }[]
 > {
 	const res = db
 		.select({
 			id: schools.id,
 			name: schools.name,
-			surveyCount: sql`count(distinct ${surveys.id})`.mapWith(Number),
+			assessmentCount: sql`count(distinct ${assessments.id})`.mapWith(Number),
 			pointsTotal:
-				sql`sum(case when ${surveyQuestionsResponses.isValidSubdomainGroup} = true then ${surveyQuestionsResponses.response} else 0 end)`.mapWith(
+				sql`sum(case when ${assessmentQuestionsResponses.isValidSubdomainGroup} = true then ${assessmentQuestionsResponses.response} else 0 end)`.mapWith(
 					Number
 				),
-			questionsTotal: sql`count(${surveyQuestionsResponses.response})`.mapWith(String)
+			questionsTotal: sql`count(${assessmentQuestionsResponses.response})`.mapWith(String)
 		})
 		.from(schools)
-		.leftJoin(surveys, eq(schools.id, surveys.schoolId))
-		.leftJoin(surveyQuestionsResponses, eq(surveys.id, surveyQuestionsResponses.surveyId))
-		.leftJoin(surveyQuestions, eq(surveyQuestions.id, surveyQuestionsResponses.questionId))
+		.leftJoin(assessments, eq(schools.id, assessments.schoolId))
+		.leftJoin(
+			assessmentQuestionsResponses,
+			eq(assessments.id, assessmentQuestionsResponses.assessmentId)
+		)
+		.leftJoin(
+			assessmentQuestions,
+			eq(assessmentQuestions.id, assessmentQuestionsResponses.questionId)
+		)
 		.groupBy(schools.id, schools.name)
 		.orderBy(schools.createdAt);
-	if (dev) console.log('getSchoolsWithSurveyCountForSuperAdmin res => ', res);
+	if (dev) console.log('getSchoolsWithAssessmentCountForSuperAdmin res => ', res);
 	return res || null;
 }
 
@@ -646,25 +677,25 @@ export async function getDistricts() {
 
 export async function addDemographicsData(values: CreateDemographicsResponseInput) {
 	if (dev) console.log('addDemographicsData values => ', values);
-	if (!values.surveyId || !values.schoolId) {
-		throw new Error('surveyId and schoolId are required');
+	if (!values.assessmentId || !values.schoolId) {
+		throw new Error('assessmentId and schoolId are required');
 	}
 	const [newDemo] = await db
-		.insert(surveyDemographics)
+		.insert(assessmentDemographics)
 		.values({
-			surveyId: values.surveyId,
+			assessmentId: values.assessmentId,
 			schoolId: values.schoolId,
 			yearsTeaching: values.yearsTeaching,
 			subjectTaught: values.subjectTaught
 		})
 		.onConflictDoUpdate({
-			target: [surveyDemographics.surveyId, surveyDemographics.schoolId],
+			target: [assessmentDemographics.assessmentId, assessmentDemographics.schoolId],
 			set: {
 				subjectTaught: sql`excluded.subject_taught`,
 				yearsTeaching: sql`excluded.years_teaching`
 			}
 		})
-		.returning({ id: surveyDemographics.id });
+		.returning({ id: assessmentDemographics.id });
 
 	return newDemo;
 }
@@ -672,12 +703,12 @@ export async function addDemographicsData(values: CreateDemographicsResponseInpu
 export async function addQuestionsData(values: CreateQuestionResponseInput) {
 	if (dev) console.log('addQuestionsData values => ', values);
 	const [newQuestionData] = await db
-		.insert(surveyQuestionsResponses)
+		.insert(assessmentQuestionsResponses)
 		.values([...values])
 		.onConflictDoUpdate({
-			target: [surveyQuestionsResponses.surveyId, surveyQuestionsResponses.questionId],
+			target: [assessmentQuestionsResponses.assessmentId, assessmentQuestionsResponses.questionId],
 			set: {
-				surveyId: sql`excluded.survey_id`,
+				assessmentId: sql`excluded.assessment_id`,
 				questionId: sql`excluded.question_id`,
 				isValidSubdomainGroup: sql`excluded.is_valid_subdomain_group`,
 				response: sql`excluded.response`
@@ -686,109 +717,120 @@ export async function addQuestionsData(values: CreateQuestionResponseInput) {
 	return newQuestionData;
 }
 
-export async function setSurveyStatus({
-	surveyId,
+export async function setAssessmentStatus({
+	assessmentId,
 	status
 }: {
-	surveyId: number;
-	status: (typeof surveyStatusEnum.enumValues)[number];
+	assessmentId: number;
+	status: (typeof assessmentStatusEnum.enumValues)[number];
 }) {
 	const [result] = await db
-		.update(surveys)
+		.update(assessments)
 		.set({ status })
-		.where(eq(surveys.id, surveyId))
-		.returning({ id: surveys.id });
+		.where(eq(assessments.id, assessmentId))
+		.returning({ id: assessments.id });
 
 	return result || null;
 }
 
-export async function getSurveyData(schoolId: number) {
+export async function getAssessmentData(schoolId: number) {
 	const results = await db
-		.select({ id: surveys.id, status: surveys.status })
-		.from(surveys)
-		.where(eq(surveys.schoolId, schoolId));
+		.select({ id: assessments.id, status: assessments.status })
+		.from(assessments)
+		.where(eq(assessments.schoolId, schoolId));
 
 	return results || [];
 }
-export async function getSchoolSurveyDataWithSummaryResult(schoolId: number) {
+export async function getSchoolAssessmentDataWithSummaryResult(schoolId: number) {
 	const results = await db
-		.select({ id: surveys.id, status: surveys.status })
-		.from(surveys)
-		.where(eq(surveys.schoolId, schoolId));
+		.select({ id: assessments.id, status: assessments.status })
+		.from(assessments)
+		.where(eq(assessments.schoolId, schoolId));
 
 	return results || [];
 }
 
-export async function getSchoolSurveyResultsData(schoolId: number) {
+export async function getSchoolAssessmentResultsData(schoolId: number) {
 	const results = await db
 		.select({
-			surveyId: surveys.id,
-			domainId: surveyDomains.id,
-			domainName: surveyDomains.name,
-			questionId: surveyQuestions.id,
-			questionResponse: surveyQuestionsResponses.response,
-			questionisValidSubdomainGroup: surveyQuestionsResponses.isValidSubdomainGroup,
-			subDomainId: surveySubDomains.id,
-			subName: surveySubDomains.name
+			assessmentId: assessments.id,
+			domainId: assessmentDomains.id,
+			domainName: assessmentDomains.name,
+			questionId: assessmentQuestions.id,
+			questionResponse: assessmentQuestionsResponses.response,
+			questionisValidSubdomainGroup: assessmentQuestionsResponses.isValidSubdomainGroup,
+			subDomainId: assessmentSubDomains.id,
+			subName: assessmentSubDomains.name
 		})
-		.from(surveyQuestionsResponses)
-		.leftJoin(surveys, eq(surveys.id, surveyQuestionsResponses.surveyId))
-		.leftJoin(surveyQuestions, eq(surveyQuestions.id, surveyQuestionsResponses.questionId))
-		.leftJoin(surveySubDomains, eq(surveySubDomains.id, surveyQuestions.subDomainId))
-		.leftJoin(surveyDomains, eq(surveyDomains.id, surveySubDomains.domainId))
-		.where(eq(surveys.schoolId, schoolId));
+		.from(assessmentQuestionsResponses)
+		.leftJoin(assessments, eq(assessments.id, assessmentQuestionsResponses.assessmentId))
+		.leftJoin(
+			assessmentQuestions,
+			eq(assessmentQuestions.id, assessmentQuestionsResponses.questionId)
+		)
+		.leftJoin(assessmentSubDomains, eq(assessmentSubDomains.id, assessmentQuestions.subDomainId))
+		.leftJoin(assessmentDomains, eq(assessmentDomains.id, assessmentSubDomains.domainId))
+		.where(eq(assessments.schoolId, schoolId));
 	return results || null;
 }
-export async function getSingleSurveyResultsDataForSuperAdmin(surveyId: number) {
+export async function getSingleAssessmentResultsDataForSuperAdmin(assessmentId: number) {
 	const results = await db
 		.select({
-			participantName: surveys.recipientName,
-			participantEmail: surveys.recipientEmail,
-			surveyId: surveys.id,
-			domainId: surveyDomains.id,
-			domainName: surveyDomains.name,
-			questionId: surveyQuestions.id,
-			questionResponse: surveyQuestionsResponses.response,
-			questionisValidSubdomainGroup: surveyQuestionsResponses.isValidSubdomainGroup,
-			subDomainId: surveySubDomains.id,
-			subName: surveySubDomains.name
+			participantName: assessments.recipientName,
+			participantEmail: assessments.recipientEmail,
+			assessmentId: assessments.id,
+			domainId: assessmentDomains.id,
+			domainName: assessmentDomains.name,
+			questionId: assessmentQuestions.id,
+			questionResponse: assessmentQuestionsResponses.response,
+			questionisValidSubdomainGroup: assessmentQuestionsResponses.isValidSubdomainGroup,
+			subDomainId: assessmentSubDomains.id,
+			subName: assessmentSubDomains.name
 		})
-		.from(surveyQuestionsResponses)
-		.leftJoin(surveys, eq(surveys.id, surveyQuestionsResponses.surveyId))
-		.leftJoin(surveyQuestions, eq(surveyQuestions.id, surveyQuestionsResponses.questionId))
-		.leftJoin(surveySubDomains, eq(surveySubDomains.id, surveyQuestions.subDomainId))
-		.leftJoin(surveyDomains, eq(surveyDomains.id, surveySubDomains.domainId))
-		.where(eq(surveys.id, surveyId));
+		.from(assessmentQuestionsResponses)
+		.leftJoin(assessments, eq(assessments.id, assessmentQuestionsResponses.assessmentId))
+		.leftJoin(
+			assessmentQuestions,
+			eq(assessmentQuestions.id, assessmentQuestionsResponses.questionId)
+		)
+		.leftJoin(assessmentSubDomains, eq(assessmentSubDomains.id, assessmentQuestions.subDomainId))
+		.leftJoin(assessmentDomains, eq(assessmentDomains.id, assessmentSubDomains.domainId))
+		.where(eq(assessments.id, assessmentId));
 
 	return results || null;
 }
-export async function getSingleSurveyResultsDataForSchoolAndDistrictAdmin(surveyId: number) {
+export async function getSingleAssessmentResultsDataForSchoolAndDistrictAdmin(
+	assessmentId: number
+) {
 	const results = await db
 		.select({
-			surveyId: surveys.id,
-			domainId: surveyDomains.id,
-			domainName: surveyDomains.name,
-			questionId: surveyQuestions.id,
-			questionResponse: surveyQuestionsResponses.response,
-			questionisValidSubdomainGroup: surveyQuestionsResponses.isValidSubdomainGroup,
-			subDomainId: surveySubDomains.id,
-			subName: surveySubDomains.name
+			assessmentId: assessments.id,
+			domainId: assessmentDomains.id,
+			domainName: assessmentDomains.name,
+			questionId: assessmentQuestions.id,
+			questionResponse: assessmentQuestionsResponses.response,
+			questionisValidSubdomainGroup: assessmentQuestionsResponses.isValidSubdomainGroup,
+			subDomainId: assessmentSubDomains.id,
+			subName: assessmentSubDomains.name
 		})
-		.from(surveyQuestionsResponses)
-		.leftJoin(surveys, eq(surveys.id, surveyQuestionsResponses.surveyId))
-		.leftJoin(surveyQuestions, eq(surveyQuestions.id, surveyQuestionsResponses.questionId))
-		.leftJoin(surveySubDomains, eq(surveySubDomains.id, surveyQuestions.subDomainId))
-		.leftJoin(surveyDomains, eq(surveyDomains.id, surveySubDomains.domainId))
-		.where(eq(surveys.id, surveyId));
+		.from(assessmentQuestionsResponses)
+		.leftJoin(assessments, eq(assessments.id, assessmentQuestionsResponses.assessmentId))
+		.leftJoin(
+			assessmentQuestions,
+			eq(assessmentQuestions.id, assessmentQuestionsResponses.questionId)
+		)
+		.leftJoin(assessmentSubDomains, eq(assessmentSubDomains.id, assessmentQuestions.subDomainId))
+		.leftJoin(assessmentDomains, eq(assessmentDomains.id, assessmentSubDomains.domainId))
+		.where(eq(assessments.id, assessmentId));
 
 	return results || null;
 }
 
 export async function getQuestionData(schoolId: number) {
 	const results = await db
-		.select({ id: surveys.id, status: surveys.status })
-		.from(surveys)
-		.where(eq(surveys.schoolId, schoolId));
+		.select({ id: assessments.id, status: assessments.status })
+		.from(assessments)
+		.where(eq(assessments.schoolId, schoolId));
 
 	return results || null;
 }
@@ -796,19 +838,22 @@ export async function getQuestionData(schoolId: number) {
 export async function getSchoolDomainResultsData(schoolId: number) {
 	const results = await db
 		.select({
-			domainId: surveyDomains.id,
-			domainName: surveyDomains.name,
-			questionId: surveyQuestions.id,
-			questionResponse: surveyQuestionsResponses.response,
-			subId: surveySubDomains.id,
-			subName: surveySubDomains.name
+			domainId: assessmentDomains.id,
+			domainName: assessmentDomains.name,
+			questionId: assessmentQuestions.id,
+			questionResponse: assessmentQuestionsResponses.response,
+			subId: assessmentSubDomains.id,
+			subName: assessmentSubDomains.name
 		})
-		.from(surveyQuestionsResponses)
-		.leftJoin(surveys, eq(surveys.id, surveyQuestionsResponses.surveyId))
-		.leftJoin(surveyQuestions, eq(surveyQuestions.id, surveyQuestionsResponses.questionId))
-		.leftJoin(surveySubDomains, eq(surveySubDomains.id, surveyQuestions.subDomainId))
-		.leftJoin(surveyDomains, eq(surveyDomains.id, surveySubDomains.domainId))
-		.where(eq(surveys.schoolId, schoolId));
+		.from(assessmentQuestionsResponses)
+		.leftJoin(assessments, eq(assessments.id, assessmentQuestionsResponses.assessmentId))
+		.leftJoin(
+			assessmentQuestions,
+			eq(assessmentQuestions.id, assessmentQuestionsResponses.questionId)
+		)
+		.leftJoin(assessmentSubDomains, eq(assessmentSubDomains.id, assessmentQuestions.subDomainId))
+		.leftJoin(assessmentDomains, eq(assessmentDomains.id, assessmentSubDomains.domainId))
+		.where(eq(assessments.schoolId, schoolId));
 
 	return results || null;
 }
@@ -835,37 +880,40 @@ export async function createAssessment({
 	schoolId: number;
 	sentBy: string;
 }): Promise<{ id: number } | null> {
-	const [newSurvey] = await db
-		.insert(surveys)
+	const [newAssessment] = await db
+		.insert(assessments)
 		.values({
 			recipientName,
 			recipientEmail,
 			schoolId,
 			sentBy
 		})
-		.returning({ id: surveys.id });
+		.returning({ id: assessments.id });
 
-	return newSurvey || null;
+	return newAssessment || null;
 }
 
 export async function getAllTimeQuestionResponsesByDomain() {
 	const results = await db
 		.select({
-			domainId: surveyDomains.id,
-			domainName: surveyDomains.name,
+			domainId: assessmentDomains.id,
+			domainName: assessmentDomains.name,
 			pointsTotal:
-				sql`sum(case when ${surveyQuestionsResponses.isValidSubdomainGroup} = true then ${surveyQuestionsResponses.response} else 0 end)`.mapWith(
+				sql`sum(case when ${assessmentQuestionsResponses.isValidSubdomainGroup} = true then ${assessmentQuestionsResponses.response} else 0 end)`.mapWith(
 					Number
 				),
-			questionsTotal: sql`count(${surveyQuestionsResponses.response})`.mapWith(Number)
+			questionsTotal: sql`count(${assessmentQuestionsResponses.response})`.mapWith(Number)
 		})
-		.from(surveyQuestionsResponses)
-		.leftJoin(surveys, eq(surveys.id, surveyQuestionsResponses.surveyId))
-		.leftJoin(surveyQuestions, eq(surveyQuestions.id, surveyQuestionsResponses.questionId))
-		.leftJoin(surveySubDomains, eq(surveySubDomains.id, surveyQuestions.subDomainId))
-		.leftJoin(surveyDomains, eq(surveyDomains.id, surveySubDomains.domainId))
-		.groupBy(surveyDomains.id)
-		.orderBy(surveyDomains.id);
+		.from(assessmentQuestionsResponses)
+		.leftJoin(assessments, eq(assessments.id, assessmentQuestionsResponses.assessmentId))
+		.leftJoin(
+			assessmentQuestions,
+			eq(assessmentQuestions.id, assessmentQuestionsResponses.questionId)
+		)
+		.leftJoin(assessmentSubDomains, eq(assessmentSubDomains.id, assessmentQuestions.subDomainId))
+		.leftJoin(assessmentDomains, eq(assessmentDomains.id, assessmentSubDomains.domainId))
+		.groupBy(assessmentDomains.id)
+		.orderBy(assessmentDomains.id);
 
 	return results || [];
 }
@@ -873,43 +921,49 @@ export async function getAllTimeQuestionResponsesByDomain() {
 export async function getAllTimeQuestionResponsesStatsByQuestion() {
 	const results = await db
 		.select({
-			questionId: surveyQuestions.id,
-			domainId: surveySubDomains.domainId,
+			questionId: assessmentQuestions.id,
+			domainId: assessmentSubDomains.domainId,
 			pointsTotal:
-				sql`sum(case when ${surveyQuestionsResponses.isValidSubdomainGroup} = true then ${surveyQuestionsResponses.response} else 0 end)`.mapWith(
+				sql`sum(case when ${assessmentQuestionsResponses.isValidSubdomainGroup} = true then ${assessmentQuestionsResponses.response} else 0 end)`.mapWith(
 					Number
 				),
-			questionsTotal: sql`count(${surveyQuestionsResponses.response})`.mapWith(Number)
+			questionsTotal: sql`count(${assessmentQuestionsResponses.response})`.mapWith(Number)
 		})
-		.from(surveyQuestionsResponses)
-		.leftJoin(surveyQuestions, eq(surveyQuestions.id, surveyQuestionsResponses.questionId))
-		.leftJoin(surveySubDomains, eq(surveySubDomains.id, surveyQuestions.subDomainId))
-		.groupBy(surveyQuestions.id, surveySubDomains.domainId)
-		.orderBy(surveyQuestions.id);
+		.from(assessmentQuestionsResponses)
+		.leftJoin(
+			assessmentQuestions,
+			eq(assessmentQuestions.id, assessmentQuestionsResponses.questionId)
+		)
+		.leftJoin(assessmentSubDomains, eq(assessmentSubDomains.id, assessmentQuestions.subDomainId))
+		.groupBy(assessmentQuestions.id, assessmentSubDomains.domainId)
+		.orderBy(assessmentQuestions.id);
 	return results || [];
 }
 
 export async function getAllTimeQuestionResponsesByDomainForDistrict(districtId: number) {
 	const results = await db
 		.select({
-			domainId: surveyDomains.id,
-			domainName: surveyDomains.name,
+			domainId: assessmentDomains.id,
+			domainName: assessmentDomains.name,
 			pointsTotal:
-				sql`sum(case when ${surveyQuestionsResponses.isValidSubdomainGroup} = true then ${surveyQuestionsResponses.response} else 0 end)`.mapWith(
+				sql`sum(case when ${assessmentQuestionsResponses.isValidSubdomainGroup} = true then ${assessmentQuestionsResponses.response} else 0 end)`.mapWith(
 					Number
 				),
-			questionsTotal: sql`count(${surveyQuestionsResponses.response})`.mapWith(Number)
+			questionsTotal: sql`count(${assessmentQuestionsResponses.response})`.mapWith(Number)
 		})
-		.from(surveyQuestionsResponses)
-		.leftJoin(surveys, eq(surveys.id, surveyQuestionsResponses.surveyId))
-		.leftJoin(schools, eq(schools.id, surveys.schoolId))
+		.from(assessmentQuestionsResponses)
+		.leftJoin(assessments, eq(assessments.id, assessmentQuestionsResponses.assessmentId))
+		.leftJoin(schools, eq(schools.id, assessments.schoolId))
 		.leftJoin(districts, eq(districts.id, schools.districtId))
-		.leftJoin(surveyQuestions, eq(surveyQuestions.id, surveyQuestionsResponses.questionId))
-		.leftJoin(surveySubDomains, eq(surveySubDomains.id, surveyQuestions.subDomainId))
-		.leftJoin(surveyDomains, eq(surveyDomains.id, surveySubDomains.domainId))
+		.leftJoin(
+			assessmentQuestions,
+			eq(assessmentQuestions.id, assessmentQuestionsResponses.questionId)
+		)
+		.leftJoin(assessmentSubDomains, eq(assessmentSubDomains.id, assessmentQuestions.subDomainId))
+		.leftJoin(assessmentDomains, eq(assessmentDomains.id, assessmentSubDomains.domainId))
 		.where(eq(districts.id, districtId))
-		.groupBy(surveyDomains.id)
-		.orderBy(surveyDomains.id);
+		.groupBy(assessmentDomains.id)
+		.orderBy(assessmentDomains.id);
 
 	return results || [];
 }
@@ -917,46 +971,52 @@ export async function getAllTimeQuestionResponsesByDomainForDistrict(districtId:
 export async function getAllTimeQuestionResponsesStatsByQuestionForDistrict(districtId: number) {
 	const results = await db
 		.select({
-			questionId: surveyQuestions.id,
-			domainId: surveySubDomains.domainId,
+			questionId: assessmentQuestions.id,
+			domainId: assessmentSubDomains.domainId,
 			pointsTotal:
-				sql`sum(case when ${surveyQuestionsResponses.isValidSubdomainGroup} = true then ${surveyQuestionsResponses.response} else 0 end)`.mapWith(
+				sql`sum(case when ${assessmentQuestionsResponses.isValidSubdomainGroup} = true then ${assessmentQuestionsResponses.response} else 0 end)`.mapWith(
 					Number
 				),
-			questionsTotal: sql`count(${surveyQuestionsResponses.response})`.mapWith(Number)
+			questionsTotal: sql`count(${assessmentQuestionsResponses.response})`.mapWith(Number)
 		})
-		.from(surveyQuestionsResponses)
-		.leftJoin(surveys, eq(surveys.id, surveyQuestionsResponses.surveyId))
-		.leftJoin(schools, eq(schools.id, surveys.schoolId))
+		.from(assessmentQuestionsResponses)
+		.leftJoin(assessments, eq(assessments.id, assessmentQuestionsResponses.assessmentId))
+		.leftJoin(schools, eq(schools.id, assessments.schoolId))
 		.leftJoin(districts, eq(districts.id, schools.districtId))
-		.leftJoin(surveyQuestions, eq(surveyQuestions.id, surveyQuestionsResponses.questionId))
-		.leftJoin(surveySubDomains, eq(surveySubDomains.id, surveyQuestions.subDomainId))
+		.leftJoin(
+			assessmentQuestions,
+			eq(assessmentQuestions.id, assessmentQuestionsResponses.questionId)
+		)
+		.leftJoin(assessmentSubDomains, eq(assessmentSubDomains.id, assessmentQuestions.subDomainId))
 		.where(eq(districts.id, districtId))
-		.groupBy(surveyQuestions.id, surveySubDomains.domainId)
-		.orderBy(surveyQuestions.id);
+		.groupBy(assessmentQuestions.id, assessmentSubDomains.domainId)
+		.orderBy(assessmentQuestions.id);
 	return results || [];
 }
 
 export async function getAllTimeQuestionResponsesByDomainForSchool(schoolId: number) {
 	const results = await db
 		.select({
-			domainId: surveyDomains.id,
-			domainName: surveyDomains.name,
+			domainId: assessmentDomains.id,
+			domainName: assessmentDomains.name,
 			pointsTotal:
-				sql`sum(case when ${surveyQuestionsResponses.isValidSubdomainGroup} = true then ${surveyQuestionsResponses.response} else 0 end)`.mapWith(
+				sql`sum(case when ${assessmentQuestionsResponses.isValidSubdomainGroup} = true then ${assessmentQuestionsResponses.response} else 0 end)`.mapWith(
 					Number
 				),
-			questionsTotal: sql`count(${surveyQuestionsResponses.response})`.mapWith(Number)
+			questionsTotal: sql`count(${assessmentQuestionsResponses.response})`.mapWith(Number)
 		})
-		.from(surveyQuestionsResponses)
-		.leftJoin(surveys, eq(surveys.id, surveyQuestionsResponses.surveyId))
-		.leftJoin(schools, eq(schools.id, surveys.schoolId))
-		.leftJoin(surveyQuestions, eq(surveyQuestions.id, surveyQuestionsResponses.questionId))
-		.leftJoin(surveySubDomains, eq(surveySubDomains.id, surveyQuestions.subDomainId))
-		.leftJoin(surveyDomains, eq(surveyDomains.id, surveySubDomains.domainId))
+		.from(assessmentQuestionsResponses)
+		.leftJoin(assessments, eq(assessments.id, assessmentQuestionsResponses.assessmentId))
+		.leftJoin(schools, eq(schools.id, assessments.schoolId))
+		.leftJoin(
+			assessmentQuestions,
+			eq(assessmentQuestions.id, assessmentQuestionsResponses.questionId)
+		)
+		.leftJoin(assessmentSubDomains, eq(assessmentSubDomains.id, assessmentQuestions.subDomainId))
+		.leftJoin(assessmentDomains, eq(assessmentDomains.id, assessmentSubDomains.domainId))
 		.where(eq(schools.id, schoolId))
-		.groupBy(surveyDomains.id)
-		.orderBy(surveyDomains.id);
+		.groupBy(assessmentDomains.id)
+		.orderBy(assessmentDomains.id);
 
 	return results || [];
 }
@@ -964,22 +1024,25 @@ export async function getAllTimeQuestionResponsesByDomainForSchool(schoolId: num
 export async function getAllTimeQuestionResponsesStatsByQuestionForSchool(schoolId: number) {
 	const results = await db
 		.select({
-			questionId: surveyQuestions.id,
-			domainId: surveySubDomains.domainId,
+			questionId: assessmentQuestions.id,
+			domainId: assessmentSubDomains.domainId,
 			pointsTotal:
-				sql`sum(case when ${surveyQuestionsResponses.isValidSubdomainGroup} = true then ${surveyQuestionsResponses.response} else 0 end)`.mapWith(
+				sql`sum(case when ${assessmentQuestionsResponses.isValidSubdomainGroup} = true then ${assessmentQuestionsResponses.response} else 0 end)`.mapWith(
 					Number
 				),
-			questionsTotal: sql`count(${surveyQuestionsResponses.response})`.mapWith(Number)
+			questionsTotal: sql`count(${assessmentQuestionsResponses.response})`.mapWith(Number)
 		})
-		.from(surveyQuestionsResponses)
-		.leftJoin(surveys, eq(surveys.id, surveyQuestionsResponses.surveyId))
-		.leftJoin(schools, eq(schools.id, surveys.schoolId))
-		.leftJoin(surveyQuestions, eq(surveyQuestions.id, surveyQuestionsResponses.questionId))
-		.leftJoin(surveySubDomains, eq(surveySubDomains.id, surveyQuestions.subDomainId))
+		.from(assessmentQuestionsResponses)
+		.leftJoin(assessments, eq(assessments.id, assessmentQuestionsResponses.assessmentId))
+		.leftJoin(schools, eq(schools.id, assessments.schoolId))
+		.leftJoin(
+			assessmentQuestions,
+			eq(assessmentQuestions.id, assessmentQuestionsResponses.questionId)
+		)
+		.leftJoin(assessmentSubDomains, eq(assessmentSubDomains.id, assessmentQuestions.subDomainId))
 		.where(eq(schools.id, schoolId))
-		.groupBy(surveyQuestions.id, surveySubDomains.domainId)
-		.orderBy(surveyQuestions.id);
+		.groupBy(assessmentQuestions.id, assessmentSubDomains.domainId)
+		.orderBy(assessmentQuestions.id);
 	return results || [];
 }
 
@@ -1013,33 +1076,33 @@ export async function getSchoolDetailsById(
 	return results || null;
 }
 
-export const getSurveyById = async (surveyId: number) => {
+export const getAssessmentById = async (assessmentId: number) => {
 	const [res] = await db
-		.select({ id: surveys.id, status: surveys.status })
-		.from(surveys)
-		.where(eq(surveys.id, surveyId));
+		.select({ id: assessments.id, status: assessments.status })
+		.from(assessments)
+		.where(eq(assessments.id, assessmentId));
 	return res || null;
 };
-export const getDemographicsDataBySurveyId = async (surveyId: number) => {
+export const getDemographicsDataByAssessmentId = async (assessmentId: number) => {
 	const [res] = await db
 		.select({
-			subjectTaught: surveyDemographics.subjectTaught,
-			yearsTeaching: surveyDemographics.yearsTeaching
+			subjectTaught: assessmentDemographics.subjectTaught,
+			yearsTeaching: assessmentDemographics.yearsTeaching
 		})
-		.from(surveyDemographics)
-		.where(eq(surveyDemographics.surveyId, surveyId));
-	if (dev) console.log('getDemographicsDataBySurveyId => ', res);
+		.from(assessmentDemographics)
+		.where(eq(assessmentDemographics.assessmentId, assessmentId));
+	if (dev) console.log('getDemographicsDataByAssessmentId => ', res);
 	return res || null;
 };
 
-export const getAssessmentDataBySurveyId = async (surveyId: number) => {
+export const getAssessmentDataByAssessmentId = async (assessmentId: number) => {
 	const res = await db
 		.select({
-			questionId: surveyQuestionsResponses.questionId,
-			response: surveyQuestionsResponses.response
+			questionId: assessmentQuestionsResponses.questionId,
+			response: assessmentQuestionsResponses.response
 		})
-		.from(surveyQuestionsResponses)
-		.where(eq(surveyQuestionsResponses.surveyId, surveyId));
-	if (dev) console.log('getAssessmentDataBySurveyId => ', res);
+		.from(assessmentQuestionsResponses)
+		.where(eq(assessmentQuestionsResponses.assessmentId, assessmentId));
+	if (dev) console.log('getAssessmentDataByAssessmentId => ', res);
 	return res || null;
 };

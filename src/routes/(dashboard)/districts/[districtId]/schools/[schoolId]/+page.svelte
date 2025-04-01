@@ -5,18 +5,24 @@
 	import { page } from '$app/state';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import AdminContactDetailsCard from '$lib/components/admin-contact-details-card.svelte';
-	import MemberSurveyResultsCard from '$lib/components/member-survey-results-card.svelte';
+	import MemberAssessmentResultsCard from '$lib/components/member-assessment-results-card.svelte';
 
 	let { data } = $props();
-	const { adminData, school, surveyData, memberData } = data;
+	const { adminData, school, assessmentData, memberData } = data;
 
-	const surveysNotStarted = surveyData.filter((survey) => survey.status === 'sent').length;
-	const surveysCompleted = surveyData.filter((survey) => survey.status === 'completed').length;
-	const totalSurveys = surveyData.length;
-	const surveysNotStartedPercentage = surveysNotStarted
-		? (surveysNotStarted / totalSurveys) * 100
+	const assessmentsNotStarted = assessmentData.filter(
+		(assessment) => assessment.status === 'sent'
+	).length;
+	const assessmentsCompleted = assessmentData.filter(
+		(assessment) => assessment.status === 'completed'
+	).length;
+	const totalAssessments = assessmentData.length;
+	const assessmentsNotStartedPercentage = assessmentsNotStarted
+		? (assessmentsNotStarted / totalAssessments) * 100
 		: 0;
-	const surveysCompletedPercentage = surveysCompleted ? (surveysCompleted / totalSurveys) * 100 : 0;
+	const assessmentsCompletedPercentage = assessmentsCompleted
+		? (assessmentsCompleted / totalAssessments) * 100
+		: 0;
 </script>
 
 <h1 class="sr-only">Manage {school.name} School</h1>
@@ -43,14 +49,14 @@
 				<Button href={`${page.url.pathname}/send-assessment`} class="mb-4">Send Assessment</Button>
 				<div class="flex items-center justify-between">
 					<div class="flex gap-2">
-						<p>Total Surveys:</p>
-						<p>{totalSurveys}</p>
+						<p>Total Assessments:</p>
+						<p>{totalAssessments}</p>
 					</div>
 				</div>
 				<p>Not Started</p>
-				<Progress barBgColor="bg-red-700" value={surveysNotStartedPercentage} />
+				<Progress barBgColor="bg-red-700" value={assessmentsNotStartedPercentage} />
 				<p>Completed</p>
-				<Progress barBgColor="bg-green-700" value={surveysCompletedPercentage} />
+				<Progress barBgColor="bg-green-700" value={assessmentsCompletedPercentage} />
 			</div>
 		</div>
 	</Card.Root>
@@ -59,10 +65,10 @@
 	<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 		{#if memberData.length > 0}
 			{#each memberData as member, idx (member.id)}
-				<MemberSurveyResultsCard {member} {idx} />
+				<MemberAssessmentResultsCard {member} {idx} />
 			{/each}
 		{:else}
-			<p>No survey results available</p>
+			<p>No assessment results available</p>
 		{/if}
 	</div>
 </section>

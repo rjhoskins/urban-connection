@@ -3,8 +3,8 @@ import { error, redirect } from '@sveltejs/kit';
 import {
 	getSchoolAdminBySchoolId,
 	getSchoolDetailsById,
-	getSchoolMemberSurveyTotalsForSchoolAndDistrictAdminBySchool,
-	getSurveyData
+	getSchoolMemberAssessmentTotalsForSchoolAndDistrictAdminBySchool,
+	getAssessmentData
 } from '$lib/server/queries';
 
 export const load = async (event) => {
@@ -29,8 +29,8 @@ export const load = async (event) => {
 	return {
 		adminData: await getSchoolAdminBySchoolId(schoolId),
 		school,
-		surveyData: await getSurveyData(schoolId),
-		memberData: await getSchoolMemberSurveyTotalsForSchoolAndDistrictAdminBySchool(schoolId),
+		assessmentData: await getAssessmentData(schoolId),
+		memberData: await getSchoolMemberAssessmentTotalsForSchoolAndDistrictAdminBySchool(schoolId),
 		layout: 'hello'
 	};
 };

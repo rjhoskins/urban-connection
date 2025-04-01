@@ -18,10 +18,10 @@
 	}
 
 	let { data }: { data: PageData } = $props();
-	const { district, adminData, memberSurveyData } = data as unknown as {
+	const { district, adminData, memberAssessmentData } = data as unknown as {
 		district: District;
 		adminData: Array<Record<string, any>> | Record<string, any>;
-		memberSurveyData: Array<{ id: string; [key: string]: any }>;
+		memberAssessmentData: Array<{ id: string; [key: string]: any }>;
 	};
 </script>
 
@@ -50,7 +50,7 @@
 		</Card>
 	</div>
 	<div class=" grid-cols-three-fluid grid max-w-6xl gap-4 py-8">
-		{#each memberSurveyData as school (school.id)}
+		{#each memberAssessmentData as school (school.id)}
 			<SchoolCard isNested {page} {school} />
 		{/each}
 	</div>

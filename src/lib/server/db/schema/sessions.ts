@@ -7,7 +7,7 @@ const sessions = pgTable('sessions', {
 	userId: varchar('user_id', { length: 256 })
 		.notNull()
 		.references(() => users.id),
-	// currentSessionHasExpiresAt: boolean('current_session_has_expires_at').default(false),
+	currentSessionHasExpiresAt: boolean('current_session_has_expires_at').default(false),
 	expiresAt: timestamp('expires_at', { withTimezone: true, mode: 'string' })
 });
 

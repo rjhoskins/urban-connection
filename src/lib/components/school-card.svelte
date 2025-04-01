@@ -2,16 +2,16 @@
 	import * as Card from '$lib/components/ui/card';
 	import Progress from './ui/progress/progress.svelte';
 	let { school, page, isNested = false } = $props();
-	const { name, id, surveyCount, pointsTotal, questionsTotal } = school;
-	const totalAssessmentScorePercentage = Math.floor((pointsTotal / questionsTotal) * 100) || 0;
+	const { name, id, assessmentCount, pointsTotal, questionsTotal } = school;
+	const totalAssessmentScorePercentage = Math.round((pointsTotal / questionsTotal) * 100) || 0;
 </script>
 
 <Card.Root class="transition-shadow duration-300 ease-in-out hover:shadow-lg">
 	<Card.Header>
 		<Card.Title>{name}</Card.Title>
 		<Card.Description class="text-primary/50 flex gap-4">
-			{#if surveyCount}
-				<p>Assessments {surveyCount}</p>
+			{#if assessmentCount}
+				<p>Assessments {assessmentCount}</p>
 			{/if}
 		</Card.Description>
 	</Card.Header>
@@ -22,7 +22,7 @@
 			>View School</a
 		>
 		<div class="flex grow flex-col gap-2">
-			{#if surveyCount > 0}
+			{#if assessmentCount > 0}
 				<div class="flex justify-between">
 					<p class="">Total Score:</p>
 					<p class="">{totalAssessmentScorePercentage}%</p>

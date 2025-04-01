@@ -6,18 +6,24 @@ export { default as schoolAdmins, schoolAdminsRelations } from './schoolAdmins';
 export { default as districtAdmins, districtAdminsRelations } from './districtAdmins';
 export { default as adminUserInvites, adminUserInvitesRelations } from './adminUserInvites';
 export { default as htmlEmailTemplates } from './htmlEmailTemplates';
-export { default as surveyDomains, surveyDomainsRelations } from './surveyDomains';
-export { default as surveySubDomains, surveySubDomainsRelations } from './surveySubDomains';
-export { default as surveyQuestions, surveyQuestionsRelations } from './surveyQuestions';
-export { default as surveys, surveysRelations } from './surveys';
+export { default as assessmentDomains, assessmentDomainsRelations } from './assessmentDomains';
+export {
+	default as assessmentSubDomains,
+	assessmentSubDomainsRelations
+} from './assessmentSubDomains';
+export {
+	default as assessmentQuestions,
+	assessmentQuestionsRelations
+} from './assessmentQuestions';
+export { default as assessments, assessmentsRelations } from './assessments';
 export { default as schoolAssessments, schoolAssessmentsRelations } from './schoolAssessments';
 export { default as assessmentInvites, assessmentInvitesRelations } from './assessmentInvites';
 export {
-	default as surveyQuestionsResponses,
-	surveyQuestionsResponsesRelations
-} from './surveyQuestionsResponses';
+	default as assessmentQuestionsResponses,
+	assessmentQuestionsResponsesRelations
+} from './assessmentQuestionsResponses';
 export {
-	default as surveyDemographics,
-	surveyDemographicsRelations
-} from './surveyDemographicsResponses';
-export { inviteType, userRolesEnum, status, templateType, surveyStatusEnum } from './db-utils';
+	default as assessmentDemographics,
+	assessmentDemographicsRelations
+} from './assessmentDemographicsResponses';
+export { inviteType, userRolesEnum, templateType, assessmentStatusEnum } from './db-utils';

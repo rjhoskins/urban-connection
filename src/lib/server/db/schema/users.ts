@@ -13,7 +13,6 @@ const users = pgTable(
 		username: varchar('username', { length: 256 }).notNull().unique(),
 		passwordHash: varchar('password_hash').default(sql`NULL`),
 		role: userRolesEnum('role').default('school_admin'),
-		isActive: boolean('is_active').default(false),
 		...timestamps
 	},
 	(table) => [index('username_idx').on(table.username)]

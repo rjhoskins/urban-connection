@@ -5,7 +5,7 @@ import type { UserInviteHTMLEmailTemplateType } from './schema';
 import { message, type SuperValidated } from 'sveltekit-superforms';
 import { setFlash } from 'sveltekit-flash-message/server';
 import type { Cookies, RequestEvent } from '@sveltejs/kit';
-import type { Domain, Question, Subdomain, SurveyData } from './types/survey';
+import type { Domain, Question, Subdomain, AssessmentData } from './types/assessment';
 
 type Message = { status: 'error' | 'success' | 'warning'; text: string };
 
@@ -26,22 +26,22 @@ export function decodeAdminUserInviteToken(token: string) {
 export function createAssessmentInviteToken({
 	name,
 	email,
-	surveyId,
+	assessmentId,
 	schoolId
 }: {
 	name: string;
 	email: string;
-	surveyId: number;
+	assessmentId: number;
 	schoolId: number;
 }) {
-	const data = `${name}|${email}|${surveyId}|${schoolId}`;
+	const data = `${name}|${email}|${assessmentId}|${schoolId}`;
 	return btoa(data);
 }
 
 export function decodeAssessmentInviteToken(token: string) {
 	const data = atob(token);
-	const [name, email, surveyId, schoolId] = data.split('|');
-	return { name, email, surveyId, schoolId };
+	const [name, email, assessmentId, schoolId] = data.split('|');
+	return { name, email, assessmentId, schoolId };
 }
 
 export function handleTypeSafeError(error: unknown, message: any, form: any) {
@@ -152,7 +152,7 @@ export function slugify(text: string): string {
 		.replace(/-+$/, ''); // Remove hyphens from end
 }
 
-export function transformSurveyData(rawData: SurveyData) {
+export function transformAssessmentData(rawData: AssessmentData) {
 	// Group by domains first
 	const domainMap = new Map();
 
@@ -203,20 +203,22 @@ export function transformSurveyData(rawData: SurveyData) {
 	return result;
 }
 
-type SurveyResponseData = {
-	surveyId: number;
+type AssessmentResponseData = {
+	assessmentId: number;
 	[key: string]: string | number;
 };
 
 type TransformedResponse = {
-	surveyId: number;
+	assessmentId: number;
 	questionId: number;
 	isValidSubdomainGroup: boolean;
 	response: 0 | 1 | null;
 };
 
-export function transformSurveyQuestionsResponses(data: SurveyResponseData): TransformedResponse[] {
-	const { surveyId, ...responses } = data;
+export function transformAssessmentQuestionsResponses(
+	data: AssessmentResponseData
+): TransformedResponse[] {
+	const { assessmentId, ...responses } = data;
 
 	const rawData = Object.entries(responses)
 		.filter(([key]) => key.startsWith('domainId='))
@@ -226,7 +228,7 @@ export function transformSurveyQuestionsResponses(data: SurveyResponseData): Tra
 
 			const [, domainId, subDomainId, questionId] = match;
 			return {
-				surveyId: surveyId,
+				assessmentId: assessmentId,
 				questionId: parseInt(questionId, 10),
 				subDomainId: parseInt(subDomainId, 10),
 				response: value === '' ? null : parseInt(String(value)) === 1 ? 1 : 0
@@ -236,34 +238,34 @@ export function transformSurveyQuestionsResponses(data: SurveyResponseData): Tra
 	console.log('rawData  ====> ', rawData);
 	let currSubdomainId;
 
-	const transformedSurveyQuestionsResponses = rawData.map((item, _, array) => {
+	const transformedAssessmentQuestionsResponses = rawData.map((item, _, array) => {
 		const currSubdomainId = item.subDomainId;
 		const currGroup = array.filter((item) => item.subDomainId === currSubdomainId);
 		const subDomainHasNullResponse = array
 			.filter((el) => el.subDomainId === currSubdomainId)
 			.some((el) => el.response === null); // whole subdomain is tainted if any question is un-answered
 		return {
-			surveyId: item.surveyId,
+			assessmentId: item.assessmentId,
 			questionId: item.questionId,
 			isValidSubdomainGroup: !subDomainHasNullResponse,
 			response: item.response
 		};
 	});
-	// console.log('transformSurveyQuestionsResponses  ====> ', transformedSurveyQuestionsResponses);
-	return transformedSurveyQuestionsResponses as TransformedResponse[];
+	// console.log('transformAssessmentQuestionsResponses  ====> ', transformedAssessmentQuestionsResponses);
+	return transformedAssessmentQuestionsResponses as TransformedResponse[];
 }
 
-export function applySurveyResponsesToQuestionsAndGetCurrentPositions({
-	surveyQuestions,
+export function applyAssessmentResponsesToQuestionsAndGetCurrentPositions({
+	assessmentQuestions,
 	currDemgraphicsData,
 	currAssessmentData
 }: {
-	surveyQuestions: any[];
+	assessmentQuestions: any[];
 	currDemgraphicsData: any;
 	currAssessmentData: any[];
 }) {
-	let surveyQuestionsCopy = JSON.parse(JSON.stringify(surveyQuestions));
-	// console.log('questionsCopy  ====> ', surveyQuestionsCopy);
+	let assessmentQuestionsCopy = JSON.parse(JSON.stringify(assessmentQuestions));
+	// console.log('questionsCopy  ====> ', assessmentQuestionsCopy);
 	// console.log('currDemgraphicsData  ====> ', currDemgraphicsData);
 	// console.log('currAssessmentData  ====> ', currAssessmentData);
 
@@ -271,7 +273,7 @@ export function applySurveyResponsesToQuestionsAndGetCurrentPositions({
 	let lastAnsweredSubdomainId;
 	let domainIdsArr: any[] = [];
 	let subdomainIdsArr: any[] = [];
-	surveyQuestionsCopy.forEach((domain: any) => {
+	assessmentQuestionsCopy.forEach((domain: any) => {
 		domainIdsArr.push(domain.id);
 		if (domain.type === 'demographics') {
 			// console.log('demographics  ====> ');
@@ -320,5 +322,5 @@ export function applySurveyResponsesToQuestionsAndGetCurrentPositions({
 	// console.log('domainIdsArr  ====> ', domainIdsArr);
 	// console.log('subdomainIdsArr  ====> ', subdomainIdsArr);
 
-	return { surveyQuestionsCopy, lastAnsweredDomain, lastAnsweredSubdomainId };
+	return { assessmentQuestionsCopy, lastAnsweredDomain, lastAnsweredSubdomainId };
 }

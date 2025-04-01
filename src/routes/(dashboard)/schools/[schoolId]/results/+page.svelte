@@ -51,7 +51,7 @@
 				<div class="flex grow flex-col gap-2">
 					<div class="flex justify-between">
 						<p>Score:</p>
-						<p>{Math.floor((domain.pointsTotal / domain.questionsTotal) * 100)}%</p>
+						<p>{Math.round((domain.pointsTotal / domain.questionsTotal) * 100)}%</p>
 					</div>
 					<Progress
 						barBgColor="bg-green-700"
@@ -79,7 +79,7 @@
 					<div class="flex grow flex-col gap-2">
 						<div class="flex justify-between">
 							<p>Score:</p>
-							<p>{Math.floor((question.pointsTotal / question.questionsTotal) * 100)}%</p>
+							<p>{Math.round((question.pointsTotal / question.questionsTotal) * 100)}%</p>
 						</div>
 					</div>
 					<Progress

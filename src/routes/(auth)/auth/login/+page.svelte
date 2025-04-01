@@ -7,7 +7,7 @@
 </script>
 
 <section class="grid-cols-golden-cols grid h-screen overflow-hidden">
-	<div class="col-start-2 grid place-content-center bg-[#8B7BC4] lg:col-start-1">
+	<div class="col-start-2 grid place-content-center bg-[#cac2e6] lg:col-start-1">
 		<LoginForm {data} />
 	</div>
 

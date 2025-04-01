@@ -2,6 +2,7 @@ import { relations } from 'drizzle-orm';
 import { boolean, integer, pgTable, timestamp } from 'drizzle-orm/pg-core';
 import assessmentInvites from './assessmentInvites';
 import schools from './schools';
+import { timestamps } from './db-utils';
 
 const schoolAssessments = pgTable('school_assessments', {
 	id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
@@ -13,7 +14,7 @@ const schoolAssessments = pgTable('school_assessments', {
 		.references(() => assessmentInvites.id),
 	isCompleted: boolean('is_completed').default(false),
 	completedAt: timestamp('completed_at', { mode: 'string' }),
-	createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull()
+	...timestamps
 });
 
 export const schoolAssessmentsRelations = relations(schoolAssessments, ({ one }) => ({

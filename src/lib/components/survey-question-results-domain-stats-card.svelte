@@ -3,8 +3,8 @@
 	import Progress from './ui/progress/progress.svelte';
 	import QuestionsCard from '$lib/components/questions-card.svelte';
 
-	let { surveyResultsData, domainId } = $props();
-	const thisDomainDataSorted = surveyResultsData
+	let { assessmentResultsData, domainId } = $props();
+	const thisDomainDataSorted = assessmentResultsData
 		.filter((result) => result.domainId === domainId)
 		.toSorted((a, b) => a.questionId - b.questionId);
 
@@ -43,7 +43,7 @@
 	</h3>
 	<div class="flex justify-between">
 		<p>Score</p>
-		<p>{Math.floor(totalDomainScore * 100)}%</p>
+		<p>{Math.round(totalDomainScore * 100)}%</p>
 	</div>
 	<Progress barBgColor="bg-green-700" value={totalDomainScore * 100} />
 

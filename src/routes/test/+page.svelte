@@ -2,9 +2,7 @@
 	// The teacher/ staff will need to enter their name, select a subject area from a drop-down (English, Math, etc. DC to provide), number of years experience)
 	import { applyAction, deserialize, enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
-	import DemographicsAndSurveyForm from '$lib/components/forms/demographics-and-survey-form.svelte';
-	import NativeDemographicsSurveyForm from '$lib/components/forms/NOTUSINGdemographics-survey-form.svelte';
-	import NativeSurveyFormTemplate from '$lib/components/forms/NOTUSINGnative-survey-form-template.svelte';
+	import DemographicsAndAssessmentForm from '$lib/components/forms/demographics-and-assessment-form.svelte';
 
 	import Card from '$lib/components/ui/card/card.svelte';
 	import { onMount } from 'svelte';
@@ -14,13 +12,13 @@
 	let { data } = $props();
 	const {
 		assessmentToken,
-		surveyQuestions,
+		assessmentQuestions,
 		currDemgraphicsData,
 		currAssessmentData,
 		lastAnsweredDomain,
 		lastAnsweredSubdomainId
 	} = data;
-	let formData = $state(surveyQuestions);
+	let formData = $state(assessmentQuestions);
 	let currDomain = $state(0);
 	let currSubDomain = $state(0);
 	const isDemographicsQuestions = $derived(
@@ -35,7 +33,7 @@
 		console.log('formData', formData);
 		console.log('demgraphicsData', currDemgraphicsData);
 		// console.log('assessmentData', currAssessmentData);
-		// const xformed = applySurveyResponsesToSurvey(formData, surveyQuestions);
+		// const xformed = applyAssessmentResponsesToAssessment(formData, assessmentQuestions);
 		// console.log('xformed', xformed);
 	});
 	onMount(() => {
@@ -125,8 +123,8 @@
 		>
 	{/if}
 
-	<DemographicsAndSurveyForm
-		bind:demoAndSurveyformData={formData}
+	<DemographicsAndAssessmentForm
+		bind:demoAndAssessmentformData={formData}
 		{currDomain}
 		{currSubDomain}
 		{assessmentToken}

@@ -7,16 +7,36 @@ const client = postgres(process.env.DATABASE_URL);
 export const db = drizzle(client);
 
 import { TEST_RUBRIC_DATA2, RUBRIC_DATA, TEST_RUBRIC_DATA } from '$lib/constants';
-import { surveyDomains, surveyQuestions, surveySubDomains } from './schema';
+import { assessmentDomains, assessmentQuestions, assessmentSubDomains } from './schema';
 
-const data = TEST_RUBRIC_DATA;
+const data = RUBRIC_DATA;
+const videoData = {
+	iframe: {
+		width: 560,
+		height: 315,
+		src: 'https://www.youtube.com/embed/ZrL_n3d6YOY?si=HvRNagTqeH0VsTx_',
+		title: 'YouTube video player',
+		frameborder: 0,
+		allow: [
+			'accelerometer',
+			'autoplay',
+			'clipboard-write',
+			'encrypted-media',
+			'gyroscope',
+			'picture-in-picture',
+			'web-share'
+		],
+		referrerpolicy: 'strict-origin-when-cross-origin',
+		allowfullscreen: true
+	}
+};
 
 async function seed() {
 	console.log('🌱 Starting seed...');
 	// Clear existing data
-	await db.delete(surveyQuestions);
-	await db.delete(surveySubDomains);
-	await db.delete(surveyDomains);
+	await db.delete(assessmentQuestions);
+	await db.delete(assessmentSubDomains);
+	await db.delete(assessmentDomains);
 
 	let currDomain;
 	let currSubDomain;
@@ -30,10 +50,12 @@ async function seed() {
 					console.error(`❌ Domain exists: ${data[i].name}`);
 				} else {
 					currDomain = possibleDomain;
+					console.log(`🌱 Domain created: ${data[i].name}`);
 				}
 				const possibleSubDomain = await createSubDomainIfNotExists({
 					description: data[i].subDomains[j].description,
 					name: data[i].subDomains[j].name,
+					videoData,
 					domainId: currDomain?.id!
 				});
 				if (!possibleSubDomain?.id) {
@@ -41,13 +63,16 @@ async function seed() {
 				} else {
 					console.log(`🌱 SubDomain created: ${data[i].subDomains[j].name}`);
 					currSubDomain = possibleSubDomain;
+					console.log(
+						`🌱 SubDomain created id:${currSubDomain?.id} => ${data[i].subDomains[j].name}`
+					);
 				}
 				currDescriptor = await createQuestionIfNotExists({
-					text: data[i].subDomains[j].descriptors[k],
+					text: data[i].subDomains[j].descriptors[k].text,
 					subDomainId: currSubDomain?.id!
 				});
 				console.log(
-					`🌱 Descriptor created id:${currDescriptor.id} => ${data[i].subDomains[j].descriptors[k]}`
+					`🌱 Descriptor created id:${currDescriptor?.id} => ${data[i].subDomains[j].descriptors[k]}`
 				);
 
 				console.log('DATA', ` ${currDomain?.id} | ${currSubDomain?.id} |  ${currDescriptor.id}`);
@@ -70,26 +95,28 @@ seed()
 
 async function createDomainIfNotExists(name: string) {
 	const [domain] = await db
-		.insert(surveyDomains)
+		.insert(assessmentDomains)
 		.values({ name })
-		.onConflictDoNothing({ target: surveyDomains.name })
-		.returning({ id: surveyDomains.id });
+		.onConflictDoNothing({ target: assessmentDomains.name })
+		.returning({ id: assessmentDomains.id });
 	return domain;
 }
 async function createSubDomainIfNotExists({
 	name,
 	domainId,
-	description
+	description,
+	videoData
 }: {
 	name: string;
 	domainId: number;
 	description: string;
+	videoData: any;
 }) {
 	const [subDomain] = await db
-		.insert(surveySubDomains)
-		.values({ name, domainId, description })
-		.onConflictDoNothing({ target: surveySubDomains.name })
-		.returning({ id: surveySubDomains.id });
+		.insert(assessmentSubDomains)
+		.values({ name, domainId, description, videoData })
+		.onConflictDoNothing({ target: assessmentSubDomains.name })
+		.returning({ id: assessmentSubDomains.id });
 	return subDomain;
 }
 async function createQuestionIfNotExists({
@@ -100,9 +127,9 @@ async function createQuestionIfNotExists({
 	subDomainId: number;
 }) {
 	const [question] = await db
-		.insert(surveyQuestions)
+		.insert(assessmentQuestions)
 		.values({ text, subDomainId })
-		.onConflictDoNothing({ target: surveyQuestions.text })
-		.returning({ id: surveyQuestions.id });
+		.onConflictDoNothing({ target: assessmentQuestions.text })
+		.returning({ id: assessmentQuestions.id });
 	return question;
 }

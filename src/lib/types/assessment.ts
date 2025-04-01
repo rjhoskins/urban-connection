@@ -22,16 +22,16 @@ const domainSchema = z.object({
 	subDomains: z.array(subDomainSchema)
 });
 
-const surveyDataSchema = z.array(domainSchema);
+const assessmentDataSchema = z.array(domainSchema);
 
 export type Question = z.infer<typeof questionSchema>;
 export type Subdomain = z.infer<typeof subDomainSchema>;
 export type Domain = z.infer<typeof domainSchema>;
-export type SurveyData = z.infer<typeof surveyDataSchema>;
+export type AssessmentData = z.infer<typeof assessmentDataSchema>;
 
-export default surveyDataSchema;
+export default assessmentDataSchema;
 
-export const createSurveyDemographicsAndSurveyResponseFormSchema = z
+export const createAssessmentDemographicsAndAssessmentResponseFormSchema = z
 	.object({
 		assessmentToken: z.string(),
 		yearsTeaching: z.string().regex(/^\d+$/, 'yearsTeaching must be a numeric string'),
@@ -48,7 +48,7 @@ export const parseAndTransformCreateDemographicsData = z.object({
 			const num = Number(val);
 			return isNaN(num) ? null : num;
 		}),
-	surveyId: z
+	assessmentId: z
 		.union([z.string(), z.number(), z.null()])
 		.optional()
 		.transform((val) => {
@@ -74,13 +74,13 @@ export type CreateDemographicsResponseInput = z.infer<
 	typeof parseAndTransformCreateDemographicsData
 >;
 
-const createSurveyQuestionResponseSchema = z
+const createAssessmentQuestionResponseSchema = z
 	.object({
-		surveyId: z.coerce.number(),
+		assessmentId: z.coerce.number(),
 		questionId: z.coerce.number(),
 		isValidSubdomainGroup: z.boolean().default(false),
 		response: z.union([z.literal(0), z.literal(1), z.null()]).default(null)
 	})
 	.array();
 
-export type CreateQuestionResponseInput = z.infer<typeof createSurveyQuestionResponseSchema>;
+export type CreateQuestionResponseInput = z.infer<typeof createAssessmentQuestionResponseSchema>;

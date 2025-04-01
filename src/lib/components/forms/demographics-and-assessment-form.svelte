@@ -8,7 +8,7 @@
 	import { page } from '$app/state';
 
 	let {
-		demoAndSurveyformData = $bindable(),
+		demoAndAssessmentformData = $bindable(),
 		currDomain,
 		currSubDomain,
 		handleNext = $bindable(),
@@ -82,11 +82,11 @@
 	}
 </script>
 
-<!-- <pre>{JSON.stringify(demoAndSurveyformData[currDomain].subDomains[currSubDomain], null, 2)}</pre> -->
+<!-- <pre>{JSON.stringify(demoAndAssessmentformData[currDomain].subDomains[currSubDomain], null, 2)}</pre> -->
 <Card class="max-w-prose  p-4 shadow-md">
-	<form method="POST" id={'demoAndSurveyForm'} class=" flex flex-col gap-2">
+	<form method="POST" id={'demoAndAssessmentForm'} class=" flex flex-col gap-2">
 		{#if isDemographicsQuestions}
-			<!-- ostensibly the first survey Q -->
+			<!-- ostensibly the first assessment Q -->
 			<input type="hidden" name="isDemographics" value="true" />
 		{/if}
 
@@ -95,9 +95,9 @@
 		{/if}
 		<input type="hidden" name="assessmentToken" value={assessmentToken} />
 
-		{#if demoAndSurveyformData[currDomain].subDomains[currSubDomain].name.toLowerCase() == 'demographics'}
+		{#if demoAndAssessmentformData[currDomain].subDomains[currSubDomain].name.toLowerCase() == 'demographics'}
 			<!-- demographics inputs -->
-			{#each demoAndSurveyformData[currDomain].subDomains[currSubDomain].fields as field, i (field.placeholder)}
+			{#each demoAndAssessmentformData[currDomain].subDomains[currSubDomain].fields as field, i (field.placeholder)}
 				{#if field.type === 'select'}
 					<div>
 						<label for={field.fieldName} class="block text-sm/6 font-medium text-gray-900"
@@ -108,9 +108,9 @@
 								id={field.fieldName}
 								name={field.fieldName}
 								bind:value={
-									demoAndSurveyformData[currDomain].subDomains[currSubDomain].fields[i].value
+									demoAndAssessmentformData[currDomain].subDomains[currSubDomain].fields[i].value
 								}
-								class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+								class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
 							>
 								<option value="" disabled selected>Select a subject</option>
 								{#each field.options as option (option)}
@@ -143,7 +143,7 @@
 							<input
 								name={field.fieldName}
 								bind:value={
-									demoAndSurveyformData[currDomain].subDomains[currSubDomain].fields[i].value
+									demoAndAssessmentformData[currDomain].subDomains[currSubDomain].fields[i].value
 								}
 								placeholder={field.placeholder}
 								type={field.type}
@@ -158,36 +158,39 @@
 				{/if}
 			{/each}
 		{:else}
-			<!-- survey inputs -->
-			{#each demoAndSurveyformData[currDomain].subDomains[currSubDomain].questions, questionIdx (questionIdx)}
+			<!-- assessment inputs -->
+			{#each demoAndAssessmentformData[currDomain].subDomains[currSubDomain].questions, questionIdx (questionIdx)}
 				<li class="flex">
 					<div class="flex flex-col gap-1.5">
 						<p>
-							{demoAndSurveyformData[currDomain].subDomains[currSubDomain].questions[questionIdx]
-								.text}
+							{demoAndAssessmentformData[currDomain].subDomains[currSubDomain].questions[
+								questionIdx
+							].text}
 						</p>
 						<label class="align-middlex flex cursor-pointer items-center space-x-2">
 							<input
 								type="radio"
-								name={`domainId=${demoAndSurveyformData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}|subDomainId=${demoAndSurveyformData[currDomain].subDomains[currSubDomain].id}|qId=${demoAndSurveyformData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}`}
+								name={`domainId=${demoAndAssessmentformData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}|subDomainId=${demoAndAssessmentformData[currDomain].subDomains[currSubDomain].id}|qId=${demoAndAssessmentformData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}`}
 								bind:group={
-									demoAndSurveyformData[currDomain].subDomains[currSubDomain].questions[questionIdx]
-										.value
+									demoAndAssessmentformData[currDomain].subDomains[currSubDomain].questions[
+										questionIdx
+									].value
 								}
 								value={1}
 								class="h-4 w-4 border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
 							/>
 							<input
 								type="hidden"
-								name={`domainId=${demoAndSurveyformData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}|subDomainId=${demoAndSurveyformData[currDomain].subDomains[currSubDomain].id}|qId=${demoAndSurveyformData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}`}
+								name={`domainId=${demoAndAssessmentformData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}|subDomainId=${demoAndAssessmentformData[currDomain].subDomains[currSubDomain].id}|qId=${demoAndAssessmentformData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}`}
 								bind:group={
-									demoAndSurveyformData[currDomain].subDomains[currSubDomain].questions[questionIdx]
-										.value
+									demoAndAssessmentformData[currDomain].subDomains[currSubDomain].questions[
+										questionIdx
+									].value
 								}
-								value={demoAndSurveyformData[currDomain].subDomains[currSubDomain].questions[
+								value={demoAndAssessmentformData[currDomain].subDomains[currSubDomain].questions[
 									questionIdx
 								].value
-									? demoAndSurveyformData[currDomain].subDomains[currSubDomain].questions[
+									? demoAndAssessmentformData[currDomain].subDomains[currSubDomain].questions[
 											questionIdx
 										].value
 									: null}
@@ -197,10 +200,11 @@
 						<label class="flex cursor-pointer items-center space-x-2">
 							<input
 								type="radio"
-								name={`domainId=${demoAndSurveyformData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}|subDomainId=${demoAndSurveyformData[currDomain].subDomains[currSubDomain].id}|qId=${demoAndSurveyformData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}`}
+								name={`domainId=${demoAndAssessmentformData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}|subDomainId=${demoAndAssessmentformData[currDomain].subDomains[currSubDomain].id}|qId=${demoAndAssessmentformData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}`}
 								bind:group={
-									demoAndSurveyformData[currDomain].subDomains[currSubDomain].questions[questionIdx]
-										.value
+									demoAndAssessmentformData[currDomain].subDomains[currSubDomain].questions[
+										questionIdx
+									].value
 								}
 								value={0}
 								class="h-4 w-4 border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"

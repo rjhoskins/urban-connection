@@ -1,5 +1,8 @@
 import type { PageServerLoad } from './$types';
-import { getDistrictAdminsDistrictIdByUserId, getDistrictSurveyTotals } from '$lib/server/queries';
+import {
+	getDistrictAdminsDistrictIdByUserId,
+	getDistrictAssessmentTotals
+} from '$lib/server/queries';
 import { error, redirect } from '@sveltejs/kit';
 
 export const load = (async (event) => {
@@ -20,5 +23,5 @@ export const load = (async (event) => {
 		throw redirect(302, `districts/${districtRes.id}`);
 	}
 
-	return { districtsData: await getDistrictSurveyTotals() };
+	return { districtsData: await getDistrictAssessmentTotals() };
 }) satisfies PageServerLoad;
