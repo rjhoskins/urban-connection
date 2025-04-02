@@ -2,7 +2,7 @@
 	import { page } from '$app/state';
 	/** @type {{ data: import('./$types').PageData, form: import('./$types').ActionData }} */
 
-	import NewSchoolForm from '$lib/components/forms/new-school-form.svelte';
+	import NewSchoolForm from '$lib/components/forms/create-school-form.svelte';
 	let { data } = $props();
 </script>
 

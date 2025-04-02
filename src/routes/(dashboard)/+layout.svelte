@@ -1,13 +1,16 @@
 <script lang="ts">
-	import Navbar from '$lib/components/layout/navbar.svelte';
+	import SideDrawerNav from '$lib/components/layout/side-drawer-nav.svelte';
+	import TopNavbar from '$lib/components/layout/top-navbar.svelte';
 
 	// const flash = getFlash(page);
 	let { children, data } = $props();
 </script>
 
-<div class="relative flex h-full flex-col">
-	<Navbar {data} />
-	<main class="grow">
+<!-- pl-24 = drawer offset -->
+<div class="relative flex h-full flex-col pl-24">
+	<SideDrawerNav {data} />
+	<TopNavbar {data} />
+	<main class="grow p-6">
 		{@render children()}
 	</main>
 </div>

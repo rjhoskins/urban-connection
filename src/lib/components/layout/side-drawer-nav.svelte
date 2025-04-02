@@ -14,7 +14,7 @@
 
 <!-- svelte-ignore a11y_role_supports_aria_props -->
 <header
-	class="bg-primary absolute left-0 flex h-full flex-col transition-all duration-300 ease-in-out {expanded
+	class="bg-primary fixed left-0 z-10 flex h-full flex-col transition-all duration-300 ease-in-out {expanded
 		? 'w-64'
 		: 'w-20'}"
 	onmouseenter={() => (expanded = true)}

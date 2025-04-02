@@ -21,7 +21,7 @@
 	let { children, data } = $props();
 </script>
 
-<div class="relative flex h-full flex-col">
+<div class="relative flex h-full flex-col bg-[#FAFAFB]">
 	{@render children()}
 
 	<Toaster />
