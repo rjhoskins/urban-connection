@@ -39,7 +39,7 @@
 						{...props}
 						type="text"
 						name="username"
-						placeholder="Enter Username"
+						placeholder="Enter Email Address"
 						bind:value={$formData.username}
 					/>
 				{/snippet}
