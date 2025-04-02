@@ -10,8 +10,11 @@
 	import { superForm } from 'sveltekit-superforms';
 	import SuperDebug from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
+	import Input from '../ui/input/input.svelte';
+	import { Eye, EyeOff } from 'lucide-svelte';
 
 	let { data } = $props();
+	let passWordIsVisible = $state(false);
 
 	const form = superForm(data.form, {
 		validators: zodClient(createNewUserOrLoginSchema)
@@ -26,23 +29,22 @@
 		src="/img/urban-connection-logo.png"
 	/>
 	<h2 class="mb-12 text-[2rem] text-[#2C205A]">Welcome to Urban Connection Project</h2>
-	<form class=" flex flex-col gap-3 text-[#030229]" action="?/login" method="POST" use:enhance>
+	<form class=" flex flex-col gap-3" action="?/login" method="POST" use:enhance>
 		<!-- username -->
 		<Field {form} name="username">
 			<Control>
 				{#snippet children({ props }: { props: any })}
 					<Label>Email Address</Label>
-					<input
+					<Input
 						{...props}
 						type="text"
 						name="username"
-						class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
 						placeholder="Enter Username"
 						bind:value={$formData.username}
 					/>
 				{/snippet}
 			</Control>
-			<Description>Should be your email address</Description>
+
 			<FieldErrors class="text-red-700" />
 		</Field>
 
@@ -51,40 +53,55 @@
 			<Control>
 				{#snippet children({ props }: { props: any })}
 					<Label>Password</Label>
-					<input
-						{...props}
-						name="password"
-						type="password"
-						class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-						placeholder="Enter  Password"
-						bind:value={$formData.password}
-					/>
+					<div class=" relative">
+						<Input
+							{...props}
+							name="password"
+							type={passWordIsVisible ? 'text' : 'password'}
+							class="relative"
+							placeholder="Enter  Password"
+							bind:value={$formData.password}
+						/>
+						<div class="absolute top-1/2 right-3 z-10 -translate-y-1/2 transform cursor-pointer">
+							{#if passWordIsVisible}
+								<Eye
+									class="absolute top-1/2 right-3 h-3.5 w-3.5 -translate-y-1/2 transform cursor-pointer text-[#230B34]"
+									onclick={() => (passWordIsVisible = !passWordIsVisible)}
+								/>
+							{:else}
+								<EyeOff
+									class="absolute top-1/2 right-3 h-3.5 w-3.5 -translate-y-1/2 transform cursor-pointer text-[#230B34]"
+									onclick={() => (passWordIsVisible = !passWordIsVisible)}
+								/>
+							{/if}
+						</div>
+					</div>
 				{/snippet}
 			</Control>
 			<FieldErrors class="text-red-700" />
 		</Field>
 
-		<div class="mb-10 flex items-center justify-between">
+		<div class=" flex items-center justify-between">
 			<!-- remember -->
-			<Field {form} name="remember">
+			<!-- <Field {form} name="remember">
 				<Control>
 					{#snippet children({ props })}
 						<div class=" space-y-1 leading-none">
 							<Checkbox class="" {...props} bind:checked={$formData.remember} />
 							<Label class=" ml-2.5">Remember me</Label>
-							<!-- <Description>
+						<Description>
 							You can manage your remember notifications in the <a href="/examples/forms"
 								>remember settings</a
 							> page.
-						</Description> -->
+						</Description> 
 						</div>
 						<input class="" name={props.name} value={$formData.remember} hidden />
 					{/snippet}
 				</Control>
 				<FieldErrors class="text-red-700" />
-			</Field>
+			</Field> -->
 
-			<a class="text-[#371E98]" href="/">Reset Password</a>
+			<!-- <a class="text-[#371E98]" href="/">Reset Password</a> -->
 		</div>
 		<div class="flex gap-4">
 			<Button class="grow" type="submit" variant="default">

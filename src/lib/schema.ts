@@ -12,8 +12,8 @@ export const createNewUserOrLoginSchema = z.object({
 		.string()
 		.nonempty({ message: 'password is required' })
 		.min(6, { message: 'password should be at least four characters' })
-		.max(50, { message: 'password should be less than 50 characters' }),
-	remember: z.string().optional().default('false')
+		.max(50, { message: 'password should be less than 50 characters' })
+	// remember: z.string().optional().default('false')
 });
 
 export const createNewUserFromInviteSchema = z

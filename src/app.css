@@ -60,7 +60,8 @@
 @layer base {
 	:root {
 		--background: 0 0% 100%;
-		--foreground: 222.2 84% 4.9%;
+		/* --foreground: 222.2 84% 4.9%; */
+		--foreground: 241.54 90.7% 8.43%;
 		--muted: 210 40% 96.1%;
 		--muted-foreground: 215.4 16.3% 46.9%;
 		--popover: 0 0% 100%;
@@ -80,7 +81,7 @@
 		--accent-foreground: 222.2 47.4% 11.2%;
 		--destructive: 0 72.2% 50.6%;
 		--destructive-foreground: 210 40% 98%;
-		--ring: 222.2 84% 4.9%;
+		--ring: 241.54 90.7% 8.43%; /* same as foreground */
 		--radius: 0.5rem;
 		--sidebar-background: 0 0% 98%;
 		--sidebar-foreground: 240 5.3% 26.1%;

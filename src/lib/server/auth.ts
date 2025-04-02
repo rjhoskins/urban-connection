@@ -9,6 +9,8 @@ import { sessions, users } from './db/schema';
 
 // Constants
 const DAY_IN_MS = 1000 * 60 * 60 * 24;
+const BROWSER_SESSION_DURATION_IN_DAYS = 15;
+
 export const sessionCookieName = 'auth-session';
 
 // Helper function to get ISO timestamp
@@ -63,7 +65,9 @@ export async function validateSessionToken(token: string) {
 	}
 
 	// Calculate renewal threshold (15 days before expiration)
-	const renewalThreshold = new Date(Date.parse(session.expiresAt) - DAY_IN_MS * 15).toISOString();
+	const renewalThreshold = new Date(
+		Date.parse(session.expiresAt) - DAY_IN_MS * BROWSER_SESSION_DURATION_IN_DAYS
+	).toISOString();
 
 	// Check if session needs renewal
 	if (currentTime >= renewalThreshold) {
