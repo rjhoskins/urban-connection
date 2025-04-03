@@ -10,7 +10,7 @@
 		<Card class="space-y-4 p-6">
 			<h2>Thank you for taking the time to participate in the Assessment!</h2>
 			<p>
-				Your psrticipation is helping to bring positive change across schools in your area. Your
+				Your participation is helping to bring positive change across schools in your area. Your
 				results are being tabulated.
 			</p>
 		</Card>
