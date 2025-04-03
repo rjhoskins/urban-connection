@@ -25,7 +25,8 @@
 								questionId: question.questionId ?? 0,
 								domainId: question.domainId ?? 0,
 								pointsTotal: question.pointsTotal,
-								questionsTotal: question.questionsTotal
+								questionsTotal: question.questionsTotal,
+								questionText: question.questionText ?? ''
 							})}
 						{/each}
 					</ul>
@@ -71,10 +72,11 @@
 	domainId: number;
 	pointsTotal: number;
 	questionsTotal: number;
+	questionText: string;
 })}
 	<Card.Root>
 		<Card.Header>
-			<Card.Title class="text-primary/90 text-xl">Question {question.questionId}</Card.Title>
+			<Card.Title class="text-xl text-black/90">Question {question.questionText}</Card.Title>
 		</Card.Header>
 		<Card.Content>
 			{#if question.questionsTotal && question.pointsTotal}

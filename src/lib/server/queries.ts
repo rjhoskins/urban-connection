@@ -923,6 +923,7 @@ export async function getAllTimeQuestionResponsesStatsByQuestion() {
 		.select({
 			questionId: assessmentQuestions.id,
 			domainId: assessmentSubDomains.domainId,
+			questionText: assessmentQuestions.text,
 			pointsTotal:
 				sql`sum(case when ${assessmentQuestionsResponses.isValidSubdomainGroup} = true then ${assessmentQuestionsResponses.response} else 0 end)`.mapWith(
 					Number
@@ -973,6 +974,7 @@ export async function getAllTimeQuestionResponsesStatsByQuestionForDistrict(dist
 		.select({
 			questionId: assessmentQuestions.id,
 			domainId: assessmentSubDomains.domainId,
+			questionText: assessmentQuestions.text,
 			pointsTotal:
 				sql`sum(case when ${assessmentQuestionsResponses.isValidSubdomainGroup} = true then ${assessmentQuestionsResponses.response} else 0 end)`.mapWith(
 					Number
@@ -1026,6 +1028,7 @@ export async function getAllTimeQuestionResponsesStatsByQuestionForSchool(school
 		.select({
 			questionId: assessmentQuestions.id,
 			domainId: assessmentSubDomains.domainId,
+			questionText: assessmentQuestions.text,
 			pointsTotal:
 				sql`sum(case when ${assessmentQuestionsResponses.isValidSubdomainGroup} = true then ${assessmentQuestionsResponses.response} else 0 end)`.mapWith(
 					Number

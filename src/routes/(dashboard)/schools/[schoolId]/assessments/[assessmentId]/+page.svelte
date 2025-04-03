@@ -29,7 +29,12 @@
 
 {#if domainIds.size > 0}
 	<Card.Root class=" mb-4 flex justify-between p-4">
-		<p>Teacher Results</p>
+		{#if assessmentResultsData[0]?.participantName && assessmentResultsData[0]?.participantEmail}
+			<p>Participant Name: {assessmentResultsData[0]?.participantName}</p>
+			<p>Participant Email: {assessmentResultsData[0]?.participantEmail}</p>
+		{:else}
+			<p>Teacher Results</p>
+		{/if}
 	</Card.Root>
 	<div class="grid grid-cols-2 gap-4">
 		{#each domainIds as domainId (domainId)}

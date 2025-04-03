@@ -7,7 +7,7 @@
 	const { domainData, questionsData } = data;
 </script>
 
-<section class=" mx-auto grid max-w-7xl gap-4 p-2 lg:p-8">
+<section class="mx-auto grid max-w-7xl gap-4 p-2 lg:p-8">
 	<h1 class="my-6 text-center text-3xl">All Time Totals</h1>
 	<div class=" p-4">
 		<div class="grid grid-cols-2 gap-4">
@@ -24,7 +24,8 @@
 							questionId: question.questionId ?? 0,
 							domainId: question.domainId ?? 0,
 							pointsTotal: question.pointsTotal,
-							questionsTotal: question.questionsTotal
+							questionsTotal: question.questionsTotal,
+							questionText: question.questionText ?? ''
 						})}
 					{/each}
 				</ul>
@@ -67,10 +68,11 @@
 	domainId: number;
 	pointsTotal: number;
 	questionsTotal: number;
+	questionText: string;
 })}
 	<Card.Root>
 		<Card.Header>
-			<Card.Title class="text-primary/90 text-xl">Question {question.questionId}</Card.Title>
+			<Card.Title class="text-xl text-black/90">Question: {question.questionText}</Card.Title>
 		</Card.Header>
 		<Card.Content>
 			{#if question.questionsTotal && question.pointsTotal}

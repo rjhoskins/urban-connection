@@ -7,32 +7,35 @@
 	const { schoolData, domainData, questionsData } = data;
 </script>
 
-<h1 class="py-3 text-center text-2xl">All Time Totals</h1>
+<section class=" mx-auto flex max-w-7xl flex-col gap-4">
+	<h1 class="py-3 text-center text-2xl">All Time Totals</h1>
 
-<div class="grid grid-cols-2 gap-4">
-	{#if domainData.length !== 0}
-		{#each domainData as domain (domain.domainId)}
-			<ul class="space-y-4">
-				{@render domainCard({
-					id: domain.domainId ?? 0,
-					domainName: domain.domainName ?? '',
-					pointsTotal: domain.pointsTotal,
-					questionsTotal: domain.questionsTotal
-				})}
-				{#each questionsData.filter((q) => q.domainId === domain.domainId) as question (question.questionId)}
-					{@render questionCard({
-						questionId: question.questionId ?? 0,
-						domainId: question.domainId ?? 0,
-						pointsTotal: question.pointsTotal,
-						questionsTotal: question.questionsTotal
+	<div class="grid grid-cols-2 gap-4">
+		{#if domainData.length !== 0}
+			{#each domainData as domain (domain.domainId)}
+				<ul class="space-y-4">
+					{@render domainCard({
+						id: domain.domainId ?? 0,
+						domainName: domain.domainName ?? '',
+						pointsTotal: domain.pointsTotal,
+						questionsTotal: domain.questionsTotal
 					})}
-				{/each}
-			</ul>
-		{/each}
-	{:else}
-		<p>No data available</p>
-	{/if}
-</div>
+					{#each questionsData.filter((q) => q.domainId === domain.domainId) as question (question.questionId)}
+						{@render questionCard({
+							questionId: question.questionId ?? 0,
+							domainId: question.domainId ?? 0,
+							pointsTotal: question.pointsTotal,
+							questionsTotal: question.questionsTotal,
+							questionText: question.questionText ?? ''
+						})}
+					{/each}
+				</ul>
+			{/each}
+		{:else}
+			<p>No data available</p>
+		{/if}
+	</div>
+</section>
 
 <!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->
 
@@ -68,10 +71,11 @@
 	domainId: number;
 	pointsTotal: number;
 	questionsTotal: number;
+	questionText: string;
 })}
 	<Card.Root>
 		<Card.Header>
-			<Card.Title class="text-primary/90 text-xl">Question {question.questionId}</Card.Title>
+			<Card.Title class="text-xl text-black/90">Question {question.questionText}</Card.Title>
 		</Card.Header>
 		<Card.Content>
 			{#if question.questionsTotal && question.pointsTotal}
