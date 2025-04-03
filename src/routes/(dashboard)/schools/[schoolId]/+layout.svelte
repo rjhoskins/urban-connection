@@ -64,7 +64,7 @@
 						</div>
 					</div>
 					<div class="">
-						<p>Sent</p>
+						<p>Not Started</p>
 						<Progress barBgColor="bg-red-700" value={assessmentsNotStartedPercentage} />
 					</div>
 					<div class="">
