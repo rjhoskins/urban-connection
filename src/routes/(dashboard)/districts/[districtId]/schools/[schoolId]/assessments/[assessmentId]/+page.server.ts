@@ -11,6 +11,7 @@ import { error, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async (event) => {
+	console.log('load function for assessment results page=======================');
 	if (!event.locals.user) {
 		throw redirect(302, '/auth/login');
 	}
@@ -35,7 +36,7 @@ export const load: PageServerLoad = async (event) => {
 	if (event.locals.user && event.locals.user.role === 'district_admin') {
 		// at school admin level -  need to get the school data for the school admin
 		if (userId) {
-			dataFunc = () => getSchoolForDistrictAdmin(schoolId);
+			dataFunc = () => getSchoolForDistrictAdmin(userId, schoolId);
 			adminDataFunc = () => getSchoolAdminBySchoolId(schoolId);
 			assessmentResultsDataFunc = () =>
 				getSingleAssessmentResultsDataForSchoolAndDistrictAdmin(assessmentId);

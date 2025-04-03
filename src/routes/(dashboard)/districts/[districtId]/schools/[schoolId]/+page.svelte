@@ -27,7 +27,7 @@
 
 <h1 class="sr-only">Manage {school.name} School</h1>
 
-<section class=" sizes mx-auto grid max-w-7xl gap-4 p-2 lg:p-8">
+<section class=" mx-auto grid max-w-7xl gap-4 p-2 lg:p-8">
 	<Card.Root class=" p-4">
 		<div class="top flex justify-between">
 			<div class="left space-y-3">
@@ -61,11 +61,12 @@
 		</div>
 	</Card.Root>
 
-	<!-- <pre>{JSON.stringify(memberData, null, 2)}</pre> -->
+	<!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->
+
 	<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 		{#if memberData.length > 0}
 			{#each memberData as member, idx (member.id)}
-				<MemberAssessmentResultsCard {member} {idx} />
+				<MemberAssessmentResultsCard {school} {member} {idx} isNested />
 			{/each}
 		{:else}
 			<p>No assessment results available</p>
