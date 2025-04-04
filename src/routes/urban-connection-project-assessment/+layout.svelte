@@ -10,7 +10,7 @@
 		<div class="max-w-theme-max mx-auto flex w-full items-center bg-white px-5 py-4">
 			<img class=" w-11" src="/img/urban-connection-logo.png" alt="" />
 			<p class=" text-xl text-[#45464E]">Urban Connection Project</p>
-			<p class=" temt-sm ml-auto rounded-md bg-[#371E98] px-1.5 py-0.5 font-normal text-white">
+			<p class=" ml-auto rounded-md bg-[#371E98] px-1.5 py-0.5 text-sm font-normal text-white">
 				{data.tokenParseRes.name}
 			</p>
 		</div>
