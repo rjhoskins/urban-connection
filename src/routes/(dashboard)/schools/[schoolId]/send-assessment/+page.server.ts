@@ -53,7 +53,7 @@ export const actions: Actions = {
 				schoolId: parseInt(event.params.schoolId)
 			});
 
-			const inviteLink = `${event.url.origin}/test?assessmentToken=${assessmentToken}`;
+			const inviteLink = `${event.url.origin}/urban-connection-project-assessment?assessmentToken=${assessmentToken}`;
 			console.log(`inviteLink => , ${inviteLink}`);
 
 			const res = await event.fetch('/api/send-assessment-invite', {

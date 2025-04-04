@@ -10,6 +10,11 @@
   If we ever want to remove these styles, we need to add an explicit border
   color utility to any element that depends on these defaults.
 */
+
+@theme {
+	--spacing-theme-max: 90rem; /* 1440px */
+	--breakpoint-theme-max: 90rem; /* 1440px */
+}
 @layer base {
 	*,
 	::after,

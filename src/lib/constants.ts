@@ -6,6 +6,13 @@ export const SERVER_ERROR_MESSAGES = {
 	'500': 'Server error'
 };
 
+export const ASSESSMENT_PROGRESS_IMG_MAP = new Map([
+	//key: domain name, value: image path
+	['Cultural Awareness', '/img/cultural-awareness-progress.png'],
+	['Systems', '/img/systems-progress.png'],
+	['Relationships', '/img/relationships-progress.png'],
+	['Rigorous & Accessible Content', '/img/community-progress.png']
+]);
 export const INITIAL_HTML_DATA = {
 	greeting: 'Dear Administrator,',
 	definition:
@@ -881,3 +888,32 @@ const testRubricData2 = [
 
 export const TEST_RUBRIC_DATA2 = testRubricData2;
 export const TEST_COMBINED_WITH_DEMOGRAPHICS = [demographicsData, ...testRubricData2];
+
+export const ZERO_BASED_ALPHABET_NUMBERING = {
+	0: 'A',
+	1: 'B',
+	2: 'C',
+	3: 'D',
+	4: 'E',
+	5: 'F',
+	6: 'G',
+	7: 'H',
+	8: 'I',
+	9: 'J',
+	10: 'K',
+	11: 'L',
+	12: 'M',
+	13: 'N',
+	14: 'O',
+	15: 'P',
+	16: 'Q',
+	17: 'R',
+	18: 'S',
+	19: 'T',
+	20: 'U',
+	21: 'V',
+	22: 'W',
+	23: 'X',
+	24: 'Y',
+	25: 'Z'
+};

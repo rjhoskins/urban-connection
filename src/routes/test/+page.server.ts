@@ -18,42 +18,29 @@ import {
 	decodeAssessmentInviteToken,
 	transformAssessmentQuestionsResponses
 } from '$lib/utils.js';
-import { error, redirect, type RequestEvent } from '@sveltejs/kit';
+import { error, redirect, type RequestEvent, type ServerLoadEvent } from '@sveltejs/kit';
 import { is } from 'drizzle-orm';
 import { setFlash } from 'sveltekit-flash-message/server';
 import { message } from 'sveltekit-superforms';
 
-export async function load(event: RequestEvent) {
-	const assessmentToken = await event.url.searchParams.get('assessmentToken');
-	const decodedeAssessmentToken = decodeAssessmentInviteToken(assessmentToken as string);
+export async function load({ params, parent, url, cookies }) {
+	const parentData = await parent();
+	console.log('parentData ====> ', parentData);
+	const assessmentToken = await url.searchParams.get('assessmentToken');
+	const assessmentId = parseInt(parentData.tokenParseRes.assessmentId);
 
-	const { name, email, assessmentId, schoolId } = decodedeAssessmentToken;
-	const tokenParseRes = AssessmentTokenInviteSchema.safeParse({
-		name,
-		email,
-		assessmentId,
-		schoolId
-	});
-	if (!tokenParseRes.success) {
-		setFlash({ type: 'error', message: 'Invalid token' }, event.cookies);
-		error(401, {
-			message: 'Invalid token'
-		});
-	}
-	// console.log('assessmentToken ====> ', tokenParseRes.data);
-
-	const currAssessment = await getAssessmentById(parseInt(assessmentId));
+	const currAssessment = await getAssessmentById(assessmentId);
 	if (!currAssessment) {
-		setFlash({ type: 'error', message: 'Invalid assessment id' }, event.cookies);
+		setFlash({ type: 'error', message: 'Invalid assessment id' }, cookies);
 		throw redirect(401, '/');
 	} else if (currAssessment.status === 'completed') {
-		setFlash({ type: 'error', message: 'Assessment already completed' }, event.cookies);
+		setFlash({ type: 'error', message: 'Assessment already completed' }, cookies);
 		throw redirect(303, '/thank-you');
 	}
 
 	let assessmentQuestions = await generateQuestionnaire();
-	let currDemgraphicsData = await getDemographicsDataByAssessmentId(parseInt(assessmentId));
-	let currAssessmentData = await getAssessmentDataByAssessmentId(parseInt(assessmentId));
+	let currDemgraphicsData = await getDemographicsDataByAssessmentId(assessmentId);
+	let currAssessmentData = await getAssessmentDataByAssessmentId(assessmentId);
 	assessmentQuestions = [demographicsData, ...assessmentQuestions];
 	let lastAnsweredDomain;
 	let lastAnsweredSubdomainId;

@@ -3,7 +3,6 @@
 	let { data, pageTitle = 'Page Title' } = $props();
 	import { page } from '$app/state';
 	const Links = [
-		{ name: 'testing', href: '/test' },
 		{ name: 'Home', href: '/' },
 		{ name: 'Contact Us', href: '/contact-us' }
 	];
