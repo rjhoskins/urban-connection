@@ -154,16 +154,19 @@
 					</p>
 				</div>
 			</div>
-			<DemographicsAndAssessmentForm
-				bind:demoAndAssessmentformData={formData}
-				{currDomain}
-				{currSubDomain}
-				{assessmentToken}
-				handleNext={next}
-				handlePrev={previous}
-				{isDemographicsQuestions}
-				{isLastQuestion}
-			/>
+			<div class="">
+				<p class="pb-8 text-2xl font-bold">{promptText}</p>
+				<DemographicsAndAssessmentForm
+					bind:demoAndAssessmentformData={formData}
+					{currDomain}
+					{currSubDomain}
+					{assessmentToken}
+					handleNext={next}
+					handlePrev={previous}
+					{isDemographicsQuestions}
+					{isLastQuestion}
+				/>
+			</div>
 		</div>
 	{/if}
 	{#if formData[currDomain].subDomains[currSubDomain].name.toLowerCase() == 'demographics'}
