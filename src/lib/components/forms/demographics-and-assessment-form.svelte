@@ -225,7 +225,7 @@
 				</Card>
 			{/each}
 		{/if}
-		<div class="flex gap-8 pt-2">
+		<div class="flex justify-end gap-4 pt-2">
 			<Button
 				type="button"
 				variant="secondary"
