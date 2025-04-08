@@ -12,7 +12,7 @@
 	const adminData = [
 		{
 			title: 'Create School',
-			url: '/schools/create-school',
+			url: '/create-school',
 			description: 'Create school and send email invitation to administrator.',
 			icon: UserRoundPlus
 		},
