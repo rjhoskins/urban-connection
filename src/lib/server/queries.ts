@@ -672,7 +672,16 @@ export async function getSchoolAdminBySchoolId(schoolId: number) {
 }
 
 export async function getDistricts() {
-	return (await db.select().from(districts)) || null;
+	const districtsRes = await db
+		.select({
+			id: districts.id,
+			name: districts.name,
+			adminId: districtAdmins.id
+		})
+		.from(districts)
+		.leftJoin(districtAdmins, eq(districtAdmins.districtId, districts.id));
+
+	return districtsRes || null;
 }
 
 export async function addDemographicsData(values: CreateDemographicsResponseInput) {

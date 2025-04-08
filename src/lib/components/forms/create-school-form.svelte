@@ -19,19 +19,17 @@
 
 	let { isDistrict = $bindable(), data } = $props();
 	const { districts } = data;
+	const districtsWithoutAdmin = districts.filter(
+		(district: { adminId: null }) => district.adminId == null
+	);
+
+	let currDistricts = $state(districts);
 	let selectedDistrict = $state(0);
 
 	const form = superForm(data.form, {
 		validators: zodClient(createSchoolSchema)
 	});
 	const { form: formData, enhance, message, delayed, tainted, submitting } = form;
-
-	$effect(() => {
-		$formData.isDistrict = isDistrict;
-		// if ($formData.isDistrict) {
-		// 	$formData.name = '';
-		// }
-	});
 
 	let unSavedChangesModalOpen = $state(false);
 	let navigateToUrl = $state('');
@@ -57,11 +55,15 @@
 		{ taint: false }
 	);
 
-	function handlePageTitleUpdate() {
+	function handleIsDistrictToggle() {
+		$formData.districtId = 0;
+
 		if ($formData.isDistrict) {
 			globals.pageName = 'Add District Admin to District';
+			currDistricts = districtsWithoutAdmin;
 		} else {
 			globals.pageName = 'Create School';
+			currDistricts = districts;
 		}
 	}
 </script>
@@ -78,26 +80,28 @@
 	<Card.Content>
 		<form class="flex flex-col gap-3" method="POST" use:enhance>
 			<div class="flex w-full gap-3">
-				<Form.Field {form} name="isDistrict" class="w-full">
-					<div class="flex flex-row items-center gap-4">
-						<Form.Control>
-							{#snippet children({ props })}
-								<Switch
-									onCheckedChange={handlePageTitleUpdate}
-									{...props}
-									bind:checked={$formData.isDistrict}
-								/>
-								<div class="space-y-0.5">
-									<Form.Label>Create District</Form.Label>
-									<Form.Description
-										>Create a distrct admin for the selected district</Form.Description
-									>
-								</div>
-							{/snippet}
-						</Form.Control>
-					</div>
-					<Form.FieldErrors />
-				</Form.Field>
+				{#if districtsWithoutAdmin.length > 0}
+					<Form.Field {form} name="isDistrict" class="w-full">
+						<div class="flex flex-row items-center gap-4">
+							<Form.Control>
+								{#snippet children({ props })}
+									<Switch
+										onCheckedChange={handleIsDistrictToggle}
+										{...props}
+										bind:checked={$formData.isDistrict}
+									/>
+									<div class="space-y-0.5">
+										<Form.Label>Create District</Form.Label>
+										<Form.Description
+											>Create a distrct admin for the selected district</Form.Description
+										>
+									</div>
+								{/snippet}
+							</Form.Control>
+						</div>
+						<Form.FieldErrors />
+					</Form.Field>
+				{/if}
 				{#if !$formData.isDistrict}
 					<!-- name -->
 					<Form.Field class="w-full" {form} name="name">
@@ -115,6 +119,7 @@
 						<Form.FieldErrors />
 					</Form.Field>
 				{/if}
+
 				<!-- district (id) -->
 				<Form.Field class="w-full" {form} name="districtId">
 					<Form.Control>
@@ -127,7 +132,7 @@
 										: districts.find((el: { id: any }) => el.id == $formData.districtId).name}
 								</Select.Trigger>
 								<Select.Content class="w-full">
-									{#each districts as district}
+									{#each currDistricts as district}
 										<Select.Item class="w-full" value={district.id} label={district.name}
 											>{district.name}</Select.Item
 										>
