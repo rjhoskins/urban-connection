@@ -10,7 +10,6 @@
 		console.log('mounted');
 		console.log('data', data);
 		globals.pageName = 'Create School';
-		globals.pageName = globals.pageName ? globals.pageName : data.pageTitle;
 	});
 </script>
 
@@ -19,6 +18,6 @@
 	<meta name="description" content="This is where the description goes for SEO" />
 </svelte:head>
 
-<div class="sizes h-full">
+<div class=" h-full">
 	<NewSchoolForm {data} />
 </div>
