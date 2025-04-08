@@ -15,7 +15,11 @@
 	import { onMount } from 'svelte';
 </script>
 
-<div class="flex items-center justify-between bg-white p-4">
-	<p class="text-2xl text-[#45464E]">{globals.pageName || 'The Urban Connection Project...'}</p>
-	<SignOutAvaterButton text={'Admin'} />
-</div>
+<nav class="flex items-center justify-between bg-white p-4">
+	<div class="max-w-theme-max flex w-full items-center justify-between">
+		<p class="text-2xl text-[#45464E]">
+			{globals.pageName || 'The Urban Connection Project...'}
+		</p>
+		<SignOutAvaterButton text={'Admin'} />
+	</div>
+</nav>

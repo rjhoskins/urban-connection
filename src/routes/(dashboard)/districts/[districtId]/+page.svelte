@@ -2,7 +2,7 @@
 	import type { PageData } from './$types';
 	import AdminContactDetailsCard from '$lib/components/admin-contact-details-card.svelte';
 	import { page } from '$app/state';
-	import SchoolCard from '$lib/components/school-card.svelte';
+	import SchoolCard from '$lib/components/school-grid-card.svelte';
 	import Card from '$lib/components/ui/card/card.svelte';
 	import { Button } from '$lib/components/ui/button';
 

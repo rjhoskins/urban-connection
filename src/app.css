@@ -78,7 +78,8 @@
 		--border: 214.3 31.8% 91.4%;
 		--input: 214.3 31.8% 91.4%;
 		/* --primary: 222.2 47.4% 11.2%; */
-		--primary: 252.3 67.03% 35.69%; /* from design */
+		/* --primary: 252.3 67.03% 35.69%; from design v1 */
+		--primary: 228.18 50% 25.88%; /* from design v2 */
 		--primary-foreground: 210 40% 98%;
 		/* --secondary: 210 40% 96.1%; */
 		--secondary: 228 88.24% 96.67%; /* from design */

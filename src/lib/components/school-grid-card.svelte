@@ -28,9 +28,9 @@
 		{#if assessmentCount > 0}
 			<div class="flex justify-between text-sm text-black/70">
 				<p class="">Total Score:</p>
-				<p class="">{totalAssessmentScorePercentage}%</p>
+				<p class="rounded-md bg-[#CCFFBD] px-1 py-0.5">{totalAssessmentScorePercentage}%</p>
 			</div>
-			<Progress barBgColor="bg-green-700" class="h-[7px]" value={totalAssessmentScorePercentage} />
+			<Progress barBgColor="bg-[#CCFFBD]" class="h-[7px]" value={totalAssessmentScorePercentage} />
 		{:else}
 			<p class="text-primary/50">No assessments taken yet</p>
 		{/if}
