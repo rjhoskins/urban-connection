@@ -47,10 +47,11 @@ export const load = async (event) => {
 			console.log('Unhandled role:', event.locals.user.role);
 			break;
 	}
-
 	const parentData = await parent();
+
 	return {
 		user: event.locals.user,
-		schools: data
+		schools: data,
+		pageTitle: 'Manage Schools'
 	};
 };

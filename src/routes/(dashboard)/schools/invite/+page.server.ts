@@ -56,6 +56,9 @@ export const actions: Actions = {
 				event
 			});
 		}
+
+		//check if valid token/invite
+		const decodedToken = decodeAdminUserInviteToken(form.data.inviteId);
 		try {
 			const htmlTemplate = await getLatestHtmlTemplateDataByType();
 			if (!htmlTemplate) {

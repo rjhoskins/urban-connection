@@ -45,6 +45,6 @@
 	</form>
 
 	<div class="grid place-items-center rounded-md bg-[#EFF2FE] p-2.5">
-		<UserRound class=" h-4 w-4 bg-[#EFF2FE]  text-red-600" />
+		<UserRound class=" text-primary h-4 w-4  bg-[#EFF2FE]" />
 	</div>
 </div>

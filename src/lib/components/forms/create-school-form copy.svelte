@@ -15,7 +15,6 @@
 	import { dev } from '$app/environment';
 	import { LoaderCircle, TriangleAlert } from 'lucide-svelte';
 	import { beforeNavigate, goto } from '$app/navigation';
-	import { globals } from '$lib/store/globals.svelte';
 
 	let { isDistrict = $bindable(), data } = $props();
 	const { districts } = data;
@@ -24,7 +23,7 @@
 	const form = superForm(data.form, {
 		validators: zodClient(createSchoolSchema)
 	});
-	const { form: formData, enhance, message, delayed, tainted, submitting } = form;
+	const { form: formData, enhance, message, delayed, tainted } = form;
 
 	$effect(() => {
 		$formData.isDistrict = isDistrict;
@@ -37,7 +36,6 @@
 	let navigateToUrl = $state('');
 	let formHasBeenUpdated = $state(false);
 	beforeNavigate(async ({ to, cancel }) => {
-		if (submitting) return;
 		if (tainted && formHasBeenUpdated) {
 			cancel();
 			unSavedChangesModalOpen = true;
@@ -51,70 +49,35 @@
 	}
 	formData.update(
 		($formData) => {
+			console.log('formData updated ===>', $formData);
 			formHasBeenUpdated = true;
 			return $formData;
 		},
 		{ taint: false }
 	);
-
-	function handlePageTitleUpdate() {
-		if ($formData.isDistrict) {
-			globals.pageName = 'Add District Admin to District';
-		} else {
-			globals.pageName = 'Create School';
-		}
-	}
 </script>
 
 <Card.Root class="w-full rounded-md p-9">
-	<h2 class="text-2xl text-[#4B5563]">
-		{#if $formData.isDistrict}
-			Add a District Admin to a district
-		{:else}
-			Create a new School
-		{/if}
-	</h2>
+	<h2 class="text-2xl text-[#4B5563]">Enter School Information Below</h2>
 
 	<Card.Content>
 		<form class="flex flex-col gap-3" method="POST" use:enhance>
 			<div class="flex w-full gap-3">
-				<Form.Field {form} name="isDistrict" class="w-full">
-					<div class="flex flex-row items-center gap-4">
-						<Form.Control>
-							{#snippet children({ props })}
-								<Switch
-									onCheckedChange={handlePageTitleUpdate}
-									{...props}
-									bind:checked={$formData.isDistrict}
-								/>
-								<div class="space-y-0.5">
-									<Form.Label>Create District</Form.Label>
-									<Form.Description
-										>Create a distrct admin for the selected district</Form.Description
-									>
-								</div>
-							{/snippet}
-						</Form.Control>
-					</div>
+				<!-- name -->
+				<Form.Field class="w-full" {form} name="name">
+					<Form.Control>
+						{#snippet children({ props })}
+							<Form.Label>School Name*</Form.Label>
+							<Input
+								class=" w-full"
+								placeholder="Enter School Name"
+								{...props}
+								bind:value={$formData.name}
+							/>
+						{/snippet}
+					</Form.Control>
 					<Form.FieldErrors />
 				</Form.Field>
-				{#if !$formData.isDistrict}
-					<!-- name -->
-					<Form.Field class="w-full" {form} name="name">
-						<Form.Control>
-							{#snippet children({ props })}
-								<Form.Label>School Name*</Form.Label>
-								<Input
-									class=" w-full"
-									placeholder="Enter School Name"
-									{...props}
-									bind:value={$formData.name}
-								/>
-							{/snippet}
-						</Form.Control>
-						<Form.FieldErrors />
-					</Form.Field>
-				{/if}
 				<!-- district (id) -->
 				<Form.Field class="w-full" {form} name="districtId">
 					<Form.Control>
@@ -190,7 +153,7 @@
 
 			<div class="flex gap-3">
 				<Form.Button variant="secondary" href="/schools" class="w-fit">Cancel</Form.Button>
-				<Form.Button class="w-fit" type="submit">
+				<Form.Button disabled={!$tainted} class="w-fit" type="submit">
 					{#if $delayed}
 						<LoaderCircle class="animate-spin" />
 						Submitting...
@@ -209,7 +172,7 @@
 <Dialog.Root bind:open={unSavedChangesModalOpen}>
 	<Dialog.Content>
 		<Dialog.Header>
-			<Dialog.Title class=" flex items-center gap-2 p-1 text-xl text-[#371E98]"
+			<Dialog.Title class="sizes flex items-center gap-2 p-1 text-xl text-[#371E98]"
 				><TriangleAlert class="h-5 w-5" /><span class="block">Unsaved Changes</span></Dialog.Title
 			>
 			<Dialog.Description>

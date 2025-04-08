@@ -32,7 +32,6 @@
 <!-- <pre>{JSON.stringify(assessmentResultsData, null, 2)}</pre> -->
 <h1 class=" py-3 text-center text-2xl">Teacher Data</h1>
 
-<!-- <pre>{JSON.stringify(memberData, null, 2)}</pre> -->
 <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 	{#if memberData.length > 0}
 		{#each memberData as member, idx (member.id)}

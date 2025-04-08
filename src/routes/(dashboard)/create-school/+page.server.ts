@@ -21,16 +21,18 @@ import {
 	checkAdminUserExists
 } from '$lib/server/queries';
 
-export const load: PageServerLoad = async (event) => {
-	if (!event.locals.user) return redirect(302, '/auth/login');
-	const user = event.locals.user;
+export const load: PageServerLoad = async ({ locals, parent }) => {
+	if (!locals.user) return redirect(302, '/auth/login');
+	const user = locals.user;
 	if (!user) return fail(400, { message: 'User not authenticated' });
 
 	const form = await superValidate(zod(createSchoolSchema));
+	const parentData = await parent();
 
 	return {
 		districts: await getDistricts(),
-		form
+		form,
+		pageTitle: parentData.pageTitle
 	};
 };
 export const actions: Actions = {
