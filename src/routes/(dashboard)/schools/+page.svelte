@@ -16,8 +16,8 @@
 
 <h1 class="sr-only my-6 text-center text-3xl">Manage All Schools</h1>
 
-<section class="flex h-full flex-col">
-	<div class="grid-cols-three-fluid grid gap-4">
+<section class="flex h-full max-w-7xl flex-col">
+	<div class="grid-cols-four-fluid grid gap-4">
 		{#each data.schools as school (school.id)}
 			<SchoolCard {page} {school} />
 		{/each}

@@ -16,7 +16,7 @@ const config: Config = {
 		},
 		extend: {
 			gridTemplateColumns: {
-				'three-fluid': 'repeat(auto-fit, minmax(300px, 3fr))',
+				'four-fluid': 'repeat(auto-fit, minmax(300px, 4fr))',
 				'golden-cols': 'minmax(0px, 1fr) minmax(0px,1.618fr)'
 			},
 			colors: {

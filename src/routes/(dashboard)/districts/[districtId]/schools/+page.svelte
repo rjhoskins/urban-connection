@@ -10,7 +10,7 @@
 
 <h1 class="sr-only my-6 text-center text-3xl">Manage All Schools</h1>
 
-<section class=" sizes grid-cols-three-fluid container grid max-w-6xl gap-4 py-8">
+<section class=" sizes grid-cols-four-fluid container grid max-w-6xl gap-4 py-8">
 	{#each data.schools as school (school.id)}
 		<SchoolCard {page} {school} />
 	{/each}
