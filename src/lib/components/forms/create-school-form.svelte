@@ -194,8 +194,10 @@
 					{#if $delayed}
 						<LoaderCircle class="animate-spin" />
 						Submitting...
+					{:else if $formData.isDistrict}
+						Add District Admin
 					{:else}
-						Add School
+						Create School
 					{/if}
 				</Form.Button>
 			</div>
