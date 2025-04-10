@@ -83,83 +83,38 @@
 
 <!-- <pre>{JSON.stringify(assessmentResultsData, null, 2)}</pre> -->
 <h1 class="sr-only">Manage {school.name} School</h1>
-<section class=" grid max-w-7xl auto-rows-[1fr_auto] grid-cols-2 gap-5">
-	<div class="top mb-11 flex justify-between">
-		<div class="left space-y-3">
-			<div class="flex items-center justify-between gap-4 font-bold text-[#525252]">
-				{#if adminData.length === 1}
-					<p class=" text-2xl">Administrator</p>
-				{:else}
-					<p class=" text-2xl">Administrators</p>
-				{/if}
-			</div>
-			{#each adminData as admin (admin.adminEmail)}
-				<AdminContactDetailsCard {admin} />
-			{/each}
-			{#if browser}
-				<div class="btns flex gap-5">
-					<Button href={`${window.location.origin}/schools/${school.id}/invite-coadmin`} class=""
-						>Add School Admin</Button
-					>
-					<Button href={`${window.location.origin}/schools/${school.id}/send-assessment`} class=""
-						>Send Assessment</Button
-					>
-					<!-- <Button href={`${window.location.origin}/schools/${school.id}/send-assessment`} class=""
-						>Mass Send Assessment</Button
-					> -->
-				</div>
-			{/if}
-		</div>
-	</div>
 
-	<Card.Root class=" row-start-2 rounded-md p-9 shadow-md ">
-		<p class="font-display text-2xl font-bold text-black">Assessment Information</p>
-		<DonutChart data={chartData} total={totalPointsPercentage} />
-	</Card.Root>
-
-	<Card.Root class="right row-start-2 flex flex-col gap-3 rounded-md p-9 shadow-md">
-		<div class="buttons flex items-center justify-between gap-2"></div>
-		<div class="flex items-center justify-between">
-			<div class="flex gap-2">
-				<p>Total Assessments:</p>
-				<p>{totalAssessments}</p>
-			</div>
-		</div>
-		{#each chartData as progress (progress.category)}
-			{@render ProgressIndicator(progress)}
-		{/each}
-
-		<div class="">
-			<div class="flex items-center justify-between">
-				<p class="text-2xl text-black/70">Total Score</p>
-				<p class="rounded-md bg-[#CCFFBD] px-1 py-0.5 text-xs">
-					{Math.round(totalPointsPercentage)}%
-				</p>
-			</div>
-
-			<Progress barBgColor="bg-[#34C759]" class="h-[7px]" value={totalPointsPercentage} />
-		</div>
-		{#if browser}
-			<div class="buttons mt-4 flex items-center justify-between gap-2">
-				<Button
-					variant={`${!page.url.pathname.includes('results') ? 'secondary' : 'default'}`}
-					href={`${window.location.origin}/schools/${school.id}/results`}
-					class="mb-4">Assessment Totals</Button
-				>
-				<Button
-					variant={`${!page.url.pathname.includes('member-data') ? 'secondary' : 'default'}`}
-					href={`${window.location.origin}/schools/${school.id}/member-data`}
-					class="mb-4">Members</Button
-				>
-			</div>
-		{/if}
-	</Card.Root>
-</section>
-<!-- 
-<pre>{JSON.stringify(page.url.pathname, null, 2)}</pre> -->
 <section class="max-w-7xl">
-	{@render children?.()}
+	<Card.Root class="mt-5 mb-14 flex justify-end gap-4 p-4">
+		<Button
+			class="flex items-center justify-center"
+			variant={`${!isGridView ? 'default' : 'secondary'}`}
+			onclick={() => (isGridView = false)}><List /><span>List</span></Button
+		>
+		<Button
+			variant={`${isGridView ? 'default' : 'secondary'}`}
+			class="flex items-center justify-center"
+			onclick={() => (isGridView = true)}><Grid2X2 /><span>Grid</span></Button
+		>
+	</Card.Root>
+	{#if isGridView}
+		<div class="grid-cols-four-fluid grid gap-4">
+			{#each data.memberData as member, idx (member.id)}
+				<MemberAssessmentResultsGridCard {idx} {member} {school} />
+			{/each}
+		</div>
+	{:else}
+		<MemberAssessmentResultsListTable {school} {page} members={data.memberData} />
+	{/if}
+
+	<p class="text-primary mt-auto pt-4 text-[13.33px]">
+		Showing {numMembersShown} of {data.memberData.length} entries
+	</p>
 </section>
+
+{@render children?.()}
+
+<!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->
 
 {#snippet ProgressIndicator(data: { category: any; value: any; chartColor: any; labelColor: any })}
 	<div class="">

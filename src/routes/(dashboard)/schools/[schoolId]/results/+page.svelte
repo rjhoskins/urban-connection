@@ -2,14 +2,28 @@
 	import type { PageData } from './$types';
 	import * as Card from '$lib/components/ui/card';
 	import { Progress } from '$lib/components/ui/progress';
+	import { Button } from '$lib/components/ui/button/index.js';
+	import { Grid2X2, List } from 'lucide-svelte';
+	import { onMount } from 'svelte';
 
 	let { data }: { data: PageData } = $props();
 	const { schoolData, domainData, questionsData } = data;
+	let isSummaryView = $state(true);
 </script>
 
-<section class=" mx-auto flex max-w-7xl flex-col gap-4">
-	<h1 class="py-3 text-center text-2xl">All Time Totals</h1>
-
+<Card.Root class="mt-5 mb-14 flex justify-end gap-4 p-4">
+	<Button
+		class="flex items-center justify-center"
+		variant={`${!isSummaryView ? 'default' : 'secondary'}`}
+		onclick={() => (isSummaryView = false)}><List /><span>Detail</span></Button
+	>
+	<Button
+		variant={`${isSummaryView ? 'default' : 'secondary'}`}
+		class="flex items-center justify-center"
+		onclick={() => (isSummaryView = true)}><Grid2X2 /><span>Summary</span></Button
+	>
+</Card.Root>
+<div class=" mx-auto flex flex-col gap-4">
 	<div class="grid grid-cols-2 gap-4">
 		{#if domainData.length !== 0}
 			{#each domainData as domain (domain.domainId)}
@@ -20,22 +34,24 @@
 						pointsTotal: domain.pointsTotal,
 						questionsTotal: domain.questionsTotal
 					})}
-					{#each questionsData.filter((q) => q.domainId === domain.domainId) as question (question.questionId)}
-						{@render questionCard({
-							questionId: question.questionId ?? 0,
-							domainId: question.domainId ?? 0,
-							pointsTotal: question.pointsTotal,
-							questionsTotal: question.questionsTotal,
-							questionText: question.questionText ?? ''
-						})}
-					{/each}
+					{#if !isSummaryView}
+						{#each questionsData.filter((q) => q.domainId === domain.domainId) as question (question.questionId)}
+							{@render questionCard({
+								questionId: question.questionId ?? 0,
+								domainId: question.domainId ?? 0,
+								pointsTotal: question.pointsTotal,
+								questionsTotal: question.questionsTotal,
+								questionText: question.questionText ?? ''
+							})}
+						{/each}
+					{/if}
 				</ul>
 			{/each}
 		{:else}
 			<p>No data available</p>
 		{/if}
 	</div>
-</section>
+</div>
 
 <!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->
 
@@ -75,7 +91,9 @@
 })}
 	<Card.Root>
 		<Card.Header>
-			<Card.Title class="text-xl text-black/90">Question {question.questionText}</Card.Title>
+			<Card.Title class="text-xl text-black/90"
+				>Question: "<span class="text-black/70">{question.questionText}</span>"</Card.Title
+			>
 		</Card.Header>
 		<Card.Content>
 			{#if question.questionsTotal && question.pointsTotal}

@@ -3,7 +3,7 @@
 	import SchoolGridCard from '$lib/components/school-grid-card.svelte';
 	import SchoolListTable from '$lib/components/school-list-table.svelte';
 	import { List, Grid2X2 } from 'lucide-svelte';
-	let { data } = $props();
+	let { data, children } = $props();
 	let schoolProgess;
 	let numSchoolsShown = $state(data.schools.length);
 	let isGridView = $state(true);
