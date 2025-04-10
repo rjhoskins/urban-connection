@@ -409,6 +409,7 @@ export async function getSchoolMemberAssessmentTotalsForSchoolAndDistrictAdminBy
 	const res = await db
 		.select({
 			id: assessments.id,
+			completedAt: assessments.updatedAt,
 			pointsTotal:
 				sql`sum(case when ${assessmentQuestionsResponses.isValidSubdomainGroup} = true then ${assessmentQuestionsResponses.response} else 0 end)`.mapWith(
 					Number
@@ -507,6 +508,7 @@ export async function getSchoolMemberAssessmentTotalsForSuperUser(
 			id: assessments.id,
 			name: assessments.recipientName,
 			email: assessments.recipientEmail,
+			completedAt: assessments.updatedAt,
 			pointsTotal:
 				sql`sum(case when ${assessmentQuestionsResponses.isValidSubdomainGroup} = true then ${assessmentQuestionsResponses.response} else 0 end)`.mapWith(
 					Number

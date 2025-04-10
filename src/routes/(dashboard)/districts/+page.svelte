@@ -19,7 +19,7 @@
 </script>
 
 <h1 class="my-6 text-center text-3xl">Manage All Districts</h1>
-<section class=" grid-cols-four-fluid container grid max-w-6xl gap-4 py-8">
+<section class=" grid-cols-four-fluid grid max-w-6xl gap-4 py-8">
 	{#each districtsData as district (district.id)}
 		{@render districtCard(district)}
 	{/each}

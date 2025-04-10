@@ -3,39 +3,42 @@
 
 	import Button from './ui/button/button.svelte';
 	import * as Table from '$lib/components/ui/table/index.js';
-	import SchoolListTableRow from './school-list-table-row.svelte';
+
 	import { cn } from '$lib/utils';
+	import MemberAssessmentResultsListTableRow from './member-assessment-results-list-table-row.svelte';
 	import { onMount } from 'svelte';
-	let { schools, page, isNested = false } = $props();
-	let sortedSchools = $state(schools);
+	let { members, school, page, isNested = false } = $props();
+	let sortedMembers = $state(members);
 
 	let sortBy = $state('name');
 	let sortDirection = $state('desc');
 
 	const tableHeaders = [
-		{ name: 'School Name', class: '', sortBy: 'name' },
-		{ name: 'Total Assessments', sortBy: 'assessmentCount' },
-		{ name: 'Total Score', sortBy: 'totalAssessmentScorePercentage' },
+		{ name: 'Name', class: '', sortBy: 'name' },
+		{ name: 'School', sortBy: 'assessmentCount' },
+		{ name: 'Completed ', sortBy: 'completed' },
+		{ name: 'Score', sortBy: 'score' },
 		{ name: 'Action', class: '[&>div]:!block [&>div]:!text-right' }
 	];
 	function handleTableHeaderClick(header: string) {
 		sortBy = header;
-		sortSchools();
+		sortMembers();
 
-		// sortSchools
+		// sortMembers
 	}
+
 	function handleTableArrowClick() {
 		sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
 
-		// sortSchools
+		// sortMembers
 	}
-	function sortSchools() {
-		const newSortedSchools = schools.toSorted((a, b) => {
+	function sortMembers() {
+		const newSortedMembers = members.toSorted((a, b) => {
 			if (sortDirection === 'asc' && typeof a[sortBy] === 'string') {
 				return a[sortBy].localeCompare(b[sortBy]);
 			} else if (sortDirection === 'desc' && typeof a[sortBy] === 'string') {
 				return b[sortBy].localeCompare(a[sortBy]);
-			} else if (sortDirection === 'asc' && sortBy === 'totalAssessmentScorePercentage') {
+			} else if (sortDirection === 'asc' && sortBy === 'score') {
 				const totalAssessmentScorePercentageA =
 					Math.round((a.pointsTotal / a.questionsTotal) * 100) || 0;
 				const totalAssessmentScorePercentageB =
@@ -47,30 +50,22 @@
 				} else {
 					return 0;
 				}
-			} else if (sortDirection === 'desc' && sortBy === 'totalAssessmentScorePercentage') {
-				const totalAssessmentScorePercentageA =
-					Math.round((a.pointsTotal / a.questionsTotal) * 100) || 0;
-				const totalAssessmentScorePercentageB =
-					Math.round((b.pointsTotal / b.questionsTotal) * 100) || 0;
-				if (totalAssessmentScorePercentageA < totalAssessmentScorePercentageB) {
-					return 1;
-				} else if (totalAssessmentScorePercentageA > totalAssessmentScorePercentageB) {
-					return -1;
-				} else {
-					return 0;
-				}
+			} else if (sortDirection === 'asc' && sortBy === 'completed') {
+				return new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime();
+			} else if (sortDirection === 'desc' && sortBy === 'completed') {
+				return new Date(a.completedAt).getTime() - new Date(b.completedAt).getTime();
 			} else if (sortDirection === 'asc') {
 				return a[sortBy] > b[sortBy] ? 1 : -1;
 			} else {
 				return a[sortBy] < b[sortBy] ? 1 : -1;
 			}
 		});
-		sortedSchools = newSortedSchools;
+		sortedMembers = newSortedMembers;
 	}
 
 	$effect(() => {});
 	onMount(() => {
-		sortSchools();
+		sortMembers();
 	});
 </script>
 
@@ -83,8 +78,8 @@
 					<div class="flex items-center gap-4">
 						{#if header.sortBy}
 							<button onclick={() => handleTableHeaderClick(header.sortBy)}>{header.name}</button>
+							<!-- svelte-ignore a11y_consider_explicit_label -->
 							{#if header.sortBy === sortBy}
-								<!-- svelte-ignore a11y_consider_explicit_label -->
 								<button
 									onclick={handleTableArrowClick}
 									class={` relative h-6 w-6 ${sortDirection === 'asc' ? 'rotate-180' : ''}`}
@@ -115,8 +110,8 @@
 		</Table.Row>
 	</Table.Header>
 	<Table.Body>
-		{#each sortedSchools as school (school.id)}
-			<SchoolListTableRow {school} {page} {isNested} />
+		{#each sortedMembers as member, idx (member.id)}
+			<MemberAssessmentResultsListTableRow {page} {member} {school} {idx} />
 		{/each}
 	</Table.Body>
 </Table.Root>

@@ -3,9 +3,9 @@
 	const { adminName, adminEmail, adminPhone } = admin;
 </script>
 
-<p class="">Name: {adminName}</p>
-<div class="flex gap-4">
-	<p class="">Email: {adminEmail}</p>
+<div class="flex flex-col gap-0.5 text-[#525252]">
+	<p class="">{adminName}</p>
+	<p class="">Email:{adminEmail}</p>
 	{#if adminPhone}
 		<p class="">Phone: {adminPhone}</p>
 	{/if}

@@ -324,3 +324,14 @@ export function applyAssessmentResponsesToQuestionsAndGetCurrentPositions({
 
 	return { assessmentQuestionsCopy, lastAnsweredDomain, lastAnsweredSubdomainId };
 }
+
+export function getScoreBackgroundColor(score: number) {
+	//added these to
+	if (score > 80) {
+		return 'bg-[#CCFFBD]';
+	} else if (score > 50) {
+		return 'bg-[#F9F5D8]';
+	} else {
+		return 'bg-[#FEF4F5]';
+	}
+}

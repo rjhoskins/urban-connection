@@ -26,3 +26,6 @@
 
 	<Toaster />
 </div>
+
+<!-- "safelist hack" -->
+<div class="hidden bg-[#C9B53D] bg-[#CCFFBD] bg-[#F9F5D8] bg-[#FEF4F5]"></div>

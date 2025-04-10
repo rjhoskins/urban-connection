@@ -1,9 +1,12 @@
-/** @type {import('./$types').LayoutServerData} */
+/** @type {import('./$types').PageServerLoad} */
 import { error, redirect } from '@sveltejs/kit';
 import {
 	getSchoolAdminBySchoolId,
-	getSchoolDetailsById,
+	getSchoolForDistrictAdmin,
+	getSchoolForSchoolAdmin,
+	getSchoolForSuperAdmin,
 	getSchoolMemberAssessmentTotalsForSchoolAndDistrictAdminBySchool,
+	getSchoolMemberAssessmentTotalsForSuperUser,
 	getAssessmentData
 } from '$lib/server/queries';
 
@@ -12,25 +15,42 @@ export const load = async (event) => {
 		throw redirect(302, '/auth/login');
 	}
 
-	// if (event.locals.user.role !== 'school_admin') {
-	// 	throw redirect(401, '/auth/login');
-	// }
+	const schoolId = parseInt(event.params.schoolId);
+	const userId = event.locals.user.id;
 
-	let schoolId = parseInt(event.params.schoolId);
-	const school = await getSchoolDetailsById(schoolId);
-	if (!school) {
-		throw error(404, 'School not found');
+	let schoolDataFunc: () => Promise<any> = async () => {
+		return null;
+	};
+	let adminDataFunc: () => Promise<any> = async () => {
+		return null;
+	};
+	let memberDataFunc: () => Promise<any> = async () => {
+		return null;
+	};
+
+	if (event.locals.user.role === 'school_admin') {
+		redirect(302, '/schools/' + schoolId);
+	}
+	if (event.locals.user.role === 'district_admin') {
+		const userId = event.locals.user.id;
+		if (userId) {
+			schoolDataFunc = async () => getSchoolForDistrictAdmin(userId, schoolId);
+			adminDataFunc = async () => getSchoolAdminBySchoolId(schoolId);
+			memberDataFunc = async () =>
+				getSchoolMemberAssessmentTotalsForSchoolAndDistrictAdminBySchool(schoolId);
+		}
+	}
+	if (event.locals.user.role === 'super_admin') {
+		console.log('super admin!!!!!!!!!!!!!!!!!!!!!!!!!!====================');
+		schoolDataFunc = async () => getSchoolForSuperAdmin(schoolId);
+		adminDataFunc = async () => getSchoolAdminBySchoolId(schoolId);
+		memberDataFunc = async () => getSchoolMemberAssessmentTotalsForSuperUser(schoolId);
 	}
 
-	// if (schoolAdminId !== event.locals.user.id && event.locals.user.role !== 'district_admin' && event.locals.user.role !== 'super_admin') { {
-	// 	throw error(401, 'Unauthorized');
-	// }
-
 	return {
-		adminData: await getSchoolAdminBySchoolId(schoolId),
-		school,
+		adminData: await adminDataFunc(),
+		school: await schoolDataFunc(),
 		assessmentData: await getAssessmentData(schoolId),
-		memberData: await getSchoolMemberAssessmentTotalsForSchoolAndDistrictAdminBySchool(schoolId),
-		layout: 'hello'
+		memberData: await memberDataFunc()
 	};
 };
