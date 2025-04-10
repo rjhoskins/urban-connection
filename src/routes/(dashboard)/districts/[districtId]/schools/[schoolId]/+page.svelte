@@ -5,7 +5,7 @@
 	import { page } from '$app/state';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import AdminContactDetailsCard from '$lib/components/admin-contact-details-card.svelte';
-	import MemberAssessmentResultsCard from '$lib/components/member-assessment-results-tabl.svelte';
+	import MemberAssessmentResultsCard from '$lib/components/member-assessment-results-grid-card.svelte';
 
 	let { data } = $props();
 	const { adminData, school, assessmentData, memberData } = data;
