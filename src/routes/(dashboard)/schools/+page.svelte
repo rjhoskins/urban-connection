@@ -11,6 +11,7 @@
 	import { globals } from '$lib/store/globals.svelte';
 	import { Card } from '$lib/components/ui/card';
 	import { Button } from '$lib/components/ui/button';
+	import { browser } from '$app/environment';
 
 	onMount(() => {
 		// console.log('mounted');
@@ -25,7 +26,15 @@
 <section class="flex h-full max-w-7xl flex-col">
 	<h1 class="p4 sr-only my-6 text-center text-3xl">Manage All Schools</h1>
 	<Card class="mb-14 flex justify-end gap-4 p-4">
+		{#if browser}
+			<Button
+				href={`${window.location.origin}/create-school`}
+				class="flex items-center justify-center"
+				onclick={() => (isGridView = false)}>Add School</Button
+			>
+		{/if}
 		<Button
+			href="/dashboard/schools/assessment"
 			class="flex items-center justify-center"
 			variant={`${!isGridView ? 'default' : 'secondary'}`}
 			onclick={() => (isGridView = false)}><List /><span>List</span></Button
