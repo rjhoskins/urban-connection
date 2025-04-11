@@ -28,14 +28,12 @@
 <h1 class="sr-only">View Assessment Detail</h1>
 
 {#if domainIds.size > 0}
-	<Card.Root class=" mb-4 flex justify-between p-4">
+	<Card.Root class="mt-5 mb-14 flex justify-between p-4">
 		{#if assessmentResultsData[0]?.participantName && assessmentResultsData[0]?.participantEmail}
 			<p>Participant Name: {assessmentResultsData[0]?.participantName}</p>
 			<p>Participant Email: {assessmentResultsData[0]?.participantEmail}</p>
 		{:else}
-			<Card.Root class="mt-5 mb-14 p-4">
-				<p>Teacher Results</p>
-			</Card.Root>
+			<p>Teacher Results</p>
 		{/if}
 	</Card.Root>
 	<div class="grid grid-cols-2 gap-4">

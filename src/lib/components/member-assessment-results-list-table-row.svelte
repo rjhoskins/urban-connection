@@ -38,10 +38,10 @@
 	</Table.Cell>
 	<Table.Cell class="text-right">
 		<Button
+			class={`${progress === 0 ? ' pointer-events-none opacity-70' : ''}`}
 			href={isNested
-				? `${page.url.pathname}/schools/${school.id}`
-				: `${page.url.pathname}/${school.id}`}
-			class=""
+				? `${page.url.pathname}/assessments/${id}`
+				: `${window.location.origin}/schools/${school.id}/assessments/${id}`}
 		>
 			View Details
 		</Button>

@@ -15,6 +15,7 @@
 			return 0;
 		}
 	});
+	console.log('progress', progress);
 	const formattedDate = new Date(completedAt).toLocaleDateString('en-US', {
 		year: 'numeric',
 		month: 'short',
@@ -33,6 +34,7 @@
 			</div>
 
 			<Button
+				class={`${progress === 0 ? ' pointer-events-none opacity-70' : ''}`}
 				href={isNested
 					? `${page.url.pathname}/assessments/${id}`
 					: `${window.location.origin}/schools/${school.id}/assessments/${id}`}>View Details</Button
