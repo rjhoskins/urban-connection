@@ -33,7 +33,9 @@
 			<p>Participant Name: {assessmentResultsData[0]?.participantName}</p>
 			<p>Participant Email: {assessmentResultsData[0]?.participantEmail}</p>
 		{:else}
-			<p>Teacher Results</p>
+			<Card.Root class="mt-5 mb-14 p-4">
+				<p>Teacher Results</p>
+			</Card.Root>
 		{/if}
 	</Card.Root>
 	<div class="grid grid-cols-2 gap-4">
