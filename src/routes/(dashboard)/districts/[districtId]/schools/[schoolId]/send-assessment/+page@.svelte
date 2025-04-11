@@ -7,7 +7,10 @@
 	import HtmlEmailTextPreview from '$lib/components/html-email-text-preview.svelte';
 
 	let { data } = $props();
+	// const { token } = data;
+	// const  { name, email, inviteId } = decodeAdminUserInviteToken(token || '');
 	let text = $state('');
+	let token;
 </script>
 
 <svelte:head>
@@ -15,14 +18,16 @@
 	<!-- <meta name="description" content="This is where the description goes for SEO" /> -->
 </svelte:head>
 
-<div class="my-4">
-	<h1 class="pb-4 text-center text-2xl font-bold">Send Assessment</h1>
+<section class="grid h-full">
+	<div class="grid h-full place-content-center">
+		<h1 class="py-4 pb-4 text-center text-3xl font-bold">Send Assessment</h1>
+		<div class="lg:grid-cols-golden-cols grid gap-6">
+			<SendAssessmentForm {data} />
+			<Card.Root>
+				<HtmlEmailTextPreview data={data.assessmentInviteHtmlTemplate?.template} disableLink />
+			</Card.Root>
+		</div>
+	</div>
+</section>
 
-	<section class="md:grid-cols-golden-cols mx-auto h-full max-w-5xl gap-4 md:grid">
-		<SendAssessmentForm bind:inviteText={text} {data} />
-		<Card.Root>
-			<HtmlEmailTextPreview data={data.assessmentInviteHtmlTemplate?.template} token="tbd" />
-		</Card.Root>
-	</section>
-	<!-- <pre class="max-w-prose">{JSON.stringify(data, null, 2)}</pre> -->
-</div>
+<!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->

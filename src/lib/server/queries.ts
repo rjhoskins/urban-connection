@@ -399,7 +399,7 @@ export async function getSchoolIDForSchoolAdmin(userId: string): Promise<number 
 export async function getSchoolsForSuperAdmin(): Promise<{ id: number; name: string }[]> {
 	const res = await db.select({ id: schools.id, name: schools.name }).from(schools);
 
-	if (dev) console.log('getSchoolIDForSchoolAdmin res => ', res);
+	if (dev) console.log('getSchoolsForSuperAdmin res => ', res);
 	return res || null;
 }
 

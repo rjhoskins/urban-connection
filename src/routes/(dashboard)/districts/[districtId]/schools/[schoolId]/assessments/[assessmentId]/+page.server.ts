@@ -16,14 +16,14 @@ export const load: PageServerLoad = async (event) => {
 		throw redirect(302, '/auth/login');
 	}
 	if (event.locals.user.role === 'school_admin') {
-		error(403, 'not authorized');
+		// error(403, 'not authorized');
 	}
 
 	const schoolId = parseInt(event.params.schoolId);
 	const assessmentId = parseInt(event.params.assessmentId);
 	const userId = event.locals.user.id;
 
-	let dataFunc: () => Promise<any> = async () => {
+	let schoolDataFunc: () => Promise<any> = async () => {
 		return null;
 	};
 	let adminDataFunc: () => Promise<any> = async () => {
@@ -33,10 +33,28 @@ export const load: PageServerLoad = async (event) => {
 		return null;
 	};
 
+	if (event.locals.user && event.locals.user.role === 'school_admin') {
+		// at school admin level -  need to get the school data for the school admin
+		if (userId) {
+			console.log('Setting up functions for school admin');
+			schoolDataFunc = () => {
+				console.log('Executing schoolDataFunc for school admin');
+				return getSchoolForSchoolAdmin(userId, schoolId);
+			};
+			adminDataFunc = async () => {
+				console.log('Executing adminDataFunc for school admin');
+				return getSchoolAdminBySchoolId(schoolId);
+			};
+			assessmentResultsDataFunc = () => {
+				console.log('Executing assessmentResultsDataFunc for school admin');
+				return getSingleAssessmentResultsDataForSchoolAndDistrictAdmin(assessmentId);
+			};
+		}
+	}
 	if (event.locals.user && event.locals.user.role === 'district_admin') {
 		// at school admin level -  need to get the school data for the school admin
 		if (userId) {
-			dataFunc = () => getSchoolForDistrictAdmin(userId, schoolId);
+			schoolDataFunc = () => getSchoolForDistrictAdmin(userId, schoolId);
 			adminDataFunc = () => getSchoolAdminBySchoolId(schoolId);
 			assessmentResultsDataFunc = () =>
 				getSingleAssessmentResultsDataForSchoolAndDistrictAdmin(assessmentId);
@@ -44,14 +62,15 @@ export const load: PageServerLoad = async (event) => {
 	}
 
 	if (event.locals.user && event.locals.user.role === 'super_admin') {
-		dataFunc = () => getSchoolForSuperAdmin(schoolId);
+		schoolDataFunc = () => getSchoolForSuperAdmin(schoolId);
 		adminDataFunc = async () => getSchoolAdminBySchoolId(schoolId);
 		assessmentResultsDataFunc = () => getSingleAssessmentResultsDataForSuperAdmin(assessmentId);
 	}
+	console.log('here in the load function');
 
 	return {
 		adminData: await adminDataFunc(),
-		school: await dataFunc(),
+		school: await schoolDataFunc(),
 		assessmentData: await getAssessmentData(schoolId),
 		assessmentResultsData: await assessmentResultsDataFunc()
 	};

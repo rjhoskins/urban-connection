@@ -25,24 +25,16 @@
 
 <!-- <pre>{JSON.stringify(domainIdsArr, null, 2)}</pre> -->
 <!-- <pre>{JSON.stringify(assessmentResultsData, null, 2)}</pre> -->
-<h1 class="sr-only">View Assessment Detail</h1>
+<h1 class=" py-3 text-center text-2xl">Assessment Totals</h1>
 
-{#if domainIds.size > 0}
-	<Card.Root class=" mb-4 flex justify-between p-4">
-		{#if assessmentResultsData[0]?.participantName && assessmentResultsData[0]?.participantEmail}
-			<p>Participant Name: {assessmentResultsData[0]?.participantName}</p>
-			<p>Participant Email: {assessmentResultsData[0]?.participantEmail}</p>
-		{:else}
-			<p>Teacher Results</p>
-		{/if}
-	</Card.Root>
-	<div class="grid grid-cols-2 gap-4">
-		{#each domainIds as domainId (domainId)}
-			<DomainQuestionResultsCard {domainId} {assessmentResultsData} />
-		{/each}
-	</div>
-{:else}
-	<p>No assessment results available</p>
-{/if}
-
-<!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->
+<section class=" mx-auto grid max-w-7xl gap-4 p-2 lg:p-8">
+	{#if domainIds.size > 0}
+		<div class="grid grid-cols-2 gap-4">
+			{#each domainIds as domainId (domainId)}
+				<DomainQuestionResultsCard {domainId} {assessmentResultsData} />
+			{/each}
+		</div>
+	{:else}
+		<p>No assessment results available</p>
+	{/if}
+</section>

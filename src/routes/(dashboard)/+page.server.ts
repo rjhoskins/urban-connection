@@ -18,7 +18,7 @@ export const load: PageServerLoad = (async (event) => {
 	if (event.locals.user.role === 'school_admin') {
 		dataFunc = async () => getLoggedInSchoolAdminsSchool(user.id);
 	}
-	if (event.locals.user.role === 'district_admin') {
+	if (event.locals.user.role === 'district_admin' || event.locals.user.role === 'super_admin') {
 		dataFunc = async () => getLoggedInDistrictAdminsDistrict(user.id);
 	}
 

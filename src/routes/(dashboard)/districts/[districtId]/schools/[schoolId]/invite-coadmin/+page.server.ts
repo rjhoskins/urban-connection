@@ -1,7 +1,8 @@
+/** @type {import('./$types').PageServerLoad} */
+/** @type {import('./$types').Actions} */
 import { message, superValidate } from 'sveltekit-superforms/server';
 import { inviteNewUserSchema } from '$lib/schema';
 import { zod } from 'sveltekit-superforms/adapters';
-import type { PageServerLoad, Actions } from './$types.js';
 import { fail } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';
 import {
@@ -9,6 +10,7 @@ import {
 	generateUserId,
 	handleLogFlashReturnFormError
 } from '$lib/utils';
+
 import { setFlash } from 'sveltekit-flash-message/server';
 import db from '$lib/server/db/index.js';
 import {
@@ -20,17 +22,16 @@ import {
 	getSchoolDetailsById
 } from '$lib/server/queries.js';
 
-export const load: PageServerLoad = async (event) => {
+export const load = async (event) => {
 	if (!event.locals.user) return redirect(302, '/auth/login');
 	const user = event.locals.user;
 	if (!user) return fail(400, { message: 'User not authenticated' });
 
 	const form = await superValidate(zod(inviteNewUserSchema));
 
-	return { form, invitSchoolAdminHtmlTemplate: await getLatestHtmlTemplateDataByType() };
+	return { form, schoolAdminHtmlTemplate: await getLatestHtmlTemplateDataByType() };
 };
-
-export const actions: Actions = {
+export const actions = {
 	default: async (event) => {
 		if (!event.locals.user) return redirect(302, '/auth/login');
 
@@ -61,6 +62,7 @@ export const actions: Actions = {
 
 		let inviteToken = '';
 		const htmlTemplate = await getLatestHtmlTemplateDataByType();
+		if (!htmlTemplate) throw new Error('Failed to get html template data');
 
 		try {
 			const result = await db.transaction(async (trx) => {
@@ -82,9 +84,11 @@ export const actions: Actions = {
 					},
 					trx
 				);
+
 				if (!inviteRes) throw new Error('Failed to create invite');
 
 				inviteToken = createAdminUserInviteToken(form.data.name, form.data.email, inviteRes.id);
+
 				const newUser = await createNewUserWithDetails(
 					{
 						id: generateUserId(),
@@ -94,11 +98,9 @@ export const actions: Actions = {
 					},
 					trx
 				);
-
-				console.log('newUser => ', newUser);
 				if (!newUser) throw new Error('Failed to create user');
 
-				//associate user w/ same school
+				//associate user w/ school
 				const newSchoolAdminRes = await createSchoolAdmin(
 					{
 						userId: newUser.id,
@@ -106,10 +108,10 @@ export const actions: Actions = {
 					},
 					trx
 				);
-
 				if (!newSchoolAdminRes) throw new Error('Failed to associate user with school');
-				console.log('newSchoolAdminRes => ', newSchoolAdminRes);
-				// throw new Error('testing error');
+
+				// throw new Error('test error');
+
 				return newUser;
 			});
 
@@ -122,7 +124,7 @@ export const actions: Actions = {
 					to: form.data.email,
 					subject: 'You have been invited to join the platform',
 					inviteLink: `${event.url.origin}/auth/register?inviteToken=${inviteToken}`,
-					htmlEmailContent: htmlTemplate?.template
+					htmlEmailContent: htmlTemplate.template
 				})
 			});
 			if (!res.ok) {
@@ -137,9 +139,10 @@ export const actions: Actions = {
 			return message(form, { status: 'error', text: UnexpectedErrorMsg });
 		}
 
-		const registerLink = `/auth/register?inviteToken=${inviteToken}`;
+		const registerLink = `${event.url.origin}/auth/register?inviteToken=${inviteToken}`;
+		console.log('register link =>', registerLink);
 		setFlash({ type: 'success', message: 'Invite sent!' }, event.cookies);
-		console.log('register =>', `/auth/register?inviteToken=${inviteToken}`);
+		console.log('register link =>', registerLink);
 
 		return redirect(302, './');
 	}

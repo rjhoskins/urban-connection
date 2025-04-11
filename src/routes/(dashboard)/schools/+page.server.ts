@@ -16,6 +16,7 @@ export const load = async (event) => {
 	let data: any = [];
 	switch (event.locals.user.role) {
 		case 'school_admin': {
+			console.log('school admin!!!!!!!!!!!!!!!!!!!!!!!!!!====================');
 			const schoolId = await getSchoolIDForSchoolAdmin(event.locals.user.id);
 			if (!schoolId) error(403, 'not authorized');
 
@@ -33,7 +34,10 @@ export const load = async (event) => {
 			}
 			if (event.url.searchParams.get('view') === 'results') {
 				throw redirect(302, `schools/${schoolId}/results`);
-			} else return redirect(302, `/schools/${schoolId}`);
+			} else {
+				console.log('herez ===============>');
+				throw redirect(302, `schools/${schoolId}`);
+			}
 		}
 		case 'super_admin': {
 			data = await getSchoolsWithAssessmentCountAndScoreData();

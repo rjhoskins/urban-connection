@@ -29,7 +29,14 @@ export const load = async (event) => {
 	};
 
 	if (event.locals.user.role === 'school_admin') {
-		redirect(302, '/schools/' + schoolId);
+		console.log('school admin!!!!!!!!!!!!!!!!!!!!!!!!!!====================');
+		const userId = event.locals.user.id;
+		if (userId) {
+			schoolDataFunc = async () => getSchoolForSchoolAdmin(userId, schoolId);
+			adminDataFunc = async () => getSchoolAdminBySchoolId(schoolId);
+			memberDataFunc = async () =>
+				getSchoolMemberAssessmentTotalsForSchoolAndDistrictAdminBySchool(schoolId);
+		}
 	}
 	if (event.locals.user.role === 'district_admin') {
 		const userId = event.locals.user.id;

@@ -3,7 +3,7 @@
 	import SchoolGridCard from '$lib/components/school-grid-card.svelte';
 	import SchoolListTable from '$lib/components/school-list-table.svelte';
 	import { List, Grid2X2 } from 'lucide-svelte';
-	let { data, children } = $props();
+	let { data } = $props();
 	let schoolProgess;
 	let numSchoolsShown = $state(data.schools.length);
 	let isGridView = $state(true);
@@ -26,7 +26,7 @@
 <section class="flex h-full max-w-7xl flex-col">
 	<h1 class="p4 sr-only my-6 text-center text-3xl">Manage All Schools</h1>
 	<Card class="mb-14 flex justify-end gap-4 p-4">
-		{#if browser}
+		{#if browser && data.user.role === 'super_admin'}
 			<Button
 				href={`${window.location.origin}/create-school`}
 				class="flex items-center justify-center"
@@ -34,7 +34,6 @@
 			>
 		{/if}
 		<Button
-			href="/dashboard/schools/assessment"
 			class="flex items-center justify-center"
 			variant={`${!isGridView ? 'default' : 'secondary'}`}
 			onclick={() => (isGridView = false)}><List /><span>List</span></Button

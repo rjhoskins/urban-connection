@@ -3,11 +3,13 @@
 	import { globals } from '$lib/store/globals.svelte';
 	import Progress from '$lib/components/ui/progress/progress.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
-
+	import AdminContactDetailsCard from '$lib/components/admin-contact-details-card.svelte';
 	import { page } from '$app/state';
+
+	import { browser } from '$app/environment';
 	import type { LayoutData } from './$types';
 	import { onMount, type Snippet } from 'svelte';
-
+	import DonutChart from '$lib/components/charts/DonutChart.svelte';
 	import { Grid2X2, List } from 'lucide-svelte';
 	import MemberAssessmentResultsGridCard from '$lib/components/member-assessment-results-grid-card.svelte';
 	import MemberAssessmentResultsListTable from '$lib/components/member-assessment-results-list-table.svelte';

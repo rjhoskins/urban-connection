@@ -1,10 +1,10 @@
 /** @type {import('./$types').PageServerLoad} */
 
-import { redirect, type Actions } from '@sveltejs/kit';
+import { error, redirect, type Actions } from '@sveltejs/kit';
 import {
 	getSchoolIDForSchoolAdmin,
 	getSchoolsForDistrictAdmin,
-	getSchoolsForSuperAdmin
+	getSchoolsWithAssessmentCountAndScoreData
 } from '$lib/server/queries';
 
 export const load = async (event) => {
@@ -17,11 +17,26 @@ export const load = async (event) => {
 	switch (event.locals.user.role) {
 		case 'school_admin': {
 			const schoolId = await getSchoolIDForSchoolAdmin(event.locals.user.id);
-			console.log('school_admin user REDIRECT => ', event.locals.user);
-			return redirect(302, `/schools/${schoolId}`);
+			if (!schoolId) error(403, 'not authorized');
+
+			if (event.url.searchParams.get('view') === 'invite') {
+				console.log('redirecting to invite-coadmin ===============>');
+				throw redirect(302, `schools/${schoolId}/invite-coadmin`);
+			}
+			if (event.url.searchParams.get('view') === 'assessment') {
+				console.log('redirecting to invite-coadmin ===============>');
+				throw redirect(302, `/schools/${schoolId}/send-assessment`);
+			}
+			if (event.url.searchParams.get('view') === 'invite') {
+				console.log('redirecting to invite-coadmin ===============>');
+				throw redirect(302, `schools/${schoolId}/invite-coadmin`);
+			}
+			if (event.url.searchParams.get('view') === 'results') {
+				throw redirect(302, `schools/${schoolId}/results`);
+			} else return redirect(302, `/schools/${schoolId}`);
 		}
 		case 'super_admin': {
-			data = await getSchoolsForSuperAdmin();
+			data = await getSchoolsWithAssessmentCountAndScoreData();
 			break;
 		}
 		case 'district_admin': {
@@ -32,29 +47,11 @@ export const load = async (event) => {
 			console.log('Unhandled role:', event.locals.user.role);
 			break;
 	}
-
 	const parentData = await parent();
+
 	return {
 		user: event.locals.user,
-		schools: data
+		schools: data,
+		pageTitle: 'Manage Schools'
 	};
-};
-
-// const getDistrictForAdmin = async (userId: string) => {
-// 	return await db
-// 		.select()
-// 		.from(districtsTable)
-// 		.innerJoin(districtAdminsTable, is(districtAdminsTable.districtId, districtsTable.id))
-// 		.where(is(districtAdminsTable.userId, userId));
-// };
-
-export const actions: Actions = {
-	default: async (event) => {
-		console.log('default event => ', event);
-		// if (!form.valid) {
-		// 	return message(form, 'Invalid form');
-		// }
-		console.log('form => ');
-		// return form;
-	}
 };

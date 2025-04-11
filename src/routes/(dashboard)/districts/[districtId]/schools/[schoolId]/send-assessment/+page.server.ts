@@ -15,7 +15,6 @@ export const load: PageServerLoad = async (event) => {
 		assessmentInviteHtmlTemplate: await getLatestHtmlTemplateDataByType('assessment_invite')
 	};
 };
-
 export const actions: Actions = {
 	default: async (event) => {
 		if (!event.locals.user) redirect(303, '/auth/login');
@@ -32,6 +31,7 @@ export const actions: Actions = {
 			});
 		}
 
+		let assessmentId;
 		try {
 			const assessmentInviteHtmlTemplate =
 				await getLatestHtmlTemplateDataByType('assessment_invite');
@@ -39,15 +39,12 @@ export const actions: Actions = {
 				throw new Error('No assessment invite template found');
 			}
 			// create assessment
-			const assessmentId = await createAssessment({
+			assessmentId = await createAssessment({
 				recipientName: form.data.name,
 				recipientEmail: form.data.email,
 				schoolId: parseInt(event.params.schoolId),
 				sentBy: event.locals.user.id
 			});
-			if (!assessmentId) {
-				throw new Error('Failed to create assessment');
-			}
 
 			const assessmentToken = createAssessmentInviteToken({
 				name: form.data.name,
@@ -83,8 +80,17 @@ export const actions: Actions = {
 				status: 500,
 				event
 			});
+			redirect(303, './');
 		}
+		const assessmentToken = createAssessmentInviteToken({
+			name: form.data.name,
+			email: form.data.email,
+			assessmentId: assessmentId!.id,
+			schoolId: parseInt(event.params.schoolId)
+		});
+		console.log(`assessmentToken => , ${assessmentToken}`);
 		setFlash({ type: 'success', message: 'Assessment invite sent' }, event.cookies);
-		return redirect(303, './');
+
+		redirect(303, './');
 	}
 };

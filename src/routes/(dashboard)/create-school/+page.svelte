@@ -18,7 +18,7 @@
 	<meta name="description" content="This is where the description goes for SEO" />
 </svelte:head>
 
-<div class=" h-full">
+<div class=" h-full max-w-7xl">
 	<NewSchoolForm {data} />
 	<!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->
 </div>
