@@ -3,10 +3,18 @@
 	import * as Card from '$lib/components/ui/card';
 	import GenericInviteForm from '$lib/components/forms/generic-invite-form.svelte';
 	import HtmlEmailTextPreview from '$lib/components/html-email-text-preview.svelte';
+	import { TEMPLATE_TITLES } from '$lib/constants.js';
+	import { onMount } from 'svelte';
+	import { globals } from '$lib/store/globals.svelte.js';
 
 	let { data } = $props();
 
 	let formisEditing = $state(true);
+	const templatTitle = TEMPLATE_TITLES[data.type!] || 'Template';
+
+	onMount(() => {
+		globals.setPageName(`HTML Email Templates | ${templatTitle}`);
+	});
 </script>
 
 <svelte:head>

@@ -12,7 +12,7 @@
 	</div>
 
 	<img
-		class="col-start-1 row-start-1 h-full w-full object-fill lg:col-start-2"
+		class="col-start-1 row-start-1 h-full w-full object-cover lg:col-start-2 2xl:object-fill"
 		alt="city with school"
 		src="/img/city-with-school.png"
 	/>

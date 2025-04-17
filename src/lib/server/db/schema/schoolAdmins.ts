@@ -13,6 +13,7 @@ const schoolAdmins = pgTable('school_admins', {
 	schoolId: integer('school_id')
 		.notNull()
 		.references(() => schools.id),
+	// assessmentToken: varchar('assessment_token', { length: 256 }),
 	...timestamps
 });
 

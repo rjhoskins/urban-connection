@@ -23,25 +23,22 @@ export function decodeAdminUserInviteToken(token: string) {
 	const [name, email, inviteId] = data.split('|');
 	return { name, email, inviteId };
 }
+
 export function createAssessmentInviteToken({
-	name,
-	email,
-	assessmentId,
+	sentBy,
 	schoolId
 }: {
-	name: string;
-	email: string;
-	assessmentId: number;
-	schoolId: number;
+	sentBy: string;
+	schoolId: number | string;
 }) {
-	const data = `${name}|${email}|${assessmentId}|${schoolId}`;
+	const data = `${sentBy}|${schoolId}`;
 	return btoa(data);
 }
 
 export function decodeAssessmentInviteToken(token: string) {
 	const data = atob(token);
-	const [name, email, assessmentId, schoolId] = data.split('|');
-	return { name, email, assessmentId, schoolId };
+	const [sentBy, schoolId] = data.split('|');
+	return { sentBy, schoolId };
 }
 
 export function handleTypeSafeError(error: unknown, message: any, form: any) {
@@ -269,8 +266,8 @@ export function applyAssessmentResponsesToQuestionsAndGetCurrentPositions({
 	// console.log('currDemgraphicsData  ====> ', currDemgraphicsData);
 	// console.log('currAssessmentData  ====> ', currAssessmentData);
 
-	let lastAnsweredDomain;
-	let lastAnsweredSubdomainId;
+	let lastAnsweredQuestionIdInDomain;
+	let lastAnsweredQuestionIdInSubdomain;
 	let domainIdsArr: any[] = [];
 	let subdomainIdsArr: any[] = [];
 	assessmentQuestionsCopy.forEach((domain: any) => {
@@ -294,11 +291,11 @@ export function applyAssessmentResponsesToQuestionsAndGetCurrentPositions({
 					);
 
 					if (questionHasResponse) {
-						lastAnsweredSubdomainId = subdomain.id;
-						// console.log('lastAnsweredSubdomainId  ====> ', lastAnsweredSubdomainId);
+						lastAnsweredQuestionIdInSubdomain = subdomain.id;
+						// console.log('lastAnsweredQuestionIdInSubdomain  ====> ', lastAnsweredQuestionIdInSubdomain);
 						// console.log('question  ====> ', question);
-						lastAnsweredDomain = domain.id;
-						// console.log('lastAnsweredDomain  ====> ', lastAnsweredDomain);
+						lastAnsweredQuestionIdInDomain = domain.id;
+						// console.log('lastAnsweredQuestionIdInDomain  ====> ', lastAnsweredQuestionIdInDomain);
 
 						const foundResponse = currAssessmentData.find(
 							(response: any) => response.questionId === question.id
@@ -322,7 +319,11 @@ export function applyAssessmentResponsesToQuestionsAndGetCurrentPositions({
 	// console.log('domainIdsArr  ====> ', domainIdsArr);
 	// console.log('subdomainIdsArr  ====> ', subdomainIdsArr);
 
-	return { assessmentQuestionsCopy, lastAnsweredDomain, lastAnsweredSubdomainId };
+	return {
+		assessmentQuestionsCopy,
+		lastAnsweredQuestionIdInDomain,
+		lastAnsweredQuestionIdInSubdomain
+	};
 }
 
 export function getScoreBackgroundColor(score: number) {
@@ -334,4 +335,12 @@ export function getScoreBackgroundColor(score: number) {
 	} else {
 		return 'bg-[#FEF4F5]';
 	}
+}
+
+export function formDataToObject(formData: FormData) {
+	const obj: Record<string, FormDataEntryValue> = {};
+	for (const [key, value] of formData.entries()) {
+		obj[key] = value;
+	}
+	return obj;
 }

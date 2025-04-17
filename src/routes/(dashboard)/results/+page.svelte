@@ -2,13 +2,18 @@
 	import type { PageData } from './$types';
 	import * as Card from '$lib/components/ui/card';
 	import { Progress } from '$lib/components/ui/progress';
+	import { globals } from '$lib/store/globals.svelte';
+	import { onMount } from 'svelte';
 
 	let { data }: { data: PageData } = $props();
 	const { domainData, questionsData } = data;
+	onMount(() => {
+		globals.setPageName('Assessment Results | All Time Totals');
+	});
 </script>
 
 <section class="mx-auto grid max-w-7xl gap-4 p-2 lg:p-8">
-	<h1 class="my-6 text-center text-3xl">All Time Totals</h1>
+	<h1 class="sr-only">All Time Totals</h1>
 	<div class=" p-4">
 		<div class="grid grid-cols-2 gap-4">
 			{#each domainData as domain (domain.domainId)}

@@ -39,39 +39,21 @@ export const createAssessmentDemographicsAndAssessmentResponseFormSchema = z
 	})
 	.catchall(z.string().regex(/^[01]?$/, "Responses must be '0', '1', or an empty string"));
 
-export const parseAndTransformCreateDemographicsData = z.object({
-	yearsTeaching: z
-		.union([z.string(), z.number(), z.null()])
-		.optional()
-		.transform((val) => {
-			if (val == null) return null;
-			const num = Number(val);
-			return isNaN(num) ? null : num;
-		}),
-	assessmentId: z
-		.union([z.string(), z.number(), z.null()])
-		.optional()
-		.transform((val) => {
-			if (val == null) return null;
-			const num = Number(val);
-			return isNaN(num) ? null : num;
-		}),
-	subjectTaught: z
-		.union([z.string(), z.number(), z.null()])
-		.optional()
-		.transform((val) => (val == null ? null : String(val))),
-	schoolId: z
-		.union([z.string(), z.number(), z.null()])
-		.optional()
-		.transform((val) => {
-			if (val == null) return null;
-			const num = Number(val);
-			return isNaN(num) ? null : num;
-		})
+export const createMixedBagAssessmentAndDemographics = z.object({
+	isDemographics: z.coerce.boolean(),
+	// yearsTeaching: z.string().regex(/^\d+$/, 'yearsTeaching must be a numeric string'),
+	email: z.string().email('Please enter a valid email.'),
+	name: z.string().nonempty('Name is required'),
+	yearsTeaching: z.coerce.number().min(1, 'Years teaching must be non-zero and positive'),
+	schoolId: z.coerce.number(),
+	subjectTaught: z.string().nonempty('Subject taught is required'),
+	assessmentToken: z.string({
+		message: 'Assessment token seems to be  missing, try re-opening the assessment link'
+	})
 });
 
-export type CreateDemographicsResponseInput = z.infer<
-	typeof parseAndTransformCreateDemographicsData
+export type CreateMixedBagAssessmentAndDemographicsInput = z.infer<
+	typeof createMixedBagAssessmentAndDemographics
 >;
 
 const createAssessmentQuestionResponseSchema = z

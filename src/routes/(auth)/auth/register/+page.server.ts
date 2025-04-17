@@ -11,11 +11,14 @@ import { setFlash } from 'sveltekit-flash-message/server';
 import {
 	checkRegisteredUserExists,
 	findUnusedInviteByInviteId,
+	getLatestHtmlTemplateDataByType,
 	updateRegisterInviteWithInviteeAndMarkUsed,
+	updateSchoolAdminWithToken,
 	updateUserWithPassword
 } from '$lib/server/queries';
 import { set } from 'zod';
 import db from '$lib/server/db';
+import { createAssessmentInviteToken } from '$lib/utils';
 
 export const load: PageServerLoad = async ({ url }) => {
 	const token = url.searchParams.get('inviteToken');
@@ -32,6 +35,8 @@ export const actions: Actions = {
 			setFlash({ type: 'error', message: 'Invalid form' }, event.cookies);
 			return message(form, 'Invalid form');
 		}
+
+		let newUserId;
 
 		const passwordHash = await hash(form.data.password, {
 			memoryCost: 19456,
@@ -63,7 +68,10 @@ export const actions: Actions = {
 				{ type: 'error', message: 'User already exists, please contact your administrator' },
 				event.cookies
 			);
-			return message(form, 'User already exists, please contact your administrator');
+			return message(form, {
+				text: 'User already exists, please contact your administrator',
+				status: 'error'
+			});
 		}
 
 		try {
@@ -83,17 +91,68 @@ export const actions: Actions = {
 
 				if (!inviteRes) throw new Error('Invite update failed');
 
-				return updatedUserWithPW;
+				//handle assessment invite token
+				const assessmentToken = createAssessmentInviteToken({
+					sentBy: updatedUserWithPW.id,
+					schoolId: existingUnusedInvite.schoolId!
+				});
+				await updateSchoolAdminWithToken(
+					{ userId: updatedUserWithPW.id, token: assessmentToken },
+					trx
+				);
+				if (!assessmentToken) throw new Error('Failed to create admin assessment token');
+
+				return { newUserId: updatedUserWithPW.id, schoolId: existingUnusedInvite.schoolId! };
 			});
+
+			const assessmentInviteHtmlTemplate =
+				await getLatestHtmlTemplateDataByType('assessment_invite');
+			if (!assessmentInviteHtmlTemplate) {
+				throw new Error('No assessment invite template found');
+			}
+
+			//send email with assessment link
+			const assessmentToken = createAssessmentInviteToken({
+				sentBy: result.newUserId,
+				schoolId: result.schoolId
+			});
+
+			const inviteLink = `${event.url.origin}/urban-connection-project-assessment?assessmentToken=${assessmentToken}`;
+			console.log(`inviteLink => , ${inviteLink}`);
+
+			const res = await event.fetch('/api/send-assessment-invite', {
+				method: 'POST',
+				headers: {
+					'content-type': 'application/json'
+				},
+				body: JSON.stringify({
+					to: form.data.email,
+					subject: 'You have been invited to take an assessment',
+					inviteLink,
+					htmlEmailContent: assessmentInviteHtmlTemplate?.template
+				})
+			});
+			if (!res.ok) {
+				const errorMessage = await res.text();
+				throw new Error(`Failed to send email: ${errorMessage}`);
+			}
 
 			// Create session and set cookie
 			const sessionToken = auth.generateSessionToken();
 			const session = await auth.createSession(sessionToken, result.id);
+			if (!session.expiresAt) throw new Error('Session expiry not set');
 			auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
 		} catch (error) {
 			const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
 			setFlash({ type: 'error', message: errorMessage }, event.cookies);
-			return message(form, 'Unexpected error: ' + errorMessage, { status: 500 });
+			return message(
+				form,
+				{
+					text: 'Unexpected error: ' + errorMessage,
+					status: 'error'
+				},
+				{ status: 500 }
+			);
 		}
 
 		setFlash({ type: 'success', message: 'Sucessfully Registered!' }, event.cookies);

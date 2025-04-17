@@ -40,16 +40,14 @@ export const actions: Actions = {
 			}
 			// create assessment
 			assessmentId = await createAssessment({
-				recipientName: form.data.name,
-				recipientEmail: form.data.email,
+				participantName: form.data.name,
+				participantEmail: form.data.email,
 				schoolId: parseInt(event.params.schoolId),
 				sentBy: event.locals.user.id
 			});
 
 			const assessmentToken = createAssessmentInviteToken({
-				name: form.data.name,
-				email: form.data.email,
-				assessmentId: assessmentId!.id,
+				sentBy: event.locals.user.id,
 				schoolId: parseInt(event.params.schoolId)
 			});
 
@@ -83,8 +81,6 @@ export const actions: Actions = {
 			redirect(303, './');
 		}
 		const assessmentToken = createAssessmentInviteToken({
-			name: form.data.name,
-			email: form.data.email,
 			assessmentId: assessmentId!.id,
 			schoolId: parseInt(event.params.schoolId)
 		});

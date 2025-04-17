@@ -8,10 +8,8 @@ export const load = (async (event) => {
 	const assessmentToken = await event.url.searchParams.get('assessmentToken');
 	const decodedeAssessmentToken = decodeAssessmentInviteToken(assessmentToken as string);
 
-	const { name, email, assessmentId, schoolId } = decodedeAssessmentToken;
+	const { assessmentId, schoolId } = decodedeAssessmentToken;
 	const tokenParseRes = AssessmentTokenInviteSchema.safeParse({
-		name,
-		email,
 		assessmentId,
 		schoolId
 	});

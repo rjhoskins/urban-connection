@@ -1,83 +1,53 @@
 <script lang="ts">
-	import * as Card from '$lib/components/ui/card';
-	import {
-		LayoutGrid,
-		List,
-		PenTool,
-		Slice,
-		UserRoundPlus,
-		NotepadTextDashed
-	} from 'lucide-svelte';
+	import DashboardCard from './dashboard-card.svelte';
 
 	const adminData = [
 		{
 			title: 'Create School',
-			url: '/create-school',
+			linkurl: '/create-school',
 			description: 'Create school and send email invitation to administrator.',
-			icon: UserRoundPlus
+			imgUrl: '/img/school.png',
+			imgStyleDimensions: 'height: 65px; width: 65px;'
 		},
 		{
 			title: 'Manage Districts',
-			url: '/districts',
+			linkurl: '/districts',
 			description: 'View the details for all districts',
-			icon: LayoutGrid
+			imgUrl: '/img/districts.png',
+			imgStyleDimensions: 'height: 60px; width: 60px;'
 		},
 		{
 			title: 'Manage Schools',
-			url: '/schools',
+			linkurl: '/schools',
 			description: 'Manage the details for all schools',
-			icon: LayoutGrid
+			imgUrl: '/img/schools.png',
+			imgStyleDimensions: 'height: 60px; width: 60px;'
 		},
 		{
 			title: 'View Results Dashboard',
-			url: '/results',
+			linkurl: '/results',
 			description: 'View completed assessment results for all schools',
-			icon: List
+			imgUrl: '/img/results.png',
+			imgStyleDimensions: 'height: 60px; width: 60px;'
 		},
 		{
 			title: 'Edit HTML Email Template text',
-			url: '/templates',
+			linkurl: '/templates',
 			description: 'Edit the text for the email template',
-			icon: NotepadTextDashed
+			imgUrl: '/img/html-email.png',
+			imgStyleDimensions: 'height: 60px; width: 60px;'
 		}
-		// {
-		// 	title: 'Manage Assessments',
-		// 	url: '/schools',/manage-assessments',
-		// 	description: 'Edit, view, and manage assessment',
-		// 	icon: PenTool
-		// }
 	];
-
-	let { displayName } = $props();
 </script>
 
-<Card.Root class="mx-auto max-w-6xl shadow-lg">
-	<Card.Header>
-		<Card.Title class="p-6">Hello, {displayName ? displayName : 'TODO'}</Card.Title>
-		<!-- <Card.Description>Card Description</Card.Description> -->
-	</Card.Header>
-	<hr class="bg-primary" />
-	<Card.Content>
-		{#each adminData.slice(0, 2) as item (item.title)}
-			{@render dashItem(item)}
-		{/each}
-
-		<hr class="bg-primary" />
-
-		{#each adminData.slice(2, adminData.length) as item (item.title)}
-			{@render dashItem(item)}
-		{/each}
-	</Card.Content>
-</Card.Root>
-
-{#snippet dashItem(item: any)}
-	<Card.Content>
-		<a href={item.url} class="flex gap-3">
-			<item.icon />
-			<div class="space-y-2">
-				<p>{item.title}</p>
-				<p class="text-primary/50">{item.description}</p>
-			</div>
-		</a>
-	</Card.Content>
-{/snippet}
+<div class="flex max-w-[920px] flex-wrap justify-center gap-6">
+	{#each adminData as item (item.title)}
+		<DashboardCard
+			title={item.title}
+			relLinkurl={item.linkurl}
+			description={item.description}
+			imgUrl={item.imgUrl}
+			imgStyleDimensions={item.imgStyleDimensions}
+		/>
+	{/each}
+</div>

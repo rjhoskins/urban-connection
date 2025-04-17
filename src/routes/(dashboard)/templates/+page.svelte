@@ -2,7 +2,9 @@
 	import { page } from '$app/state';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Card from '$lib/components/ui/card';
+	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
+	import { globals } from '$lib/store/globals.svelte';
 
 	let { data }: { data: PageData } = $props();
 	const { templateTypes } = data;
@@ -29,6 +31,10 @@
 			...template,
 			...templateType
 		};
+	});
+
+	onMount(() => {
+		globals.setPageName('HTML Email Templates');
 	});
 </script>
 

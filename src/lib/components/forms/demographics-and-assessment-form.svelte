@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { applyAction, deserialize, enhance } from '$app/forms';
+	import { applyAction, deserialize } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
 	import { Button } from '$lib/components/ui/button';
 	import Card from '$lib/components/ui/card/card.svelte';
@@ -7,17 +7,108 @@
 	import { updateFlash } from 'sveltekit-flash-message';
 	import { page } from '$app/state';
 	import { ZERO_BASED_ALPHABET_NUMBERING } from '$lib/constants';
+	import Input from '../ui/input/input.svelte';
+	import { setFlash } from 'sveltekit-flash-message/server';
+	import toast from 'svelte-french-toast';
+	import { currAssessment } from '$lib/store/assessment.svelte';
+	import { createMixedBagAssessmentAndDemographics } from '$lib/types/assessment';
+	import {
+		applyAssessmentResponsesToQuestionsAndGetCurrentPositions,
+		decodeAssessmentInviteToken,
+		formDataToObject
+	} from '$lib/utils';
+	import { onMount } from 'svelte';
 
 	let {
 		demoAndAssessmentformData = $bindable(),
-		currDomain,
-		currSubDomain,
+		currDomain = $bindable(),
+		currSubDomain = $bindable(),
 		handleNext = $bindable(),
 		handlePrev = $bindable(),
+		formLastAnsweredQuestionIdInSubdomain = $bindable(),
+		formLastAnsweredQuestionIdInDomain = $bindable(),
+		formUpdatedAssessmentProgress,
 		isDemographicsQuestions,
 		isLastQuestion,
 		assessmentToken
 	} = $props();
+
+	onMount(() => {
+		console.log('form mounted');
+	});
+	$effect(() => {
+		console.log('currDomain => ', currDomain);
+	});
+
+	async function handleInitialize(
+		event:
+			| (MouseEvent & {
+					currentTarget: EventTarget & HTMLButtonElement;
+			  })
+			| (MouseEvent & {
+					currentTarget: EventTarget & HTMLAnchorElement;
+			  })
+	) {
+		event.preventDefault();
+
+		const form = event.currentTarget.closest('form');
+		console.log('handleInitialize', form);
+		const data = new FormData(form!);
+		console.log('handleInitialize data', data);
+
+		const isDemographics = data.get('isDemographics');
+
+		const name = data.get('name');
+		if (name) currAssessment.setAssessmentParticipantName(name.toString());
+
+		const decodedeAssessmentToken = decodeAssessmentInviteToken(assessmentToken as string);
+		const schoolId = parseInt(decodedeAssessmentToken.schoolId);
+		console.log('data', data);
+		const parseRes = createMixedBagAssessmentAndDemographics.safeParse({
+			...formDataToObject(data),
+			schoolId
+		});
+		if (!parseRes.success) {
+			const errorStrArray = Object.entries(parseRes.error.flatten().fieldErrors)
+				.map(([key, value]) => value)
+				.join(', ');
+
+			toast.error(`form error: ${errorStrArray}`);
+			return;
+		}
+		if (name) currAssessment.setAssessmentParticipantName(name.toString());
+
+		//data => server
+		if (!form?.action) throw new Error('Form action is required');
+		const response = await fetch(form.action, {
+			method: 'POST',
+			body: data
+		});
+		const result: ActionResult = deserialize(await response.text());
+		const resData = result.type === 'success' ? result.data : undefined;
+		if (resData?.currAssessmentData || resData?.currDemographicsData) {
+			const positionData = applyAssessmentResponsesToQuestionsAndGetCurrentPositions({
+				assessmentQuestions: currAssessment.assessmentQuestions,
+				currDemgraphicsData: resData.currDemographicsData,
+				currAssessmentData: resData.currAssessmentData
+			});
+			formLastAnsweredQuestionIdInDomain = positionData.lastAnsweredQuestionIdInDomain;
+			formLastAnsweredQuestionIdInSubdomain = positionData.lastAnsweredQuestionIdInSubdomain;
+			console.log('positionData', positionData);
+			formUpdatedAssessmentProgress();
+			demoAndAssessmentformData = positionData.assessmentQuestionsCopy;
+		}
+
+		if (result.type === 'success' && result.data?.currAssessmentId) {
+			currAssessment.setAssessmentId(result.data.currAssessmentId);
+		}
+
+		//svelte is too fast
+		await new Promise((resolve) => setTimeout(resolve, 0));
+
+		handleNext();
+		applyAction(result);
+	}
 
 	async function handleIntermediateSubmit(
 		event:
@@ -31,22 +122,23 @@
 		event.preventDefault();
 
 		const form = event.currentTarget.closest('form');
-		console.log('handleIntermediateSubmit', form);
-		const data = new FormData(form!);
+		const formData = new FormData(form!);
+
+		formData.append('assessmentId', `${currAssessment.currAssessmentId}`);
+
+		console.log('handleIntermediateSubmit data', formData);
 
 		if (!form?.action) throw new Error('Form action is required');
 		const response = await fetch(form.action, {
 			method: 'POST',
-			body: data
+			body: formData
 		});
 		const result: ActionResult = deserialize(await response.text());
-		console.log('handleIntermediateSubmit RESULT', result);
-		if (result.type === 'success' && result?.data?.isDemographics) {
-			// rerun all `load` functions, following the successful update
-			await updateFlash(page);
-		}
+
+		await new Promise((resolve) => setTimeout(resolve, 0));
 
 		handleNext();
+		applyAction(result);
 	}
 
 	async function handleFinish(
@@ -62,14 +154,16 @@
 		console.log('handleFinish');
 
 		const form = event.currentTarget.closest('form');
-		const data = new FormData(form!);
+		const formData = new FormData(form!);
+		formData.append('assessmentId', `${currAssessment.currAssessmentId}`);
+		formData.append('isLastQuestion', 'true');
 
 		// handleFormDataChange({ event, data });
 
 		if (!form?.action) throw new Error('Form action is required');
 		const response = await fetch(form.action, {
 			method: 'POST',
-			body: data
+			body: formData
 		});
 
 		const result: ActionResult = deserialize(await response.text());
@@ -97,15 +191,13 @@
 		<input type="hidden" name="assessmentToken" value={assessmentToken} />
 
 		{#if demoAndAssessmentformData[currDomain].subDomains[currSubDomain].name.toLowerCase() == 'demographics'}
-			<Card class="max-w-prose  p-4 shadow-md">
+			<Card class="flex max-w-prose flex-col gap-4 p-4 shadow-md">
 				<!-- demographics inputs -->
 				{#each demoAndAssessmentformData[currDomain].subDomains[currSubDomain].fields as field, i (field.placeholder)}
 					{#if field.type === 'select'}
-						<div>
-							<label for={field.fieldName} class="block text-sm/6 font-medium text-gray-900"
-								>{field.label}</label
-							>
-							<div class="mt-2 grid grid-cols-1">
+						<div class="">
+							<label for={field.fieldName} class="">{field.label}</label>
+							<div class="grid grid-cols-1">
 								<select
 									id={field.fieldName}
 									name={field.fieldName}
@@ -137,12 +229,13 @@
 							</div>
 						</div>
 					{:else}
-						<div>
+						<div class="">
 							<label for={field.fieldName} class="block text-sm/6 font-medium text-gray-900"
 								>{field.label}</label
 							>
-							<div class="mt-2">
-								<input
+							<div class="">
+								<Input
+									required={field?.required}
 									name={field.fieldName}
 									bind:value={
 										demoAndAssessmentformData[currDomain].subDomains[currSubDomain].fields[i].value
@@ -150,7 +243,7 @@
 									placeholder={field.placeholder}
 									type={field.type}
 									id={field.fieldName}
-									maxlength="256"
+									maxlength={field.type === 'text' ? 256 : undefined}
 									inputmode={field.type === 'number' ? 'numeric' : undefined}
 									min={field.type === 'number' ? '1' : undefined}
 									class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
@@ -229,12 +322,14 @@
 			<Button
 				type="button"
 				variant="secondary"
-				disabled={isDemographicsQuestions}
+				disabled={isDemographicsQuestions || (currSubDomain === 0 && currDomain === 1)}
 				onclick={() => handlePrev()}
 				class="w-fit">Previous</Button
 			>
 			{#if isLastQuestion}
 				<Button type="submit" onclick={(e) => handleFinish(e)} class="w-fit">Finish</Button>
+			{:else if isDemographicsQuestions}
+				<Button type="submit" onclick={(e) => handleInitialize(e)} class="w-fit">Start</Button>
 			{:else}
 				<Button type="submit" onclick={(e) => handleIntermediateSubmit(e)} class="w-fit"
 					>Next</Button

@@ -25,6 +25,7 @@ import type {
 	CreateDemographicsResponseInput,
 	CreateQuestionResponseInput
 } from '$lib/types/assessment';
+import { scaleQuantile } from 'd3';
 
 export async function simpleRegisterToBeDEPRICATED(
 	{
@@ -198,6 +199,23 @@ export async function createSchoolAdmin(
 	const queryBuilder = trx ? trx.insert(schoolAdmins) : db.insert(schoolAdmins);
 	const [result] = await queryBuilder
 		.values({ userId, schoolId: schoolId })
+		.returning({ id: schoolAdmins.id });
+	return result || null;
+}
+export async function updateSchoolAdminWithToken(
+	{
+		userId,
+		token
+	}: {
+		userId: string;
+		token: string;
+	},
+	trx?: PgTransaction<PostgresJsQueryResultHKT, any, any>
+) {
+	const queryBuilder = trx ? trx.update(schoolAdmins) : db.update(schoolAdmins);
+	const [result] = await queryBuilder
+		.set({ assessmentToken: token })
+		.where(eq(schoolAdmins.userId, userId))
 		.returning({ id: schoolAdmins.id });
 	return result || null;
 }
@@ -506,8 +524,8 @@ export async function getSchoolMemberAssessmentTotalsForSuperUser(
 	const res = await db
 		.select({
 			id: assessments.id,
-			name: assessments.recipientName,
-			email: assessments.recipientEmail,
+			name: assessments.participantName,
+			email: assessments.participantEmail,
 			completedAt: assessments.updatedAt,
 			pointsTotal:
 				sql`sum(case when ${assessmentQuestionsResponses.isValidSubdomainGroup} = true then ${assessmentQuestionsResponses.response} else 0 end)`.mapWith(
@@ -622,7 +640,7 @@ export async function getLoggedInDistrictAdminsDistrict(userId: string) {
 		.innerJoin(districtAdmins, eq(districtAdmins.districtId, districtAdmins.id))
 		.where(eq(districtAdmins.userId, userId));
 
-	if (dev) console.log('getSchoolForSchoolAdmin res => ', res);
+	if (dev) console.log('getLoggedInDistrictAdminsDistrict res => ', res);
 	return res || null;
 }
 
@@ -654,7 +672,7 @@ export async function getSchoolForDistrictAdmin(userId: string, schoolId: number
 		.where(
 			and(eq(schools.isActive, true), eq(schools.id, schoolId), eq(districtAdmins.userId, userId))
 		);
-	if (dev) console.log('getSchoolForSuperAdmin res => ', res);
+	if (dev) console.log('getSchoolForDistrictAdmin res => ', res);
 	return res || null;
 }
 
@@ -787,8 +805,8 @@ export async function getSchoolAssessmentResultsData(schoolId: number) {
 export async function getSingleAssessmentResultsDataForSuperAdmin(assessmentId: number) {
 	const results = await db
 		.select({
-			participantName: assessments.recipientName,
-			participantEmail: assessments.recipientEmail,
+			participantName: assessments.participantName,
+			participantEmail: assessments.participantEmail,
 			assessmentId: assessments.id,
 			domainId: assessmentDomains.id,
 			domainName: assessmentDomains.name,
@@ -881,21 +899,21 @@ export async function getDistrictAdminsDistrictIdByUserId(
 }
 
 export async function createAssessment({
-	recipientName,
-	recipientEmail,
+	participantName,
+	participantEmail,
 	schoolId,
 	sentBy
 }: {
-	recipientName: string;
-	recipientEmail: string;
+	participantName: string;
+	participantEmail: string;
 	schoolId: number;
 	sentBy: string;
 }): Promise<{ id: number } | null> {
 	const [newAssessment] = await db
 		.insert(assessments)
 		.values({
-			recipientName,
-			recipientEmail,
+			participantName,
+			participantEmail,
 			schoolId,
 			sentBy
 		})
@@ -1090,13 +1108,21 @@ export async function getSchoolDetailsById(
 	return results || null;
 }
 
-export const getAssessmentById = async (assessmentId: number) => {
+export const getAssessmentByParticipantEmail = async ({
+	email,
+	schoolId
+}: {
+	email: string;
+	schoolId: number;
+}) => {
 	const [res] = await db
 		.select({ id: assessments.id, status: assessments.status })
 		.from(assessments)
-		.where(eq(assessments.id, assessmentId));
+		.where(and(eq(assessments.participantEmail, email), eq(assessments.schoolId, schoolId)));
+	if (dev) console.log('getAssessmentByParticipantEmail => ', res);
 	return res || null;
 };
+
 export const getDemographicsDataByAssessmentId = async (assessmentId: number) => {
 	const [res] = await db
 		.select({

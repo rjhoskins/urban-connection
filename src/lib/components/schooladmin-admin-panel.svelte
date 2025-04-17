@@ -1,62 +1,50 @@
 <script lang="ts">
 	import * as Card from '$lib/components/ui/card';
 	import { List, UserRoundPlus, Eye, Send } from 'lucide-svelte';
+	import DashboardCard from './dashboard-card.svelte';
 	const schoolAdminPanelAdminData = [
 		{
 			title: 'View Organization',
-			url: '/schools',
+			linkurl: '/schools',
 			description: 'View  organization & results by teacher.',
-			icon: Eye
+			imgUrl: '/img/person-gear.png',
+			imgStyleDimensions: 'height: 65px; width: 65px;'
 		},
 		{
 			title: 'Invite Administrator',
-			url: '/schools?&view=invite',
+			linkurl: '/schools?&view=invite',
 			description: 'Send email invitation to administrator.',
-			icon: UserRoundPlus
+			imgUrl: '/img/person-gear.png',
+			imgStyleDimensions: 'height: 65px; width: 65px;'
 		},
 		{
 			title: 'Send Assessment Invitation',
-			url: '/schools/?&view=assessment',
+			linkurl: '/schools/?&view=assessment',
 			description: 'Send email invitation to take the Assessment.',
-			icon: Send
+			imgUrl: '/img/person-gear.png',
+			imgStyleDimensions: 'height: 65px; width: 65px;'
 		},
 		{
 			title: 'View Assessment Results',
-			url: '/schools?&view=results',
+			linkurl: '/schools?&view=results',
 			description: 'View completed Assessment Total results for the organization',
-			icon: List
+			imgUrl: '/img/person-gear.png',
+			imgStyleDimensions: 'height: 65px; width: 65px;'
 		}
 	];
 
-	let { displayName, school } = $props();
+	let { school } = $props();
 </script>
 
-<Card.Root class="mx-auto max-w-6xl shadow-2xl">
-	<Card.Header>
-		<p class="text-primary/50 -mb-2">Manage School</p>
-		<Card.Title class="mt-0! py-4">{school.name}</Card.Title>
-		<!-- <Card.Description>Card Description</Card.Description> -->
-	</Card.Header>
-	<hr class="bg-primary" />
-
+<h1 class="sr-only">Manage {school.name} School</h1>
+<div class="flex max-w-[920px] flex-wrap justify-center gap-6">
 	{#each schoolAdminPanelAdminData.slice(0, 3) as item (item.title)}
-		{@render dashItem(item)}
+		<DashboardCard
+			title={item.title}
+			relLinkurl={item.linkurl}
+			description={item.description}
+			imgUrl={item.imgUrl}
+			imgStyleDimensions={item.imgStyleDimensions}
+		/>
 	{/each}
-	<hr class="bg-primary" />
-	{#each schoolAdminPanelAdminData.slice(3, schoolAdminPanelAdminData.length) as item (item.title)}
-		{@render dashItem(item)}
-	{/each}
-</Card.Root>
-
-{#snippet dashItem(item: any)}
-	<Card.Content>
-		<a href={item.url} class="flex gap-3">
-			<!-- svelte-ignore svelte_component_deprecated -->
-			<item.icon />
-			<div class="space-y-2">
-				<p>{item.title}</p>
-				<p class="text-primary/50">{item.description}</p>
-			</div>
-		</a>
-	</Card.Content>
-{/snippet}
+</div>

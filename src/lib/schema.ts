@@ -229,9 +229,7 @@ export const createUserSchema = z.object({
 });
 
 export const AssessmentTokenInviteSchema = z.object({
-	name: z.string().min(1, 'Name is required'),
-	email: z.string().email('Invalid email format'),
-	assessmentId: z.string().min(1, 'Assessment ID is required'),
+	sentBy: z.string().min(1, 'must be a valid user'),
 	schoolId: z.string().min(1, 'School ID is required')
 });
 

@@ -7,21 +7,20 @@
 	import Card from '$lib/components/ui/card/card.svelte';
 	import { Progress } from '$lib/components/ui/progress';
 	import { ASSESSMENT_PROGRESS_IMG_MAP } from '$lib/constants';
+	import { currAssessment } from '$lib/store/assessment.svelte.js';
 	import { onMount } from 'svelte';
 
 	// http://localhost:5173/urban-connection-project-assessment?assessmentToken=RHVzdHl8ZHVzdHlAZW1haWwuY29tfDM2fDMz
+	// http://localhost:5173/urban-connection-project-assessment?assessmentToken=OHwx
 
 	let { data } = $props();
-	const {
-		assessmentToken,
-		assessmentQuestions,
-		currDemgraphicsData,
-		currAssessmentData,
-		lastAnsweredDomain,
-		lastAnsweredSubdomainId
-	} = data;
+	const { assessmentToken, assessmentQuestions } = data;
+
 	let formData = $state(assessmentQuestions);
+	currAssessment.setAssessmentQuestions(assessmentQuestions);
 	let currDomain = $state(0);
+	let lastAnsweredQuestionIdInDomain = $state(0);
+	let lastAnsweredQuestionIdInSubdomain = $state(0);
 	// let currDomain = 1;
 	let currSubDomain = $state(0);
 	const totalQuestions = $derived(() => {
@@ -50,24 +49,25 @@
 	);
 
 	$effect(() => {
-		console.log('formData', formData);
-		console.log('demgraphicsData', currDemgraphicsData);
-		// console.log('assessmentData', currAssessmentData);
-		// const xformed = applyAssessmentResponsesToAssessment(formData, assessmentQuestions);
-		// console.log('xformed', xformed);
+		console.log('currDomain => ', currDomain);
+		console.log('currSubDomain => ', currSubDomain);
 	});
-	onMount(() => {
-		console.log('mounted');
-		if (lastAnsweredDomain && lastAnsweredSubdomainId) {
-			const domainIndex = formData.findIndex((domain) => domain.id === lastAnsweredDomain);
+	function applyCurrentProgress() {
+		console.log('=============applyCurrentProgress==============');
+		if (lastAnsweredQuestionIdInDomain && lastAnsweredQuestionIdInSubdomain) {
+			const domainIndex = formData.findIndex(
+				(domain) => domain.id === lastAnsweredQuestionIdInDomain
+			);
 			const subDomainIndex = formData[domainIndex].subDomains.findIndex(
-				(subDomain: { id: number }) => subDomain.id === lastAnsweredSubdomainId
+				(subDomain: { id: number }) => subDomain.id === lastAnsweredQuestionIdInSubdomain
 			);
 			currDomain = domainIndex;
 			currSubDomain = subDomainIndex;
-
-			//need to hack in demo data too, not sure why...
 		}
+	}
+	onMount(() => {
+		console.log('page mounted');
+		// console.log('OG assessmentQuestions', assessmentQuestions);
 	});
 
 	const promptText =
@@ -112,7 +112,8 @@
 			{formData[currDomain].subDomains[currSubDomain].description}
 		</Card>
 	{:else}
-		<Card class="p-4 shadow-md">
+		<!-- TODO: PHASE 2 -->
+		<!-- <Card class="p-4 shadow-md">
 			<div class="flex grow flex-col gap-2 text-sm font-normal">
 				<div class="flex grow flex-col gap-2">
 					<div class="flex justify-between">
@@ -122,7 +123,8 @@
 				</div>
 				<Progress barBgColor="bg-primary" class="h-[9px]" value={0.5 * 100} />
 			</div>
-		</Card>
+		</Card> -->
+		<!-- TODO: PHASE 2 -->
 		<div class="grid grid-cols-4 gap-4 py-4">
 			{#each domains as domain (domain.name)}
 				{@render AssessmentDomainProgressCard({ ...domain })}
@@ -165,6 +167,9 @@
 					handlePrev={previous}
 					{isDemographicsQuestions}
 					{isLastQuestion}
+					formUpdatedAssessmentProgress={() => applyCurrentProgress()}
+					bind:formLastAnsweredQuestionIdInDomain={lastAnsweredQuestionIdInDomain}
+					bind:formLastAnsweredQuestionIdInSubdomain={lastAnsweredQuestionIdInSubdomain}
 				/>
 			</div>
 		</div>
@@ -179,6 +184,9 @@
 			handlePrev={previous}
 			{isDemographicsQuestions}
 			{isLastQuestion}
+			formUpdatedAssessmentProgress={() => applyCurrentProgress()}
+			bind:formLastAnsweredQuestionIdInDomain={lastAnsweredQuestionIdInDomain}
+			bind:formLastAnsweredQuestionIdInSubdomain={lastAnsweredQuestionIdInSubdomain}
 		/>
 	{/if}
 
@@ -204,7 +212,7 @@
 		>
 			{domain.name}
 		</p>
-		<div class="text-sm">
+		<!-- <div class="text-sm">
 			{#if domain.status == 'completed'}
 				<p class="text-white">Completed</p>
 			{:else if domain.status == 'in-progress'}
@@ -212,6 +220,6 @@
 			{:else}
 				<p class="">Coming up</p>
 			{/if}
-		</div>
+		</div> -->
 	</Card>
 {/snippet}

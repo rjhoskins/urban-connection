@@ -42,23 +42,23 @@ export async function load({ params, parent, url, cookies }) {
 	let currDemgraphicsData = await getDemographicsDataByAssessmentId(assessmentId);
 	let currAssessmentData = await getAssessmentDataByAssessmentId(assessmentId);
 	assessmentQuestions = [demographicsData, ...assessmentQuestions];
-	let lastAnsweredDomain;
-	let lastAnsweredSubdomainId;
+	let lastAnsweredQuestionIdInDomain;
+	let lastAnsweredQuestionIdInSubdomain;
 
 	if (currAssessment.status === 'started') {
 		// console.log('currAssessment.status STARTED LOAD THAT DATA! ====> ', currAssessment.status);
 		const {
 			assessmentQuestionsCopy,
-			lastAnsweredDomain: lastDomain,
-			lastAnsweredSubdomainId: lastSubdomain
+			lastAnsweredQuestionIdInDomain: lastDomain,
+			lastAnsweredQuestionIdInSubdomain: lastSubdomain
 		} = applyAssessmentResponsesToQuestionsAndGetCurrentPositions({
 			assessmentQuestions,
 			currDemgraphicsData,
 			currAssessmentData
 		});
 		assessmentQuestions = assessmentQuestionsCopy;
-		lastAnsweredDomain = lastDomain;
-		lastAnsweredSubdomainId = lastSubdomain;
+		lastAnsweredQuestionIdInDomain = lastDomain;
+		lastAnsweredQuestionIdInSubdomain = lastSubdomain;
 	}
 
 	return {
@@ -66,8 +66,8 @@ export async function load({ params, parent, url, cookies }) {
 		currAssessmentData,
 		assessmentToken,
 		assessmentQuestions,
-		lastAnsweredDomain,
-		lastAnsweredSubdomainId
+		lastAnsweredQuestionIdInDomain,
+		lastAnsweredQuestionIdInSubdomain
 	};
 }
 
@@ -80,7 +80,7 @@ export const actions = {
 
 		const decodedeAssessmentToken = decodeAssessmentInviteToken(assessmentToken as string);
 
-		const { name, email, assessmentId, schoolId } = decodedeAssessmentToken;
+		const { assessmentId, schoolId } = decodedeAssessmentToken;
 		try {
 			if (data.isDemographics) {
 				const { assessmentToken, subjectTaught, yearsTeaching, ...assessmentData } = data;
@@ -116,6 +116,9 @@ export const actions = {
 			console.log('error => ', UnexpectedErrorMsg);
 			setFlash({ type: 'error', message: UnexpectedErrorMsg }, event.cookies);
 		}
+		if (!data.isDemographics && !data.isLastQuestion) {
+			console.log('server QUESTIONS data ====> ', data);
+		}
 
 		if (data.isDemographics) {
 			console.log('isDemographics data ====> ', data);
@@ -125,7 +128,7 @@ export const actions = {
 		if (data.isLastQuestion) {
 			console.log('isDemographics data ====> ', data);
 			setFlash({ type: 'success', message: 'Assessment Completed, Thank you!' }, event.cookies);
-			throw redirect(303, '/thank-you');
+			return redirect(303, '/thank-you');
 		}
 	}
 };

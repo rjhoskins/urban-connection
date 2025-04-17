@@ -17,8 +17,8 @@
 		assessmentQuestions,
 		currDemgraphicsData,
 		currAssessmentData,
-		lastAnsweredDomain,
-		lastAnsweredSubdomainId
+		lastAnsweredQuestionIdInDomain,
+		lastAnsweredQuestionIdInSubdomain
 	} = data;
 	let formData = $state(assessmentQuestions);
 	let currDomain = $state(0);
@@ -58,10 +58,12 @@
 	});
 	onMount(() => {
 		console.log('mounted');
-		if (lastAnsweredDomain && lastAnsweredSubdomainId) {
-			const domainIndex = formData.findIndex((domain) => domain.id === lastAnsweredDomain);
+		if (lastAnsweredQuestionIdInDomain && lastAnsweredQuestionIdInSubdomain) {
+			const domainIndex = formData.findIndex(
+				(domain) => domain.id === lastAnsweredQuestionIdInDomain
+			);
 			const subDomainIndex = formData[domainIndex].subDomains.findIndex(
-				(subDomain: { id: number }) => subDomain.id === lastAnsweredSubdomainId
+				(subDomain: { id: number }) => subDomain.id === lastAnsweredQuestionIdInSubdomain
 			);
 			currDomain = domainIndex;
 			currSubDomain = subDomainIndex;
@@ -106,7 +108,7 @@
 </script>
 
 <section class="mx-auto max-w-7xl space-y-5 p-2 lg:p-8">
-	<h1 class="text-3xl">Culturally Responsive teaching Progress Monitoring Assessment</h1>
+	<h1 class="text-3xl">Culturally Responsive eaching Progress Monitoring Assessment</h1>
 	{#if formData[currDomain].subDomains[currSubDomain].name.toLowerCase() == 'demographics'}
 		<Card class="p-4 shadow-md">
 			{formData[currDomain].subDomains[currSubDomain].description}

@@ -14,6 +14,9 @@
 	import MemberAssessmentResultsGridCard from '$lib/components/member-assessment-results-grid-card.svelte';
 	import MemberAssessmentResultsListTable from '$lib/components/member-assessment-results-list-table.svelte';
 
+	import toast from 'svelte-french-toast';
+	import { createAssessmentInviteToken } from '$lib/utils';
+
 	let { data, children }: { data: LayoutData; children: Snippet } = $props();
 	const { adminData, school, assessmentData, memberData } = data;
 	let numMembersShown = $state(data.memberData.length);
@@ -69,6 +72,24 @@
 			labelColor: '#FEF4F5'
 		}
 	];
+
+	function copyAsssessmentLink() {
+		const assessmentToken = createAssessmentInviteToken({
+			sentBy: data.user?.id as string,
+			schoolId: school.id
+		});
+		if (browser) {
+			const assessmentLink = `${window.location.origin}/urban-connection-project-assessment?assessmentToken=${assessmentToken}`;
+			navigator.clipboard.writeText(assessmentLink).then(
+				() => {
+					toast.success('Assessment link copied to clipboard!');
+				},
+				(err) => {
+					toast.error('Could not copy text: ', err);
+				}
+			);
+		}
+	}
 </script>
 
 <!-- <svelte:head>
@@ -101,12 +122,7 @@
 					<Button href={`${window.location.origin}/schools/${school.id}/invite-coadmin`} class=""
 						>Add School Admin</Button
 					>
-					<Button href={`${window.location.origin}/schools/${school.id}/send-assessment`} class=""
-						>Send Assessment</Button
-					>
-					<!-- <Button href={`${window.location.origin}/schools/${school.id}/send-assessment`} class=""
-						>Mass Send Assessment</Button
-					> -->
+					<Button onclick={copyAsssessmentLink}>Copy Assessment Link</Button>
 				</div>
 			{/if}
 		</div>
@@ -155,8 +171,8 @@
 		{/if}
 	</Card.Root>
 </section>
-<!-- 
-<pre>{JSON.stringify(page.url.pathname, null, 2)}</pre> -->
+
+<!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->
 <section class="max-w-7xl">
 	{@render children?.()}
 </section>

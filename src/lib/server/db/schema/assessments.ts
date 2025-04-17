@@ -6,8 +6,8 @@ import users from './users';
 
 const assessments = pgTable('assessments', {
 	id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-	recipientName: varchar('recipient_name', { length: 256 }).notNull(),
-	recipientEmail: varchar('recipient_email', { length: 256 }).notNull().unique(),
+	participantName: varchar('participant_name', { length: 256 }).notNull(),
+	participantEmail: varchar('participant_email', { length: 256 }).notNull().unique(),
 	schoolId: integer('school_id').references(() => schools.id),
 	sentBy: varchar('sent_by', { length: 256 }).references(() => users.id),
 	status: assessmentStatusEnum('status').default('sent'),

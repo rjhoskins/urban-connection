@@ -3,6 +3,8 @@
 	import type { PageData } from './$types';
 	import * as Card from '$lib/components/ui/card';
 	import { Progress } from '$lib/components/ui/progress';
+	import { onMount } from 'svelte';
+	import { globals } from '$lib/store/globals.svelte';
 
 	interface District {
 		id: number;
@@ -16,9 +18,13 @@
 	const { districtsData } = data as {
 		districtsData: District[];
 	};
+
+	onMount(() => {
+		globals.setPageName('Manage Districts');
+	});
 </script>
 
-<h1 class="my-6 text-center text-3xl">Manage All Districts</h1>
+<h1 class="sr-only">Manage All Districts</h1>
 <section class=" grid-cols-four-fluid grid max-w-6xl gap-4 py-8">
 	{#each districtsData as district (district.id)}
 		{@render districtCard(district)}

@@ -102,6 +102,7 @@ export const actions: Actions = {
 					{
 						id: generateUserId(),
 						username: form.data.adminEmail,
+
 						name: form.data.adminName,
 						role: form.data.isDistrict ? 'district_admin' : 'school_admin',
 						phone: form.data.adminPhone ? form.data.adminPhone : ''

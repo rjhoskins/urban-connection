@@ -54,6 +54,12 @@ export const load = async (event) => {
 		memberDataFunc = async () => getSchoolMemberAssessmentTotalsForSuperUser(schoolId);
 	}
 
+	// console.log('Loading data for school', schoolId);
+	console.log('Admin data call:', await adminDataFunc());
+	// console.log('School data call:', await schoolDataFunc());
+	// console.log('Assessment data call:', await getAssessmentData(schoolId));
+	// console.log('Member data call:', await memberDataFunc());
+
 	return {
 		adminData: await adminDataFunc(),
 		school: await schoolDataFunc(),

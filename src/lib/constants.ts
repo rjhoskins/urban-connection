@@ -35,6 +35,22 @@ export const demographicsData = {
 			description: 'Please provide the following information about yourself.',
 			fields: [
 				{
+					label: 'name',
+					fieldName: 'name',
+					type: 'text',
+					value: null,
+					placeholder: 'Enter name',
+					required: true
+				},
+				{
+					label: 'Email',
+					fieldName: 'email',
+					type: 'email',
+					value: null,
+					placeholder: 'Enter email',
+					required: true
+				},
+				{
 					label: 'Years Teaching',
 					fieldName: 'yearsTeaching',
 					type: 'number',
@@ -916,4 +932,9 @@ export const ZERO_BASED_ALPHABET_NUMBERING = {
 	23: 'X',
 	24: 'Y',
 	25: 'Z'
+};
+
+export const TEMPLATE_TITLES = {
+	admin_invite: 'Admin Invite',
+	assessment_invite: 'Assessment Invite'
 };

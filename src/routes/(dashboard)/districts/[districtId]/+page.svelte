@@ -27,9 +27,13 @@
 		memberAssessmentData: Array<{ id: string; [key: string]: any }>;
 	};
 	let isGridView = $state(true);
+
+	onMount(() => {
+		globals.setPageName('Manage District | ' + district.name);
+	});
 </script>
 
-<h1 class="sr-only text-2xl font-semibold">District || {district.name}</h1>
+<h1 class="sr-only">District || {district.name}</h1>
 
 <section class="grid max-w-7xl">
 	<div class=" space-y-3 pt-3">
