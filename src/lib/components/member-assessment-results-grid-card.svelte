@@ -15,7 +15,7 @@
 			return 0;
 		}
 	});
-	console.log('progress', progress);
+
 	const formattedDate = new Date(completedAt).toLocaleDateString('en-US', {
 		year: 'numeric',
 		month: 'short',
