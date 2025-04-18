@@ -24,6 +24,10 @@
 	});
 	const { form: formData, enhance, message, delayed } = form;
 
+	$effect(() => {
+		console.log('delayed ===>', $delayed);
+	});
+
 	let isModalOpen = $state(false);
 
 	async function handleSubmit(
@@ -47,6 +51,7 @@
 			invalidateAll();
 		} else {
 			toast.error('Error sending invite');
+			applyAction(result);
 		}
 	}
 
@@ -63,7 +68,7 @@
 	</Card.Header>
 	<hr class="bg-primary" />
 	<Card.Content>
-		<form class="flex flex-col gap-3" onsubmit={handleSubmit}>
+		<form class="flex flex-col gap-3" method="POST" use:enhance onsubmit={handleSubmit}>
 			<!-- name -->
 			<Form.Field class=" space-y-0" {form} name="name">
 				<Form.Control>
