@@ -14,7 +14,7 @@
 </svelte:head>
 
 <section class="grid h-full place-items-center">
-	<h1 class="pb-4 text-center text-2xl font-bold">Invite Co-Admin</h1>
+	<h1 class="sr-only">Invite Co-Admin</h1>
 	<div class="md:grid-cols-golden-cols mx-auto max-w-5xl gap-4 md:grid">
 		<InviteCoAdminForm {data} {page} />
 		<Card>
