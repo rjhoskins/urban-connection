@@ -16,7 +16,7 @@
 	const form = superForm(data.form, {
 		validators: zodClient(createNewUserFromInviteSchema)
 	});
-	const { form: formData, enhance, message } = form;
+	const { form: formData, enhance, message, delayed } = form;
 	$effect(() => {
 		$formData.name = name;
 		$formData.email = email;
@@ -113,7 +113,14 @@
 				<FieldErrors class="text-red-700" />
 			</Field>
 			<div class="flex gap-4">
-				<Button class="grow" type="submit" variant="default">Register</Button>
+				<Button class="grow" type="submit" variant="default">
+					{#if $delayed}
+						<LoaderCircle class="animate-spin" />
+						Registering...
+					{:else}
+						Register
+					{/if}
+				</Button>
 			</div>
 		</form>
 	</Card.Content>
