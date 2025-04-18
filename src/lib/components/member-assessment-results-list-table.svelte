@@ -63,7 +63,6 @@
 		sortedMembers = newSortedMembers;
 	}
 
-	$effect(() => {});
 	onMount(() => {
 		sortMembers();
 	});

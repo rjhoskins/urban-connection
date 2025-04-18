@@ -2,6 +2,7 @@
 	// The teacher/ staff will need to enter their name, select a subject area from a drop-down (English, Math, etc. DC to provide), number of years experience)
 	import { applyAction, deserialize, enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
+	import AssessmentDomainProgressCard from '$lib/components/assessment-domain-progress-card.svelte';
 	import DemographicsAndAssessmentForm from '$lib/components/forms/demographics-and-assessment-form.svelte';
 
 	import Card from '$lib/components/ui/card/card.svelte';
@@ -48,12 +49,7 @@
 		formData.length == currDomain + 1 && formData[currDomain].subDomains.length == currSubDomain + 1
 	);
 
-	$effect(() => {
-		console.log('currDomain => ', currDomain);
-		console.log('currSubDomain => ', currSubDomain);
-	});
 	function applyCurrentProgress() {
-		console.log('=============applyCurrentProgress==============');
 		if (lastAnsweredQuestionIdInDomain && lastAnsweredQuestionIdInSubdomain) {
 			const domainIndex = formData.findIndex(
 				(domain) => domain.id === lastAnsweredQuestionIdInDomain
@@ -66,7 +62,7 @@
 		}
 	}
 	onMount(() => {
-		console.log('page mounted');
+		// console.log('page mounted');
 		// console.log('OG assessmentQuestions', assessmentQuestions);
 	});
 
@@ -126,8 +122,14 @@
 		</Card> -->
 		<!-- TODO: PHASE 2 -->
 		<div class="grid grid-cols-4 gap-4 py-4">
-			{#each domains as domain (domain.name)}
-				{@render AssessmentDomainProgressCard({ ...domain })}
+			{#each domains as domain, index (domain.name)}
+				<!-- +1 bc demographics not included -->
+				<AssessmentDomainProgressCard
+					posIndex={index + 1}
+					{currDomain}
+					name={domain.name}
+					imgUrl={domain.imgUrl}
+				/>
 			{/each}
 		</div>
 		{#if formData[currDomain].subDomains[currSubDomain].name}
@@ -192,34 +194,3 @@
 
 	<!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->
 </section>
-
-{#snippet AssessmentDomainProgressCard(domain: {
-	name: string;
-	imgUrl: string;
-	status?: 'completed' | 'in-progress' | 'not-started' | '';
-})}
-	<Card
-		class={`${domain.status == 'completed' ? 'bg-[#371E98]' : domain.status == 'in-progress' ? 'bg-[#EFF2FE]' : ''} flex flex-col gap-1 px-7 py-4 text-left `}
-	>
-		<img
-			src={domain.imgUrl}
-			alt={`${domain.name} progress indicator icon`}
-			class="h-8 w-8"
-			srcset=""
-		/>
-		<p
-			class={`${domain.status == 'completed' ? 'text-white' : domain.status == 'in-progress' ? 'text-[#371E98]' : ''} text-lg `}
-		>
-			{domain.name}
-		</p>
-		<!-- <div class="text-sm">
-			{#if domain.status == 'completed'}
-				<p class="text-white">Completed</p>
-			{:else if domain.status == 'in-progress'}
-				<p class="">In Progress</p>
-			{:else}
-				<p class="">Coming up</p>
-			{/if}
-		</div> -->
-	</Card>
-{/snippet}

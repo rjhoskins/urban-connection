@@ -36,9 +36,6 @@
 	onMount(() => {
 		console.log('form mounted');
 	});
-	$effect(() => {
-		console.log('currDomain => ', currDomain);
-	});
 
 	async function handleInitialize(
 		event:

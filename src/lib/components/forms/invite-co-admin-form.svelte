@@ -1,7 +1,8 @@
 <script lang="ts">
 	/** @type {{ data: import('./$types').PageData, form: import('./$types').ActionData }} */
 	import * as Form from '$lib/components/ui/form/index.js';
-	import { LoaderCircle } from 'lucide-svelte';
+	import type { ActionResult } from '@sveltejs/kit';
+	import { LoaderCircle, CircleCheck } from 'lucide-svelte';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import * as Card from '$lib/components/ui/card';
 	import { superForm } from 'sveltekit-superforms';
@@ -10,6 +11,11 @@
 	import { inviteNewUserSchema } from '$lib/schema.js';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { dev } from '$app/environment';
+	import { applyAction, deserialize } from '$app/forms';
+	import toast from 'svelte-french-toast';
+	import * as Dialog from '../ui/dialog';
+	import { Button } from '../ui/button';
+	import { goto, invalidateAll } from '$app/navigation';
 
 	let { page, data } = $props();
 
@@ -17,6 +23,37 @@
 		validators: zodClient(inviteNewUserSchema)
 	});
 	const { form: formData, enhance, message, delayed } = form;
+
+	let isModalOpen = $state(false);
+
+	async function handleSubmit(
+		event: SubmitEvent & { currentTarget: EventTarget & HTMLFormElement }
+	) {
+		event.preventDefault();
+		const data = new FormData(event.currentTarget);
+		console.log('formData ===>', data);
+
+		const response = await fetch(event.currentTarget.action, {
+			method: 'POST',
+			body: data
+		});
+		const result: ActionResult = deserialize(await response.text());
+
+		if (result.type === 'success') {
+			// rerun all `load` functions, following the successful update
+			isModalOpen = true;
+			applyAction(result);
+			form.reset();
+			invalidateAll();
+		} else {
+			toast.error('Error sending invite');
+		}
+	}
+
+	function handleLeave() {
+		isModalOpen = false;
+		goto('./');
+	}
 </script>
 
 <Card.Root class="w-96 max-w-6xl">
@@ -26,7 +63,7 @@
 	</Card.Header>
 	<hr class="bg-primary" />
 	<Card.Content>
-		<form class="flex flex-col gap-3" method="POST" use:enhance>
+		<form class="flex flex-col gap-3" onsubmit={handleSubmit}>
 			<!-- name -->
 			<Form.Field class=" space-y-0" {form} name="name">
 				<Form.Control>
@@ -74,3 +111,25 @@
 		</form>
 	</Card.Content>
 </Card.Root>
+
+<Dialog.Root bind:open={isModalOpen}>
+	<Dialog.Content class="w-fit">
+		<Dialog.Header>
+			<Dialog.Title class=" text-primary flex items-center gap-2 p-1 text-xl">
+				<CircleCheck class="text-primary h-5 w-5" /><span class="block">Success!</span
+				></Dialog.Title
+			>
+			<Dialog.Description class="font text-[#4B5563]"
+				>Admin has been invited to register</Dialog.Description
+			>
+		</Dialog.Header>
+		<div class="flex gap-4 font-normal">
+			<Button
+				variant="secondary"
+				onclick={() => (isModalOpen = !isModalOpen)}
+				class="w-full !font-normal">Stay On Page</Button
+			>
+			<Button onclick={handleLeave} class="w-full !font-normal">Manage Organization</Button>
+		</div>
+	</Dialog.Content>
+</Dialog.Root>

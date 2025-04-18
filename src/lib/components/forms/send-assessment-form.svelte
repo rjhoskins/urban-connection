@@ -20,11 +20,7 @@
 	});
 	const { form: formData, enhance, message, delayed } = form;
 
-	$effect(() => {
-		// $formData.name = name;
-		// $formData.email = email;
-	});
-	inviteText = $formData.inviteText;
+	// inviteText = $formData.inviteText;
 </script>
 
 <Card.Root class="">

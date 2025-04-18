@@ -3,7 +3,7 @@
 import { message, superValidate } from 'sveltekit-superforms/server';
 import { inviteNewUserSchema } from '$lib/schema';
 import { zod } from 'sveltekit-superforms/adapters';
-import { fail } from '@sveltejs/kit';
+import { error, fail } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';
 import {
 	createAdminUserInviteToken,
@@ -34,6 +34,10 @@ export const load = async (event) => {
 export const actions = {
 	default: async (event) => {
 		if (!event.locals.user) return redirect(302, '/auth/login');
+
+		//testing
+		// return { success: true, message: 'Invite sent successfully' };
+		// error(400, 'Invite sent unsuccessfully');
 
 		const form = await superValidate(event, zod(inviteNewUserSchema));
 
@@ -141,9 +145,7 @@ export const actions = {
 
 		const registerLink = `${event.url.origin}/auth/register?inviteToken=${inviteToken}`;
 		console.log('register link =>', registerLink);
-		setFlash({ type: 'success', message: 'Invite sent!' }, event.cookies);
-		console.log('register link =>', registerLink);
 
-		return redirect(302, './');
+		return { success: true, message: 'Invite sent successfully' };
 	}
 };

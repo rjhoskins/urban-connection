@@ -10,9 +10,8 @@
 	import type { LayoutData } from './$types';
 	import { onMount, type Snippet } from 'svelte';
 	import DonutChart from '$lib/components/charts/DonutChart.svelte';
-	import { Grid2X2, List } from 'lucide-svelte';
-	import MemberAssessmentResultsGridCard from '$lib/components/member-assessment-results-grid-card.svelte';
-	import MemberAssessmentResultsListTable from '$lib/components/member-assessment-results-list-table.svelte';
+	import { createAssessmentInviteToken } from '$lib/utils';
+	import toast from 'svelte-french-toast';
 
 	let { data, children }: { data: LayoutData; children: Snippet } = $props();
 	const { adminData, school, assessmentData, memberData } = data;
@@ -23,6 +22,24 @@
 	onMount(() => {
 		globals.setPageName(pageTitle);
 	});
+
+	function copyAsssessmentLink() {
+		const assessmentToken = createAssessmentInviteToken({
+			sentBy: data.user?.id as string,
+			schoolId: school.id
+		});
+		if (browser) {
+			const assessmentLink = `${window.location.origin}/urban-connection-project-assessment?assessmentToken=${assessmentToken}`;
+			navigator.clipboard.writeText(assessmentLink).then(
+				() => {
+					toast.success('Assessment link copied to clipboard!');
+				},
+				(err) => {
+					toast.error('Could not copy text: ', err);
+				}
+			);
+		}
+	}
 
 	const totalAssessments = assessmentData.length;
 	const assessmentsNotStarted = assessmentData.filter(
@@ -96,19 +113,14 @@
 			{#each adminData as admin (admin.adminEmail)}
 				<AdminContactDetailsCard {admin} />
 			{/each}
-			{#if browser}
-				<div class="btns flex gap-5">
-					<Button href={`${window.location.origin}/schools/${school.id}/invite-coadmin`} class=""
-						>Add School Admin</Button
-					>
-					<Button href={`${window.location.origin}/schools/${school.id}/send-assessment`} class=""
-						>Send Assessment</Button
-					>
-					<!-- <Button href={`${window.location.origin}/schools/${school.id}/send-assessment`} class=""
+
+			<div class="btns flex gap-5">
+				<Button href={`${page.url.pathname}/invite-coadmin`} class="">Add School Admin</Button>
+				<Button onclick={copyAsssessmentLink}>Copy Assessment Link</Button>
+				<!-- <Button href={`${window.location.origin}/schools/${school.id}/send-assessment`} class=""
 						>Mass Send Assessment</Button
 					> -->
-				</div>
-			{/if}
+			</div>
 		</div>
 	</div>
 
@@ -143,20 +155,20 @@
 			<div class="buttons mt-4 flex items-center justify-between gap-2">
 				<Button
 					variant={`${!page.url.pathname.includes('results') ? 'secondary' : 'default'}`}
-					href={`${window.location.origin}/schools/${school.id}/results`}
+					href={`${page.url.pathname}/results`}
 					class="mb-4">Assessment Totals</Button
 				>
 				<Button
 					variant={`${!page.url.pathname.includes('member-data') ? 'secondary' : 'default'}`}
-					href={`${window.location.origin}/schools/${school.id}/member-data`}
+					href={`${page.url.pathname}/member-data`}
 					class="mb-4">Members</Button
 				>
 			</div>
 		{/if}
 	</Card.Root>
 </section>
-<!-- 
-<pre>{JSON.stringify(page.url.pathname, null, 2)}</pre> -->
+
+<!-- <pre>{JSON.stringify(page.url.pathname, null, 2)}</pre> -->
 <section class="max-w-7xl">
 	{@render children?.()}
 </section>

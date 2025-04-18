@@ -68,7 +68,6 @@
 		sortedSchools = newSortedSchools;
 	}
 
-	$effect(() => {});
 	onMount(() => {
 		sortSchools();
 	});
