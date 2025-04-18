@@ -20,40 +20,29 @@
 	let { page, data } = $props();
 
 	const form = superForm(data.form, {
-		validators: zodClient(inviteNewUserSchema)
+		validators: zodClient(inviteNewUserSchema),
+		onSubmit: () => {
+			console.log('onSubmit');
+		},
+		onResult: async ({ result, cancel }) => {
+			console.log('onResult', result);
+			if (result.type === 'success') {
+				isModalOpen = true;
+				await invalidateAll();
+				cancel();
+			} else {
+				cancel();
+				toast.error('Error sending invite');
+			}
+		}
 	});
 	const { form: formData, enhance, message, delayed } = form;
+
+	let isModalOpen = $state(false);
 
 	$effect(() => {
 		console.log('delayed ===>', $delayed);
 	});
-
-	let isModalOpen = $state(false);
-
-	async function handleSubmit(
-		event: SubmitEvent & { currentTarget: EventTarget & HTMLFormElement }
-	) {
-		event.preventDefault();
-		const data = new FormData(event.currentTarget);
-		console.log('formData ===>', data);
-
-		const response = await fetch(event.currentTarget.action, {
-			method: 'POST',
-			body: data
-		});
-		const result: ActionResult = deserialize(await response.text());
-
-		if (result.type === 'success') {
-			// rerun all `load` functions, following the successful update
-			isModalOpen = true;
-			applyAction(result);
-			form.reset();
-			invalidateAll();
-		} else {
-			toast.error('Error sending invite');
-			applyAction(result);
-		}
-	}
 
 	function handleLeave() {
 		isModalOpen = false;
@@ -68,7 +57,7 @@
 	</Card.Header>
 	<hr class="bg-primary" />
 	<Card.Content>
-		<form class="flex flex-col gap-3" method="POST" use:enhance onsubmit={handleSubmit}>
+		<form class="flex flex-col gap-3" method="POST" use:enhance>
 			<!-- name -->
 			<Form.Field class=" space-y-0" {form} name="name">
 				<Form.Control>
