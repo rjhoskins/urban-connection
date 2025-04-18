@@ -16,7 +16,6 @@ export {
 	assessmentQuestionsRelations
 } from './assessmentQuestions';
 export { default as assessments, assessmentsRelations } from './assessments';
-export { default as schoolAssessments, schoolAssessmentsRelations } from './schoolAssessments';
 export { default as assessmentInvites, assessmentInvitesRelations } from './assessmentInvites';
 export {
 	default as assessmentQuestionsResponses,

@@ -15,7 +15,7 @@
 
 <section class="grid h-full place-items-center">
 	<h1 class="pb-4 text-center text-2xl font-bold">Invite Co-Admin</h1>
-	<div class="md:grid-cols-golden-cols mx-auto h-full max-w-5xl gap-4 md:grid">
+	<div class="md:grid-cols-golden-cols mx-auto max-w-5xl gap-4 md:grid">
 		<InviteCoAdminForm {data} {page} />
 		<Card>
 			<HtmlEmailTextPreview data={data.schoolAdminHtmlTemplate?.template} token="tbd" disableLink />

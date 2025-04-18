@@ -127,7 +127,7 @@ export const actions: Actions = {
 				},
 				body: JSON.stringify({
 					to: form.data.email,
-					subject: 'You have been invited to take an assessment',
+					subject: 'Thank you for registering - Here is your assessment link',
 					inviteLink,
 					htmlEmailContent: assessmentInviteHtmlTemplate?.template
 				})
