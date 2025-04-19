@@ -18,7 +18,7 @@ import {
 } from '$lib/server/queries';
 import { set } from 'zod';
 import db from '$lib/server/db';
-import { createAssessmentInviteToken } from '$lib/utils';
+import { createAssessmentInviteToken, handleLogFlashReturnFormError } from '$lib/utils';
 
 export const load: PageServerLoad = async ({ url }) => {
 	const token = url.searchParams.get('inviteToken');
@@ -52,16 +52,17 @@ export const actions: Actions = {
 		});
 
 		if (!existingUnusedInvite) {
-			setFlash(
-				{ type: 'error', message: 'Invalid invite, please contact your administrator' },
-				event.cookies
-			);
-			return message(form, 'Invalid invite, please contact your administrator');
+			handleLogFlashReturnFormError({
+				form,
+				event,
+				message: 'Invalid invite, please contact your administrator',
+				status: 400,
+				type: 'error'
+			});
 		}
-		console.log('existingUnusedInvite => ', existingUnusedInvite);
 
 		const existingUser = await checkRegisteredUserExists({ username: userEmail });
-		console.log('HERE => ', userEmail);
+
 		if (existingUser) {
 			console.log('HERE => ', userEmail);
 			setFlash(
@@ -76,7 +77,6 @@ export const actions: Actions = {
 
 		try {
 			const result = await db.transaction(async (trx) => {
-				console.log('userEmail => ', userEmail);
 				const updatedUserWithPW = await updateUserWithPassword({ userEmail, passwordHash }, trx);
 
 				if (!updatedUserWithPW) throw new Error('Failed to register user');
@@ -88,6 +88,8 @@ export const actions: Actions = {
 					},
 					trx
 				);
+
+				// throw new Error('testing...');
 
 				if (!inviteRes) throw new Error('Invite update failed');
 
@@ -110,6 +112,7 @@ export const actions: Actions = {
 			if (!assessmentInviteHtmlTemplate) {
 				throw new Error('No assessment invite template found');
 			}
+			newUserId = result.newUserId;
 
 			//send email with assessment link
 			const assessmentToken = createAssessmentInviteToken({
@@ -139,7 +142,7 @@ export const actions: Actions = {
 
 			// Create session and set cookie
 			const sessionToken = auth.generateSessionToken();
-			const session = await auth.createSession(sessionToken, result.id);
+			const session = await auth.createSession(sessionToken, String(newUserId));
 			if (!session.expiresAt) throw new Error('Session expiry not set');
 			auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
 		} catch (error) {
