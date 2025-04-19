@@ -14,14 +14,14 @@
 		{
 			title: 'Send Assessment Invitation',
 			linkurl: '/districts',
-			description: 'Navigate to a school to add an additional administrator.',
+			description: 'Navigate to a school to add an admin or access your assessment invite link.',
 			imgUrl: '/img/person-gear.png',
 			imgStyleDimensions: 'height: 65px; width: 65px;'
 		},
 		{
 			title: 'Invite School Admin Invitation',
 			linkurl: '/districts',
-			description: 'Navigate to a school to send an assessment to a teacher.',
+			description: 'Navigate to a school to access your assessment invite link.',
 			imgUrl: '/img/person-gear.png',
 			imgStyleDimensions: 'height: 65px; width: 65px;'
 		},

@@ -19,8 +19,8 @@
 		},
 		{
 			title: 'Send Assessment Invitation',
-			linkurl: '/schools/?&view=assessment',
-			description: 'Send email invitation to take the Assessment.',
+			linkurl: '/schools',
+			description: 'Access your assessment invitation link.',
 			imgUrl: '/img/person-gear.png',
 			imgStyleDimensions: 'height: 65px; width: 65px;'
 		},
@@ -38,7 +38,7 @@
 
 <h1 class="sr-only">Manage {school.name} School</h1>
 <div class="flex max-w-[920px] flex-wrap justify-center gap-6">
-	{#each schoolAdminPanelAdminData.slice(0, 3) as item (item.title)}
+	{#each schoolAdminPanelAdminData as item (item.title)}
 		<DashboardCard
 			title={item.title}
 			relLinkurl={item.linkurl}

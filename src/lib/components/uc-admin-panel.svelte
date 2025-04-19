@@ -19,7 +19,7 @@
 		{
 			title: 'Manage Schools',
 			linkurl: '/schools',
-			description: 'Manage the details for all schools',
+			description: 'Add an admin or access your assessment invite link.',
 			imgUrl: '/img/schools.png',
 			imgStyleDimensions: 'height: 60px; width: 60px;'
 		},
