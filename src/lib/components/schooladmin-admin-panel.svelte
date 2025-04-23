@@ -36,7 +36,7 @@
 	let { school } = $props();
 </script>
 
-<h1 class="sr-only">Manage {school.name} School</h1>
+<!-- <h1 class="sr-only">Manage {school.name} School</h1> -->
 <div class="flex max-w-[920px] flex-wrap justify-center gap-6">
 	{#each schoolAdminPanelAdminData as item (item.title)}
 		<DashboardCard

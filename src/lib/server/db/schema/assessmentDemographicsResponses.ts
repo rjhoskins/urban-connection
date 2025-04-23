@@ -8,7 +8,7 @@ const assessmentDemographics = pgTable(
 	'assessment_demographics_responses',
 	{
 		id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-		subjectTaught: varchar('subject_taught', { length: 256 }),
+		educationLevel: varchar('education_level', { length: 64 }),
 		yearsTeaching: integer('years_teaching'),
 		schoolId: integer('school_id')
 			.references(() => schools.id)

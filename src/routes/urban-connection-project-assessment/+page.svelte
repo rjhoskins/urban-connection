@@ -19,7 +19,7 @@
 
 	let formData = $state(assessmentQuestions);
 	currAssessment.setAssessmentQuestions(assessmentQuestions);
-	let currDomain = $state(0);
+	let currDomain = $state(1);
 	let lastAnsweredQuestionIdInDomain = $state(0);
 	let lastAnsweredQuestionIdInSubdomain = $state(0);
 	// let currDomain = 1;
@@ -65,9 +65,6 @@
 		// console.log('page mounted');
 		// console.log('OG assessmentQuestions', assessmentQuestions);
 	});
-
-	const promptText =
-		'Now, considering the information you read in the indicator summary, determine if each of the descriptors below are represented at your school. It is important to note that Descriptor scoring is not a measurement of perfection. If a descriptor is an expectation regularly expressed and supported by administration, select Yes. Othenelse, select No. Select Next after answering each descriptor.';
 
 	function next() {
 		if (
@@ -137,29 +134,46 @@
 				<p class="text-2xl font-bold">
 					{formData[currDomain].subDomains[currSubDomain].name}
 				</p>
-				<p class="rounded-full bg-[#F9F5D8] p-2 py-1 text-sm font-normal text-[#371E98]">
-					{formData[currDomain].subDomains[currSubDomain].questions?.length} points available
+				<p class="text-primary rounded-full bg-[#F9F5D8] p-2 py-1 text-sm font-normal">
+					{formData[currDomain].subDomains[currSubDomain].questions?.length} descriptors
 				</p>
 			</div>
 		{/if}
 
 		<div class="grid grid-cols-2 gap-6">
 			<div class="left col-span-1 flex flex-col gap-4 space-y-3">
-				<div class="aspect-w-16 aspect-h-9 overflow-hidden rounded-3xl">
-					{@html '<iframe class="h-[315px] w-full" src="https://www.youtube.com/embed/ZrL_n3d6YOY?si=HvRNagTqeH0VsTx_" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>'}
-				</div>
-
 				<div class="rounded-md bg-[#EFF2FE]/50 p-4">
-					<p class=" mb-9 text-2xl font-bold">Read the indicator summary below.</p>
+					<p class=" mb-4 text-lg font-bold">Read the indicator summary below.</p>
 					<p class="text-basetext-[#334155]">
 						{#if formData[currDomain]?.subDomains[currSubDomain] && formData[currDomain]?.subDomains[currSubDomain]?.description}
 							<p class="">{formData[currDomain].subDomains[currSubDomain].description!}</p>
 						{/if}
 					</p>
 				</div>
+				<div class="aspect-w-16 aspect-h-9 overflow-hidden rounded-3xl">
+					{@html '<iframe class="h-[315px] w-full"  src="https://www.youtube.com/embed/ZrL_n3d6YOY?si=HvRNagTqeH0VsTx_&autoplay=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>'}
+				</div>
 			</div>
 			<div class="">
-				<p class="pb-8 text-2xl font-bold">{promptText}</p>
+				<div class="prose space-y-3 p-4">
+					<p class=" mb-4 text-lg font-bold">Instuctions</p>
+					<p>
+						Now, considering the information you read in the indicator summary, determine if each of
+						the descriptors below are represented at your school.
+					</p>
+
+					<p>
+						<span class="font-bold">Note: </span> Descriptor scoring is not a measurement of perfection.
+					</p>
+
+					<p>
+						If a descriptor is an expectation regularly expressed and supported by administration,
+						select <span class="font-bold">Yes.</span> Otherwise, select
+						<span class="font-bold">No</span>.
+					</p>
+
+					<p>Select <span class="font-bold">Next</span> after answering each descriptor.</p>
+				</div>
 				<DemographicsAndAssessmentForm
 					bind:demoAndAssessmentformData={formData}
 					{currDomain}

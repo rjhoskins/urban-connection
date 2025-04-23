@@ -715,12 +715,12 @@ export async function addDemographicsData(values: CreateDemographicsResponseInpu
 			assessmentId: values.assessmentId,
 			schoolId: values.schoolId,
 			yearsTeaching: values.yearsTeaching,
-			subjectTaught: values.subjectTaught
+			educationLevel: values.educationLevel
 		})
 		.onConflictDoUpdate({
 			target: [assessmentDemographics.assessmentId, assessmentDemographics.schoolId],
 			set: {
-				subjectTaught: sql`excluded.subject_taught`,
+				educationLevel: sql`excluded.education_level`,
 				yearsTeaching: sql`excluded.years_teaching`
 			}
 		})

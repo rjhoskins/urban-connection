@@ -193,7 +193,9 @@
 				{#each demoAndAssessmentformData[currDomain].subDomains[currSubDomain].fields as field, i (field.placeholder)}
 					{#if field.type === 'select'}
 						<div class="">
-							<label for={field.fieldName} class="">{field.label}</label>
+							<label for={field.fieldName} class="block text-sm/6 font-medium text-gray-900"
+								>{field.label}</label
+							>
 							<div class="grid grid-cols-1">
 								<select
 									id={field.fieldName}
@@ -203,7 +205,7 @@
 									}
 									class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
 								>
-									<option value="" disabled selected>Select a subject</option>
+									<option value="" disabled selected={true}>{field.placeholder}</option>
 									{#each field.options as option (option)}
 										<option value={option.value}>
 											{option.label}

@@ -135,7 +135,7 @@ export const actions = {
 					yearsTeaching: parseInt(String(data.yearsTeaching))!,
 					schoolId,
 					assessmentId: currAssessmentId,
-					subjectTaught: String(data.subjectTaught)
+					educationLevel: String(data.educationLevel)
 				};
 				await addDemographicsData(newDemographicsData);
 				await setAssessmentStatus({ assessmentId: currAssessmentId, status: 'started' });
@@ -162,7 +162,10 @@ export const actions = {
 				addQuestionsData(transformedAssessmentQuestionsResponses);
 
 				if (data.isLastQuestion) {
-					// setAssessmentStatus({ assessmentId: parseInt(assessmentId), status: 'completed' });
+					setAssessmentStatus({
+						assessmentId: parseInt(data.assessmentId as string),
+						status: 'completed'
+					});
 				}
 			}
 		} catch (error) {

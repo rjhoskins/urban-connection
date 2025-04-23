@@ -7,7 +7,8 @@ import {
 	getSchoolForSuperAdmin,
 	getSchoolMemberAssessmentTotalsForSchoolAndDistrictAdminBySchool,
 	getSchoolMemberAssessmentTotalsForSuperUser,
-	getAssessmentData
+	getAssessmentData,
+	getSchoolIDForSchoolAdmin
 } from '$lib/server/queries';
 
 export const load = async (event) => {
@@ -15,7 +16,7 @@ export const load = async (event) => {
 		throw redirect(302, '/auth/login');
 	}
 
-	const schoolId = parseInt(event.params.schoolId);
+	let schoolId = parseInt(event.params.schoolId) || '';
 	const userId = event.locals.user.id;
 
 	let schoolDataFunc: () => Promise<any> = async () => {
@@ -31,7 +32,8 @@ export const load = async (event) => {
 	if (event.locals.user.role === 'school_admin') {
 		console.log('school admin!!!!!!!!!!!!!!!!!!!!!!!!!!====================');
 		const userId = event.locals.user.id;
-		if (userId) {
+		schoolId = parseInt(await getSchoolIDForSchoolAdmin(userId));
+		if (userId && schoolId) {
 			schoolDataFunc = async () => getSchoolForSchoolAdmin(userId, schoolId);
 			adminDataFunc = async () => getSchoolAdminBySchoolId(schoolId);
 			memberDataFunc = async () =>

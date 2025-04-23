@@ -46,6 +46,8 @@ export const actions: Actions = {
 		});
 
 		const userEmail = form.data.email;
+		console.log('form.data.inviteId => ', form.data.inviteId);
+		// throw new Error('testing...');
 
 		const existingUnusedInvite = await findUnusedInviteByInviteId({
 			inviteId: form.data.inviteId as string

@@ -51,31 +51,52 @@ export const demographicsData = {
 					required: true
 				},
 				{
-					label: 'Years Teaching',
+					label: 'Years in Education',
 					fieldName: 'yearsTeaching',
 					type: 'number',
 					value: null,
-					placeholder: 'Enter number of years teaching'
+					placeholder: 'Enter number of years in education'
 				},
 				{
-					label: 'Subject',
-					fieldName: 'subjectTaught',
+					label: 'Education Level',
+					fieldName: 'educationLevel',
 					type: 'select',
 					value: null,
 					options: [
 						{
-							value: 'Math',
-							label: 'Math'
+							value: 'K-2',
+							label: 'K-2'
 						},
 						{
-							value: 'Science',
-							label: 'Science'
+							value: '3-5',
+							label: '3-5'
 						},
 						{
-							value: 'English',
-							label: 'English'
+							value: '6-8',
+							label: '6-8'
+						},
+						{
+							value: '9-12',
+							label: '9-12'
+						},
+						{
+							value: 'Post-Secondary/Baccalaureate',
+							label: 'Post-Secondary/Baccalaureate'
+						},
+						{
+							value: 'Graduate Level',
+							label: 'Graduate Level'
+						},
+						{
+							value: 'Doctoral',
+							label: 'Doctoral'
+						},
+						{
+							value: 'Other (Admin, Coach, Professor)',
+							label: 'Other (Admin, Coach, Professor)'
 						}
-					]
+					],
+					placeholder: 'select Level of education'
 				}
 			]
 		}

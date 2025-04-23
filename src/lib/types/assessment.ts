@@ -46,7 +46,7 @@ export const createMixedBagAssessmentAndDemographics = z.object({
 	name: z.string().nonempty('Name is required'),
 	yearsTeaching: z.coerce.number().min(1, 'Years teaching must be non-zero and positive'),
 	schoolId: z.coerce.number(),
-	subjectTaught: z.string().nonempty('Subject taught is required'),
+	educationLevel: z.string().nonempty('Subject taught is required'),
 	assessmentToken: z.string({
 		message: 'Assessment token seems to be  missing, try re-opening the assessment link'
 	})
