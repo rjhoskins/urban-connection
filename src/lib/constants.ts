@@ -35,7 +35,7 @@ export const demographicsData = {
 			description: 'Please provide the following information about yourself.',
 			fields: [
 				{
-					label: 'name',
+					label: 'Name',
 					fieldName: 'name',
 					type: 'text',
 					value: null,
