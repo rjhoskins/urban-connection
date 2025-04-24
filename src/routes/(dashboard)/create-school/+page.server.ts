@@ -40,29 +40,35 @@ export const actions: Actions = {
 		if (!event.locals.user) return redirect(302, '/auth/login');
 
 		const form = await superValidate(event, zod(createSchoolSchema));
-		if (!form.valid) {
-			return handleLogFlashReturnFormError({
-				type: 'error',
-				form,
-				message: 'Invalid form',
-				status: 400,
-				event
-			});
-		}
-
-		const existingUser = await checkAdminUserExists({ username: form.data.adminEmail });
-		if (existingUser) {
-			return handleLogFlashReturnFormError({
-				type: 'error',
-				form,
-				message: 'User already exists, please contact your administrator',
-				status: 400,
-				event
-			});
-		}
 
 		let inviteToken: string = '';
 		try {
+			if (!form.valid) {
+				return handleLogFlashReturnFormError({
+					type: 'error',
+					form,
+					message: 'Invalid form',
+					status: 400,
+					event
+				});
+			}
+
+			//testing
+			// await new Promise((resolve) => setTimeout(resolve, 3000));
+			// return { success: true, message: 'testing... success' };
+			// throw new Error(testing...');
+
+			const existingUser = await checkAdminUserExists({ username: form.data.adminEmail });
+			if (existingUser) {
+				return handleLogFlashReturnFormError({
+					type: 'error',
+					form,
+					message: 'User already exists, please contact your administrator',
+					status: 400,
+					event
+				});
+			}
+
 			console.log('', form);
 			const result = await db.transaction(async (trx) => {
 				let schoolResult;

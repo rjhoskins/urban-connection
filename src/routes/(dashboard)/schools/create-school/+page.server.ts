@@ -63,7 +63,6 @@ export const actions: Actions = {
 
 		let inviteToken: string = '';
 		try {
-			console.log('', form);
 			const result = await db.transaction(async (trx) => {
 				let schoolResult;
 				if (!form.data.isDistrict) {

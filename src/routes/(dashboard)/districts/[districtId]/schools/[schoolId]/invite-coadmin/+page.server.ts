@@ -35,10 +35,6 @@ export const actions = {
 	default: async (event) => {
 		if (!event.locals.user) return redirect(302, '/auth/login');
 
-		//testing
-		// return { success: true, message: 'Invite sent successfully' };
-		// throw new Error('============testing...===============================');
-
 		const form = await superValidate(event, zod(inviteNewUserSchema));
 
 		if (!form.valid) {
@@ -65,10 +61,12 @@ export const actions = {
 		}
 
 		let inviteToken = '';
-		const htmlTemplate = await getLatestHtmlTemplateDataByType();
-		if (!htmlTemplate) throw new Error('Failed to get html template data');
+		let htmlTemplate;
 
 		try {
+			htmlTemplate = await getLatestHtmlTemplateDataByType();
+			if (!htmlTemplate) throw new Error('Failed to get html template data');
+
 			const result = await db.transaction(async (trx) => {
 				const schoolRes = await getSchoolDetailsById(schoolId, trx);
 				if (!schoolRes.id) throw new Error('School not found or does not exist');

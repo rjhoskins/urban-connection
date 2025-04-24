@@ -65,10 +65,11 @@ export const actions = {
 		}
 
 		let inviteToken = '';
-		const htmlTemplate = await getLatestHtmlTemplateDataByType();
-		if (!htmlTemplate) throw new Error('Failed to get html template data');
+		let htmlTemplate;
 
 		try {
+			htmlTemplate = await getLatestHtmlTemplateDataByType();
+			if (!htmlTemplate) throw new Error('Failed to get html template data');
 			const result = await db.transaction(async (trx) => {
 				const schoolRes = await getSchoolDetailsById(schoolId, trx);
 				if (!schoolRes.id) throw new Error('School not found or does not exist');

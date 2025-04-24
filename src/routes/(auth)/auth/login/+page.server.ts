@@ -49,15 +49,6 @@ export const actions: Actions = {
 				status: 404,
 				event
 			});
-
-			console.log('invalid username, password, or user not found');
-			setFlash(
-				{ type: 'error', message: 'invalid username, password, or user not found' },
-				event.cookies
-			);
-			return message(form, 'invalid username, password, or user not found', {
-				status: 404
-			});
 		}
 
 		const validPassword = await verify(existingUser.passwordHash!, form.data.password, {
