@@ -4,7 +4,7 @@ import { fail, redirect } from '@sveltejs/kit';
 import * as auth from '$lib/server/auth';
 import { message, superValidate } from 'sveltekit-superforms/server';
 import { zod } from 'sveltekit-superforms/adapters';
-import { createNewUserFromInviteSchema } from '$lib/schema';
+import { createsimpleRegisterToBeDEPRICATED } from '$lib/schema';
 import type { Actions, PageServerLoad } from '../$types';
 import { setFlash } from 'sveltekit-flash-message/server';
 import { checkRegisteredUserExists, simpleRegisterToBeDEPRICATED } from '$lib/server/queries';
@@ -13,20 +13,19 @@ import { generateUserId } from '$lib/utils';
 
 export const load: PageServerLoad = async ({ url }) => {
 	if (!dev) return redirect(302, '/');
-	const token = url.searchParams.get('inviteToken');
 
-	const form = await superValidate(zod(createNewUserFromInviteSchema));
+	const form = await superValidate(zod(createsimpleRegisterToBeDEPRICATED));
 
-	return { form, token };
+	return { form };
 };
 
 export const actions: Actions = {
-	register: async (event) => {
+	default: async (event) => {
 		if (!dev) return redirect(302, '/');
-		const form = await superValidate(event, zod(createNewUserFromInviteSchema));
+		const form = await superValidate(event, zod(createsimpleRegisterToBeDEPRICATED));
 		if (!form.valid) {
 			setFlash({ type: 'error', message: 'Invalid form' }, event.cookies);
-			return message(form, 'Invalid form');
+			return message(form, { text: 'Invalid form', status: 'error' });
 		}
 
 		const passwordHash = await hash(form.data.password, {
@@ -36,24 +35,27 @@ export const actions: Actions = {
 			parallelism: 1
 		});
 
-		const userEmail = form.data.email;
+		const username = form.data.username;
 		console.log('HERE form => ', form);
 
-		const existingUser = await checkRegisteredUserExists({ username: userEmail });
-		console.log('HERE => ', userEmail);
+		const existingUser = await checkRegisteredUserExists({ username });
+		console.log('HERE => ', username);
 		if (existingUser) {
-			console.log('HERE => ', userEmail);
+			console.log('HERE => ', username);
 			setFlash(
 				{ type: 'error', message: 'User already exists, please contact your administrator' },
 				event.cookies
 			);
-			return message(form, 'User already exists, please contact your administrator');
+			return message(form, {
+				text: 'User already exists, please contact your administrator',
+				status: 'error'
+			});
 		}
 
 		try {
 			const newUser = await simpleRegisterToBeDEPRICATED({
 				id: generateUserId(),
-				username: userEmail,
+				username: username,
 				passwordHash
 			});
 			// Create session and set cookie

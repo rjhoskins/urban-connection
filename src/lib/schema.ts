@@ -16,6 +16,16 @@ export const createNewUserOrLoginSchema = z.object({
 	// remember: z.string().optional().default('false')
 });
 
+export const createsimpleRegisterToBeDEPRICATED = z.object({
+	username: z.string(),
+	password: z
+		.string()
+		.nonempty({ message: 'password is required' })
+		.min(4, { message: 'password should be at least four characters' })
+		.max(50, { message: 'password should be less than 50 characters' })
+		.max(50, { message: 'name should be less than 50 characters' })
+});
+
 export const createNewUserFromInviteSchema = z
 	.object({
 		// name: z.string(),
@@ -34,7 +44,6 @@ export const createNewUserFromInviteSchema = z
 			.min(4, { message: 'password should be at least four characters' })
 			.max(50, { message: 'password should be less than 50 characters' })
 	})
-
 	.refine((data) => data.password === data.confirm, {
 		message: "Passwords don't match",
 		path: ['confirm'] // path of error);

@@ -19,7 +19,7 @@
 
 	let formData = $state(assessmentQuestions);
 	currAssessment.setAssessmentQuestions(assessmentQuestions);
-	let currDomain = $state(1);
+	let currDomain = $state(0);
 	let lastAnsweredQuestionIdInDomain = $state(0);
 	let lastAnsweredQuestionIdInSubdomain = $state(0);
 	// let currDomain = 1;

@@ -69,7 +69,7 @@
 </script>
 
 <Card.Root class="w-full rounded-md p-9">
-	<h2 class="text-2xl text-[#4B5563]">
+	<h2 class="text-2xl text-[#4B5563] capitalize">
 		{#if $formData.isDistrict}
 			Add a District Admin to a district
 		{:else}
