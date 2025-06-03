@@ -25,7 +25,7 @@
 <h1 class="sr-only">Invite Administrator</h1>
 <p class="hidden">Invite Token => {token || 'TODO'}</p>
 <div class="grid h-full place-content-center">
-	<!-- <pre class="sizes">{JSON.stringify(pageIsEditing, null, 2)}</pre> -->
+	<!-- <pre class="">{JSON.stringify(pageIsEditing, null, 2)}</pre> -->
 	<Card.Root class="m-6 lg:lg:w-[65ch]">
 		<Card.Content>
 			{#if canEditForm}

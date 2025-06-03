@@ -70,7 +70,7 @@
 		>
 	</Card>
 
-	<div class="sizes grid-cols-four-fluid grid gap-4">
+	<div class=" grid-cols-four-fluid grid gap-4">
 		{#if isGridView}
 			{#each memberAssessmentData as school (school.id)}
 				<SchoolGridCard isNested {page} {school} />

@@ -3,7 +3,7 @@
 </script>
 
 <Dialog.Root>
-	<Dialog.Trigger class="sizes">Open</Dialog.Trigger>
+	<Dialog.Trigger class="">Open</Dialog.Trigger>
 	<Dialog.Content>
 		<Dialog.Header>
 			<Dialog.Title>Are you sure absolutely sure?</Dialog.Title>

@@ -144,11 +144,11 @@
 			<div class="left col-span-1 flex flex-col gap-4 space-y-3">
 				<div class="rounded-md bg-[#EFF2FE]/50 p-4">
 					<p class=" mb-4 text-lg font-bold">Read the indicator summary below.</p>
-					<p class="text-basetext-[#334155]">
+					<div class="text-basetext-[#334155]">
 						{#if formData[currDomain]?.subDomains[currSubDomain] && formData[currDomain]?.subDomains[currSubDomain]?.description}
 							<p class="">{formData[currDomain].subDomains[currSubDomain].description!}</p>
 						{/if}
-					</p>
+					</div>
 				</div>
 				<div class="aspect-w-16 aspect-h-9 overflow-hidden rounded-3xl">
 					{@html '<iframe class="h-[315px] w-full"  src="https://www.youtube.com/embed/ZrL_n3d6YOY?si=HvRNagTqeH0VsTx_&autoplay=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>'}
