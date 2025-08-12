@@ -5,17 +5,14 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import AdminContactDetailsCard from '$lib/components/admin-contact-details-card.svelte';
 	import { page } from '$app/state';
-
 	import { browser } from '$app/environment';
 	import type { LayoutData } from './$types';
 	import { onMount, type Snippet } from 'svelte';
-	import DonutChart from '$lib/components/charts/DonutChart.svelte';
-	import { Grid2X2, List } from 'lucide-svelte';
-	import MemberAssessmentResultsGridCard from '$lib/components/member-assessment-results-grid-card.svelte';
-	import MemberAssessmentResultsListTable from '$lib/components/member-assessment-results-list-table.svelte';
 
 	import toast from 'svelte-french-toast';
 	import { createAssessmentInviteToken } from '$lib/utils';
+	import DonutChart from '$lib/components/charts/DonutChart.svelte';
+	import { goto } from '$app/navigation';
 
 	let { data, children }: { data: LayoutData; children: Snippet } = $props();
 	const { adminData, school, assessmentData, memberData } = data;
@@ -90,6 +87,21 @@
 			);
 		}
 	}
+
+	async function purchaseAssessment(
+		event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }
+	) {
+		console.log('Checkout button clicked');
+		event.preventDefault();
+		const response = await fetch('/api/create-checkout-session', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		});
+		const { url } = await response.json();
+		window.location.href = url;
+	}
 </script>
 
 <!-- <svelte:head>
@@ -125,6 +137,7 @@
 					<Button onclick={copyAsssessmentLink}>Copy Assessment Link</Button>
 				</div>
 			{/if}
+			<Button onclick={purchaseAssessment}>Purchase Assessment</Button>
 		</div>
 	</div>
 
@@ -174,7 +187,11 @@
 
 <!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->
 <section class="max-w-7xl">
-	{@render children?.()}
+	{#if !data}
+		<p>loading...</p>
+	{:else}
+		{@render children?.()}
+	{/if}
 </section>
 
 {#snippet ProgressIndicator(data: { category: any; value: any; chartColor: any; labelColor: any })}

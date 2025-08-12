@@ -90,6 +90,7 @@
 		"nodemailer": "^6.10.0",
 		"pg": "^8.13.3",
 		"postgres": "^3.4.5",
+		"stripe": "^18.4.0",
 		"svelte-french-toast": "^1.2.0"
 	}
 }

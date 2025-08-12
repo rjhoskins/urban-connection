@@ -959,3 +959,53 @@ export const TEMPLATE_TITLES = {
 	admin_invite: 'Admin Invite',
 	assessment_invite: 'Assessment Invite'
 };
+export const TEST_STRIPE_PRODUCTS = [
+	{
+		priceId: 'price_1RukA0AAfGnMCvIQ6BJJcl0O',
+		name: 'TEST Sample Assessment',
+		amount: 250000,
+		description: 'This is a test product for demonstration purposes, good for one assessment.'
+	}
+];
+export const PROD_STRIPE_PRODUCTS = [
+	{
+		priceId: 'price_1RsrX8AAfGnMCvIQALisbsda',
+		name: 'PROD!!! Sample Assessment',
+		amount: 250000,
+		description: 'This is a PROD!!! product for demonstration purposes, good for one assessment.'
+	}
+];
+
+export const YOUTUBE_EMBEDS = [
+	'<iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ?si=abc123def456ghi7" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>',
+	'<iframe width="640" height="360" src="https://www.youtube.com/embed/jNQXAC9IVRw?si=xyz789uvw012abc3" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>',
+	'<iframe width="560" height="315" src="https://www.youtube.com/embed/9bZkp7q19f0?si=def456ghi789jkl0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>',
+	'<iframe width="853" height="480" src="https://www.youtube.com/embed/fJ9rUzIMcZQ?si=mno123pqr456stu7" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>',
+	'<iframe width="560" height="315" src="https://www.youtube.com/embed/astISOttCQ0?si=vwx890yza123bcd4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>',
+	'<iframe width="480" height="270" src="https://www.youtube.com/embed/L_jWHffIx5E?si=efg567hij890klm1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>',
+	'<iframe width="560" height="315" src="https://www.youtube.com/embed/kJQP7kiw5Fk?si=nop234qrs567tuv8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>',
+	'<iframe width="720" height="405" src="https://www.youtube.com/embed/hFZFjoX2cGg?si=wxy901zab234cde5" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>',
+	'<iframe width="560" height="315" src="https://www.youtube.com/embed/y6120QOlsfU?si=fgh678ijk901lmn2" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>',
+	'<iframe width="800" height="450" src="https://www.youtube.com/embed/ZbZSe6N_BXs?si=opq345rst678uvw9" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>',
+	'<iframe width="560" height="315" src="https://www.youtube.com/embed/VbfpW0pbvaU?si=xyz012abc345def6" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>',
+	'<iframe width="426" height="240" src="https://www.youtube.com/embed/M7lc1UVf-VE?si=ghi789jkl012mno3" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>',
+	'<iframe width="560" height="315" src="https://www.youtube.com/embed/DyDfgMOUjCI?si=pqr456stu789vwx0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>',
+	'<iframe width="1280" height="720" src="https://www.youtube.com/embed/rYEDA3JcQqw?si=yza123bcd456efg7" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>',
+	'<iframe width="560" height="315" src="https://www.youtube.com/embed/eVTXPUF4Oz4?si=hij890klm123nop4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>',
+	'<iframe width="640" height="480" src="https://www.youtube.com/embed/WgvTgV5EoGY?si=qrs567tuv890wxy1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>',
+	'<iframe width="560" height="315" src="https://www.youtube.com/embed/Ahg6qcgoay4?si=zab234cde567fgh8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>',
+	'<iframe width="854" height="480" src="https://www.youtube.com/embed/c4BU9rpQDb0?si=ijk901lmn234opq5" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>',
+	'<iframe width="560" height="315" src="https://www.youtube.com/embed/gYb9sRLUDyM?si=rst678uvw901xyz2" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>',
+	'<iframe width="1024" height="576" src="https://www.youtube.com/embed/2Z4m4lnjxkY?si=abc345def678ghi9" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>'
+];
+
+// console work
+// `<iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ?si=abc123def456ghi7" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`.match(/src="(https:\/\/www\.youtube\.com\/embed\/[^"]+)"/)[1].split('embed/')[1]
+
+// const html = `<iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ?si=abc123def456ghi7" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`;
+
+// const match = html.match(/src="(https:\/\/www\.youtube\.com\/embed\/[^"]+)"/);
+// const embedUrl = match ? match[1] : null;
+
+// console.log(embedUrl);
+// Output: https://www.youtube.com/embed/dQw4w9WgXcQ?si=abc123def456ghi7
