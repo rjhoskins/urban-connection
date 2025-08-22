@@ -4,8 +4,8 @@ import { updateSchoolStripeData } from '$lib/server/queries';
 
 interface StripeData {
 	stripePaymentId: string;
-	userId: string;
 	schoolId: number;
+	userId: string;
 	payment_date: string;
 }
 
@@ -21,8 +21,8 @@ export const POST: RequestHandler = async (event) => {
 			// do something with stripeData...
 			stripeData = {
 				stripePaymentId: data.object.id,
-				userId: data.metadata.userId,
 				schoolId: data.metadata.schoolId,
+				userId: data.metadata.userId,
 				payment_date: new Date(data.object.created * 1000).toISOString()
 			};
 			const result = await updateSchoolStripeData({
