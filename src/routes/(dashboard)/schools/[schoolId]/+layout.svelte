@@ -133,15 +133,15 @@
 				<AdminContactDetailsCard {admin} />
 			{/each}
 			{#if browser}
-				<div class="btns flex gap-5">
+				<div class="btns flex flex-wrap gap-5">
 					<Button href={`${window.location.origin}/schools/${school.id}/invite-coadmin`} class=""
 						>Add School Admin</Button
 					>
 					<Button onclick={copyAsssessmentLink}>Copy Assessment Link</Button>
+					{#each products as { default_price, name }}
+						<Button onclick={() => handlePurchase(default_price)}>Purchase {name}</Button>
+					{/each}
 				</div>
-				{#each products as { default_price, name }}
-					<Button onclick={() => handlePurchase(default_price)}>Purchase {name}</Button>
-				{/each}
 			{/if}
 		</div>
 	</div>
