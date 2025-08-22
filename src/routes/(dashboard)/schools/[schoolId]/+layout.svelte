@@ -12,7 +12,6 @@
 	import toast from 'svelte-french-toast';
 	import { createAssessmentInviteToken } from '$lib/utils';
 	import DonutChart from '$lib/components/charts/DonutChart.svelte';
-	import { goto } from '$app/navigation';
 	import Stripe from 'stripe';
 
 	let { data, children }: { data: LayoutData; children: Snippet } = $props();
@@ -100,8 +99,8 @@
 		priceId: string | Stripe.Price | null | undefined;
 		userId: string | null | undefined;
 		schoolId: number | null | undefined;
-	}): any {
-		console.log('Purchase button clicked');
+	}) {
+		console.log('Purchase button clicked', { priceId, userId, schoolId });
 		const response = await fetch('/api/create-checkout-session', {
 			method: 'POST',
 			headers: {
@@ -109,8 +108,8 @@
 			},
 			body: JSON.stringify({
 				price: priceId,
-				userId: data.user?.id,
-				schoolId: school.id
+				userId,
+				schoolId
 			})
 		});
 		const { url } = await response.json();
