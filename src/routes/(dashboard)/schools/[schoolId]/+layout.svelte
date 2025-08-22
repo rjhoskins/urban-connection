@@ -13,6 +13,7 @@
 	import { createAssessmentInviteToken } from '$lib/utils';
 	import DonutChart from '$lib/components/charts/DonutChart.svelte';
 	import { goto } from '$app/navigation';
+	import Stripe from 'stripe';
 
 	let { data, children }: { data: LayoutData; children: Snippet } = $props();
 	const { adminData, school, assessmentData, memberData, stripeProducts } = data;
@@ -91,7 +92,15 @@
 		}
 	}
 
-	async function handlePurchase(priceId: string | Stripe.Price | null | undefined): any {
+	async function handlePurchase({
+		priceId,
+		userId,
+		schoolId
+	}: {
+		priceId: string | Stripe.Price | null | undefined;
+		userId: string | null | undefined;
+		schoolId: number | null | undefined;
+	}): any {
 		console.log('Purchase button clicked');
 		const response = await fetch('/api/create-checkout-session', {
 			method: 'POST',
@@ -141,7 +150,14 @@
 					>
 					<Button onclick={copyAsssessmentLink}>Copy Assessment Link</Button>
 					{#each products as { default_price, name }}
-						<Button onclick={() => handlePurchase(default_price)}>Purchase {name}</Button>
+						<Button
+							onclick={() =>
+								handlePurchase({
+									priceId: default_price,
+									userId: data.user?.id,
+									schoolId: school.id
+								})}>Purchase {name}</Button
+						>
 					{/each}
 				</div>
 			{/if}
