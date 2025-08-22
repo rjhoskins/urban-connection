@@ -4,7 +4,7 @@ import { updateSchoolStripeData } from '$lib/server/queries';
 
 interface StripeData {
 	stripePaymentId: string;
-	schoolId: number;
+	schoolId: string;
 	userId: string;
 	payment_date: string;
 }
@@ -19,19 +19,18 @@ export const POST: RequestHandler = async (event) => {
 	if (data.object.status === 'complete') {
 		try {
 			// do something with stripeData...
-			stripeData = {
-				stripePaymentId: data.object.id,
-				schoolId: data.metadata.schoolId,
-				userId: data.metadata.userId,
-				payment_date: new Date(data.object.created * 1000).toISOString()
-			};
 			const result = await updateSchoolStripeData({
-				id: stripeData.schoolId,
-				stripePaymentId: stripeData.stripePaymentId,
-				stripeData: JSON.stringify(stripeData)
+				id: parseInt(data.metadata.schoolId, 10),
+				stripePaymentId: data.object.id,
+				stripeData: JSON.stringify({
+					stripePaymentId: data.object.id,
+					schoolId: data.metadata.schoolId,
+					userId: data.metadata.userId,
+					payment_date: new Date(data.object.created * 1000).toISOString()
+				})
 			});
 
-			console.log('DID something with Stripe data........:', result, stripeData);
+			console.log('DID something with Stripe data........:', result);
 		} catch (error) {
 			console.error('Error storing stripe data', error);
 		}
