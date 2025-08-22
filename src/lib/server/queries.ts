@@ -1146,3 +1146,24 @@ export const getAssessmentDataByAssessmentId = async (assessmentId: number) => {
 	if (dev) console.log('getAssessmentDataByAssessmentId => ', res);
 	return res || null;
 };
+
+export async function updateSchoolStripeData({
+	id,
+	stripePaymentId,
+	stripeData
+}: {
+	id: number;
+	stripePaymentId: string | null;
+	stripeData: any | null;
+}) {
+	const [result] = await db
+		.update(schools)
+		.set({
+			stripePaymentId,
+			stripeData
+		})
+		.where(eq(schools.id, id))
+		.returning({ id: schools.id });
+
+	return result || null;
+}

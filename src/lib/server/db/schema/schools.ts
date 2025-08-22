@@ -1,4 +1,4 @@
-import { pgTable, integer, boolean, uniqueIndex, varchar } from 'drizzle-orm/pg-core';
+import { pgTable, integer, boolean, uniqueIndex, varchar, jsonb } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 import { timestamps } from './db-utils';
@@ -16,6 +16,8 @@ const schools = pgTable(
 			.references((): AnyPgColumn => districts.id)
 			.notNull(),
 		createdBy: varchar('created_by', { length: 256 }).references((): AnyPgColumn => users.id),
+		stripePaymentId: varchar('payment_id', { length: 256 }),
+		stripeData: jsonb('stripe_data'),
 		...timestamps
 	},
 	(table) => [uniqueIndex('districtSchoolNameComboUniqueIndex').on(table.districtId, table.name)]
