@@ -15,14 +15,17 @@
 	import { goto } from '$app/navigation';
 
 	let { data, children }: { data: LayoutData; children: Snippet } = $props();
-	const { adminData, school, assessmentData, memberData } = data;
+	const { adminData, school, assessmentData, memberData, stripeProducts } = data;
+	const products = $state(stripeProducts.data);
 	let numMembersShown = $state(data.memberData.length);
 	let isGridView = $state(true);
 
 	let pageTitle = $state(`${school.name} | Dashboard`);
 	onMount(() => {
 		globals.setPageName(pageTitle);
+		console.log('Layout data:', data);
 	});
+	// price_1Rz21gAAfGnMCvIQR4vLKG6G
 
 	const totalAssessments = assessmentData.length;
 	const assessmentsNotStarted = assessmentData.filter(
@@ -88,16 +91,16 @@
 		}
 	}
 
-	async function purchaseAssessment(
-		event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }
-	) {
-		console.log('Checkout button clicked');
-		event.preventDefault();
+	async function handlePurchase(priceId: string | Stripe.Price | null | undefined): any {
+		console.log('Purchase button clicked');
 		const response = await fetch('/api/create-checkout-session', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
-			}
+			},
+			body: JSON.stringify({
+				price: priceId
+			})
 		});
 		const { url } = await response.json();
 		window.location.href = url;
@@ -136,8 +139,10 @@
 					>
 					<Button onclick={copyAsssessmentLink}>Copy Assessment Link</Button>
 				</div>
+				{#each products as { default_price, name }}
+					<Button onclick={() => handlePurchase(default_price)}>Purchase {name}</Button>
+				{/each}
 			{/if}
-			<Button onclick={purchaseAssessment}>Purchase Assessment</Button>
 		</div>
 	</div>
 

@@ -9,18 +9,19 @@ const secretKey = dev ? STRIPE_SECRET_TEST_KEY : STRIPE_SECRET_KEY;
 const ngrokUrl = 'https://872700b78225.ngrok-free.app';
 // const baseUrl = dev ? 'localhost:5173' : ngrokUrl; // For local https development
 const product = TEST_STRIPE_PRODUCTS[0]; // testing...
-const success_url = new URL('/success', baseUrl);
+const success_url = new URL('/?purchaseRedirect=true', baseUrl);
 const cancel_url = new URL('/cancel', baseUrl);
 
 const stripe = new Stripe(secretKey as string);
 
 export const POST: RequestHandler = async (event) => {
+	const { price } = await event.request.json();
 	console.log('Creating checkout session......................');
 	const session = await stripe.checkout.sessions.create({
 		line_items: [
 			{
-				//only one product so hardcoding the price ID
-				price: product.priceId,
+				//allow for multiple products but only buy one at a time
+				price,
 				quantity: 1
 			}
 		],
