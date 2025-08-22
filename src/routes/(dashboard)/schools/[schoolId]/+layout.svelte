@@ -99,7 +99,9 @@
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({
-				price: priceId
+				price: priceId,
+				userId: data.user?.id,
+				schoolId: school.id
 			})
 		});
 		const { url } = await response.json();

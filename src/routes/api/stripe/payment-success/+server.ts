@@ -25,15 +25,14 @@ export const POST: RequestHandler = async (event) => {
 	if (data.object.status === 'complete') {
 		stripeData = {
 			stripe_payment_id: data.object.id,
-			type: data.object.object,
-			stripe_charge_id: data.object.latest_charge,
-			payment_amount: data.object.amount / 100,
-			payment_currency: data.object.currency,
-			payment_status: data.object.status,
+			userId: data.metadata.userId,
+			schoolId: data.metadata.schoolId,
 			payment_date: new Date(data.object.created * 1000).toISOString()
 		};
+
 		try {
 			// do something with stripeData...
+			console.log('Doing something with Stripe data........:', stripeData);
 		} catch (error) {
 			console.error('Error storing stripe data', error);
 		}

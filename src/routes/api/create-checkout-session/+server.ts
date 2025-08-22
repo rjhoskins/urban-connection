@@ -15,8 +15,8 @@ const cancel_url = new URL('/cancel', baseUrl);
 const stripe = new Stripe(secretKey as string);
 
 export const POST: RequestHandler = async (event) => {
-	const { price } = await event.request.json();
-	console.log('Creating checkout session......................');
+	const { price, userId, schoolId } = await event.request.json();
+	console.log('Creating checkout session......................', { price, userId, schoolId });
 	const session = await stripe.checkout.sessions.create({
 		line_items: [
 			{
@@ -27,6 +27,10 @@ export const POST: RequestHandler = async (event) => {
 		],
 		mode: 'payment',
 		success_url: success_url.toString(),
+		metadata: {
+			schoolId,
+			userId
+		},
 		cancel_url: cancel_url.toString()
 	});
 	console.log('Checkout session created:', session);
