@@ -24,8 +24,8 @@ export const POST: RequestHandler = async (event) => {
 				stripePaymentId: data.object.id,
 				stripeData: JSON.stringify({
 					stripePaymentId: data.object.id,
-					schoolId: data.metadata.schoolId,
-					userId: data.metadata.userId,
+					schoolId: data.object.metadata.schoolId,
+					userId: data.object.metadata.userId,
 					payment_date: new Date(data.object.created * 1000).toISOString()
 				})
 			});
