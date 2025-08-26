@@ -47,8 +47,14 @@
 		? (assessmentsCompleted / totalAssessments) * 100
 		: 0;
 
-	const totalPoints = memberData.reduce((acc, member) => acc + member.pointsTotal, 0);
-	const totaPossiblePoints = memberData.reduce((acc, member) => acc + member.questionsTotal, 0);
+	const totalPoints = memberData.reduce(
+		(acc: any, member: { pointsTotal: any }) => acc + member.pointsTotal,
+		0
+	);
+	const totaPossiblePoints = memberData.reduce(
+		(acc: any, member: { questionsTotal: any }) => acc + member.questionsTotal,
+		0
+	);
 	const totalPointsPercentage = Math.round((totalPoints / totaPossiblePoints) * 100) || 0;
 
 	const chartData = [
@@ -147,17 +153,20 @@
 					<Button href={`${window.location.origin}/schools/${school.id}/invite-coadmin`} class=""
 						>Add School Admin</Button
 					>
-					<Button onclick={copyAsssessmentLink}>Copy Assessment Link</Button>
-					{#each products as { default_price, name }}
-						<Button
-							onclick={() =>
-								handlePurchase({
-									priceId: default_price,
-									userId: data.user?.id,
-									schoolId: school.id
-								})}>Purchase {name}</Button
-						>
-					{/each}
+					{#if school.paid}
+						<Button onclick={copyAsssessmentLink}>Copy Assessment Link</Button>
+					{:else}
+						{#each products as { default_price, name }}
+							<Button
+								onclick={() =>
+									handlePurchase({
+										priceId: default_price,
+										userId: data.user?.id,
+										schoolId: school.id
+									})}>Purchase {name}</Button
+							>
+						{/each}
+					{/if}
 				</div>
 			{/if}
 		</div>

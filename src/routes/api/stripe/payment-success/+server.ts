@@ -12,25 +12,22 @@ interface StripeData {
 export const POST: RequestHandler = async (event) => {
 	const { request } = event;
 	const body = await request.json();
-	let stripeData: StripeData;
 
 	const { data } = body;
 	console.log('Doing something with Stripe data........:', data);
 	if (data.object.status === 'complete') {
 		try {
-			// do something with stripeData...
 			const result = await updateSchoolStripeData({
-				id: parseInt(data.metadata.schoolId, 10),
+				schoolId: parseInt(data.object.metadata.schoolId, 10),
 				stripePaymentId: data.object.id,
 				stripeData: JSON.stringify({
 					stripePaymentId: data.object.id,
 					schoolId: data.object.metadata.schoolId,
 					userId: data.object.metadata.userId,
-					payment_date: new Date(data.object.created * 1000).toISOString()
+					paymentDate: new Date(data.object.created * 1000).toISOString()
 				})
 			});
-
-			console.log('DID something with Stripe data........:', result);
+			console.log('DID something cool........:', result);
 		} catch (error) {
 			console.error('Error storing stripe data', error);
 		}
