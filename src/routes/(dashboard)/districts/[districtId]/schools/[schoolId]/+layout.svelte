@@ -98,7 +98,8 @@
 		userId: string | null | undefined;
 		schoolId: number | null | undefined;
 	}) {
-		console.log('Purchase button clicked', { priceId, userId, schoolId });
+		const currUrl = window.location.href;
+		console.log('Purchase button clicked', { priceId, userId, schoolId, currUrl });
 		const response = await fetch('/api/create-checkout-session', {
 			method: 'POST',
 			headers: {
@@ -107,7 +108,8 @@
 			body: JSON.stringify({
 				price: priceId,
 				userId,
-				schoolId
+				schoolId,
+				success_url: currUrl
 			})
 		});
 		const { url } = await response.json();

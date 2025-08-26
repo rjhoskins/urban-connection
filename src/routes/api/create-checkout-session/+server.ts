@@ -7,16 +7,21 @@ import { error, json, redirect, type RequestHandler } from '@sveltejs/kit';
 const baseUrl = dev ? PUBLIC_FRONTEND_URL_SANDBOX : PUBLIC_FRONTEND_URL_PROD;
 const secretKey = dev ? STRIPE_SECRET_TEST_KEY : STRIPE_SECRET_KEY;
 const ngrokUrl = 'https://872700b78225.ngrok-free.app';
-// const baseUrl = dev ? 'localhost:5173' : ngrokUrl; // For local https development
+
 const product = TEST_STRIPE_PRODUCTS[0]; // testing...
-const success_url = new URL('/?purchaseRedirect=true', baseUrl);
+
 const cancel_url = new URL('/cancel', baseUrl);
 
 const stripe = new Stripe(secretKey as string);
 
 export const POST: RequestHandler = async (event) => {
-	const { price, userId, schoolId } = await event.request.json();
-	console.log('Creating checkout session......................', { price, userId, schoolId });
+	const { price, userId, schoolId, success_url } = await event.request.json();
+	console.log('Creating checkout session......................', {
+		price,
+		userId,
+		schoolId,
+		success_url
+	});
 	const session = await stripe.checkout.sessions.create({
 		line_items: [
 			{
@@ -26,7 +31,7 @@ export const POST: RequestHandler = async (event) => {
 			}
 		],
 		mode: 'payment',
-		success_url: success_url.toString(),
+		success_url,
 		metadata: {
 			schoolId,
 			userId
