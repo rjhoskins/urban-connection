@@ -649,7 +649,8 @@ export async function getSchoolForSuperAdmin(schoolId: number) {
 			id: schools.id,
 			name: schools.name,
 			createdAt: schools.createdAt,
-			createdBy: schools.createdBy
+			createdBy: schools.createdBy,
+			paid: isNotNull(schools.stripePaymentId)
 		})
 		.from(schools)
 		.where(eq(schools.id, schoolId));
