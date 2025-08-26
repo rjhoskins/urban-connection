@@ -18,9 +18,9 @@ export const load = (async (event) => {
 		// console.log('districtId========================', districtRes?.id);
 		if (!districtRes) error(403, 'not authorized');
 		if (event.url.searchParams.get('view') === 'results') {
-			throw redirect(302, `districts/${districtRes.id}/results`);
+			throw redirect(302, `districts/${districtRes.districtId}/results`);
 		}
-		throw redirect(302, `districts/${districtRes.id}`);
+		throw redirect(302, `districts/${districtRes.districtId}`);
 	}
 
 	return { districtsData: await getDistrictAssessmentTotals() };
