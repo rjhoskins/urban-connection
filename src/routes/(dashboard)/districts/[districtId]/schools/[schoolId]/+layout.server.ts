@@ -10,6 +10,13 @@ import {
 	getAssessmentData
 } from '$lib/server/queries';
 
+import { STRIPE_SECRET_KEY, STRIPE_SECRET_TEST_KEY } from '$env/static/private';
+import { dev } from '$app/environment';
+import Stripe from 'stripe';
+
+const secretKey = dev ? STRIPE_SECRET_TEST_KEY : STRIPE_SECRET_KEY;
+const stripe = new Stripe(secretKey as string);
+
 export const load = async (event) => {
 	if (!event.locals.user) {
 		throw redirect(302, '/auth/login');
@@ -51,6 +58,7 @@ export const load = async (event) => {
 		adminData: await adminDataFunc(),
 		school: await schoolDataFunc(),
 		assessmentData: await getAssessmentData(schoolId),
-		memberData: await memberDataFunc()
+		memberData: await memberDataFunc(),
+		stripeProducts: await stripe.products.list({ limit: 2, active: true })
 	};
 };

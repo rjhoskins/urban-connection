@@ -21,11 +21,9 @@ import type { PgEnum, PgTransaction } from 'drizzle-orm/pg-core';
 import db from './db';
 import type { AdminInvite, CreateUser, UserInviteHTMLEmailTemplateType } from '$lib/schema';
 import { transformAssessmentData } from '$lib/utils';
-import type {
-	CreateDemographicsResponseInput,
-	CreateQuestionResponseInput
-} from '$lib/types/assessment';
+import type { CreateQuestionResponseInput } from '$lib/types/assessment';
 import { scaleQuantile } from 'd3';
+import type district from './db/schema/districts';
 
 export async function simpleRegisterToBeDEPRICATED(
 	{
@@ -603,8 +601,9 @@ export async function getSchoolForSchoolAdmin(userId: string, schoolId: number) 
 		.select({
 			id: schools.id,
 			name: schools.name,
-			createdAt: schools.createdAt,
-			createdBy: schools.createdBy
+			// createdAt: schools.createdAt,
+			// createdBy: schools.createdBy,
+			paid: isNotNull(schools.stripePaymentId)
 		})
 		.from(schoolAdmins)
 		.innerJoin(schools, eq(schoolAdmins.schoolId, schools.id))
@@ -634,10 +633,10 @@ export async function getLoggedInDistrictAdminsDistrict(userId: string) {
 			id: districts.id,
 			name: districts.name,
 			createdAt: districts.createdAt,
-			createdBy: districts.createdBy
+			createdBy: districts.createdBy || null
 		})
 		.from(districts)
-		.innerJoin(districtAdmins, eq(districtAdmins.districtId, districtAdmins.id))
+		.innerJoin(districtAdmins, eq(districtAdmins.districtId, districts.id))
 		.where(eq(districtAdmins.userId, userId));
 
 	if (dev) console.log('getLoggedInDistrictAdminsDistrict res => ', res);
@@ -665,7 +664,8 @@ export async function getSchoolForDistrictAdmin(userId: string, schoolId: number
 			id: schools.id,
 			name: schools.name,
 			createdAt: schools.createdAt,
-			createdBy: schools.createdBy
+			createdBy: schools.createdBy,
+			paid: isNotNull(schools.stripePaymentId)
 		})
 		.from(schools)
 		.leftJoin(districtAdmins, eq(districtAdmins.districtId, schools.districtId))
@@ -889,10 +889,11 @@ export async function getSchoolDomainResultsData(schoolId: number) {
 
 export async function getDistrictAdminsDistrictIdByUserId(
 	userId: string
-): Promise<{ id: number } | null> {
+): Promise<{ districtId: number; userId: string } | null> {
 	const [districtRes] = await db
-		.select({ id: districtAdmins.id })
+		.select({ districtId: districtAdmins.districtId, userId: districtAdmins.userId })
 		.from(districtAdmins)
+		.leftJoin(districts, eq(districts.id, districtAdmins.districtId))
 		.where(eq(districtAdmins.userId, userId));
 
 	return districtRes || null;
@@ -1148,21 +1149,23 @@ export const getAssessmentDataByAssessmentId = async (assessmentId: number) => {
 };
 
 export async function updateSchoolStripeData({
-	id,
+	schoolId,
 	stripePaymentId,
 	stripeData
 }: {
-	id: number;
+	schoolId: number;
 	stripePaymentId: string | null;
 	stripeData: any | null;
 }) {
+	if (dev)
+		console.log('QUERY updateSchoolStripeData.... => ', { schoolId, stripePaymentId, stripeData });
 	const [result] = await db
 		.update(schools)
 		.set({
 			stripePaymentId,
 			stripeData
 		})
-		.where(eq(schools.id, id))
+		.where(eq(schools.id, schoolId))
 		.returning({ id: schools.id });
 
 	return result || null;

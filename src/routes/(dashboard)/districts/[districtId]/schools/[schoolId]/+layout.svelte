@@ -12,9 +12,11 @@
 	import DonutChart from '$lib/components/charts/DonutChart.svelte';
 	import { createAssessmentInviteToken } from '$lib/utils';
 	import toast from 'svelte-french-toast';
+	import { Stripe } from 'stripe';
 
 	let { data, children }: { data: LayoutData; children: Snippet } = $props();
-	const { adminData, school, assessmentData, memberData } = data;
+	const { adminData, school, assessmentData, memberData, stripeProducts } = data;
+	const products = $state(stripeProducts.data);
 	let numMembersShown = $state(data.memberData.length);
 	let isGridView = $state(true);
 
@@ -86,6 +88,36 @@
 			labelColor: '#FEF4F5'
 		}
 	];
+
+	async function handlePurchase({
+		priceId,
+		userId,
+		schoolId
+	}: {
+		priceId: string | Stripe.Price | null | undefined;
+		userId: string | null | undefined;
+		schoolId: number | null | undefined;
+	}) {
+		console.log('Purchase button clicked', { priceId, userId, schoolId });
+		const response = await fetch('/api/create-checkout-session', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				price: priceId,
+				userId,
+				schoolId
+			})
+		});
+		const { url } = await response.json();
+		window.location.href = url;
+	}
+
+	onMount(() => {
+		globals.setPageName(school.name);
+		console.log('/districts/[districtId]/schools/[schoolId]/ layout	', data);
+	});
 </script>
 
 <!-- <svelte:head>
@@ -116,7 +148,20 @@
 
 			<div class="btns flex gap-5">
 				<Button href={`${page.url.pathname}/invite-coadmin`} class="">Add School Admin</Button>
-				<Button onclick={copyAsssessmentLink}>Copy Assessment Link</Button>
+				{#if school.paid}
+					<Button onclick={copyAsssessmentLink}>Copy Assessment Link</Button>
+				{:else}
+					{#each products as { default_price, name }}
+						<Button
+							onclick={() =>
+								handlePurchase({
+									priceId: default_price,
+									userId: data.user?.id,
+									schoolId: school.id
+								})}>Purchase {name}</Button
+						>
+					{/each}
+				{/if}
 				<!-- <Button href={`${window.location.origin}/schools/${school.id}/send-assessment`} class=""
 						>Mass Send Assessment</Button
 					> -->
@@ -158,11 +203,11 @@
 					href={`${page.url.pathname}/results`}
 					class="mb-4">Assessment Totals</Button
 				>
-				<Button
+				<!-- <Button
 					variant={`${!page.url.pathname.includes('member-data') ? 'secondary' : 'default'}`}
 					href={`${page.url.pathname}/member-data`}
 					class="mb-4">Members</Button
-				>
+				> -->
 			</div>
 		{/if}
 	</Card.Root>

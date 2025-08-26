@@ -8,6 +8,7 @@
 	import { Grid2X2, List } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 	import { globals } from '$lib/store/globals.svelte';
+	import MemberAssessmentResultsListTable from '$lib/components/member-assessment-results-list-table.svelte';
 
 	interface School {
 		id: string;
@@ -58,11 +59,11 @@
 		</Card>
 	</div>
 	<Card class="mt-5 mb-14 flex justify-end gap-4 p-4">
-		<Button
+		<!-- <Button
 			class="flex items-center justify-center"
 			variant={`${!isGridView ? 'default' : 'secondary'}`}
 			onclick={() => (isGridView = false)}><List /><span>List</span></Button
-		>
+		> -->
 		<Button
 			variant={`${isGridView ? 'default' : 'secondary'}`}
 			class="flex items-center justify-center"
