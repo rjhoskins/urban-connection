@@ -7,6 +7,7 @@
 	import { afterNavigate, beforeNavigate } from '$app/navigation';
 	import { globals } from '$lib/store/globals.svelte';
 	import { setModalStateContext } from '$lib/modal-state.svelte';
+	import YoutubeVidsModal from '$lib/components/youtube-vids-modal.svelte';
 	setModalStateContext();
 
 	const flash = initFlash(page, {
@@ -46,6 +47,8 @@
 	{@render children()}
 
 	<Toaster />
+	<!-- controlled with state -->
+	<YoutubeVidsModal />
 </div>
 
 <!-- "safelist hack" -->

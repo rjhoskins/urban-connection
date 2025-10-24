@@ -57,8 +57,6 @@ export async function load({ params, url, cookies }) {
 		code,
 		schoolId
 	});
-	//check assessment status
-
 	// vars
 
 	let assessmentQuestions = await generateQuestionnaire();
@@ -69,7 +67,7 @@ export async function load({ params, url, cookies }) {
 
 	if (!currAssessment) {
 		console.log('NOOOO currAssessment ====> ');
-		setFlash({ type: 'success', message: "Let's get started!" }, cookies);
+		// setFlash({ type: 'success', message: "Let's get started!" }, cookies);
 		assessmentQuestions = [demographicsQuestionsData, ...assessmentQuestions];
 		console.log('assessmentQuestions LENGTH ====> ', assessmentQuestions.length);
 	} else if (currAssessment && currAssessment?.status === 'started') {

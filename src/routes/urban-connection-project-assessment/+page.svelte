@@ -1,20 +1,12 @@
 <script lang="ts">
-	// The teacher/ staff will need to enter their name, select a subject area from a drop-down (English, Math, etc. DC to provide), number of years experience)
-	import { applyAction, deserialize, enhance } from '$app/forms';
-	import { goto } from '$app/navigation';
 	import AssessmentDomainProgressCard from '$lib/components/assessment-domain-progress-card.svelte';
 	import DemographicsAndAssessmentForm from '$lib/components/forms/demographics-and-assessment-form.svelte';
-
 	import Card from '$lib/components/ui/card/card.svelte';
-	import { Progress } from '$lib/components/ui/progress';
-	import YoutubeVidsModal from '$lib/components/youtube-vids-modal.svelte';
 	import { ASSESSMENT_PROGRESS_IMG_MAP, videoIdMap } from '$lib/constants';
 	import { getModalStateContext } from '$lib/modal-state.svelte';
 	import { Video } from 'lucide-svelte';
 	const modal = getModalStateContext();
 	import { onMount, tick } from 'svelte';
-
-	// http://localhost:5173/urban-connection-project-assessment?assessmentToken=VHpsV1VPYlpwMDhSTWl4NHwyMXwzMzVBQnA=
 
 	let { data } = $props();
 	let {
@@ -138,27 +130,25 @@
 		switch (currDomain) {
 			case 0:
 				if (currDomain <= 0 && currSubDomain == 0 && modal.highestSubDomain! <= 0) {
-					modal.setModalEmbeddedId(videoIdMap.get('modal-instructions-preload') ?? '');
+					modal.setModalEmbeddedId(videoIdMap.get('modal-instructions-preload')!);
 					modal.open();
 				}
 				break;
 			case 1:
-				console.log('handleModalVideoIdChange case 1');
-				if (currDomain == 1 && modal.highestSubDomain <= 0) {
-					console.log('handleModalVideoIdChange case 1 0');
-					modal.setModalEmbeddedId(videoIdMap.get('modal-instructions-preload') ?? '');
+				if (modal.highestSubDomain <= 0) {
+					modal.setModalEmbeddedId(videoIdMap.get('modal-instructions-preload')!);
 					modal.open();
 				}
 				if (currSubDomain == 1 && modal.highestSubDomain <= 1) {
-					modal.setModalEmbeddedId(videoIdMap.get('modal-domain-mentorship') ?? '');
+					modal.setModalEmbeddedId(videoIdMap.get('modal-domain-mentorship')!);
 					modal.open();
 				}
 				if (currSubDomain == 2 && modal.highestSubDomain! <= 2) {
-					modal.setModalEmbeddedId(videoIdMap.get('modal-domain-representation') ?? '');
+					modal.setModalEmbeddedId(videoIdMap.get('modal-domain-representation')!);
 					modal.open();
 				}
 				if (currSubDomain == 3 && modal.highestSubDomain! <= 3) {
-					modal.setModalEmbeddedId(videoIdMap.get('modal-domain-summaryInstructions') ?? '');
+					modal.setModalEmbeddedId(videoIdMap.get('modal-domain-summaryInstructions')!);
 					modal.open();
 				}
 				break;
@@ -361,8 +351,6 @@
 				/>
 			{/if}
 			<!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->
-			<!-- controlled with state -->
-			<YoutubeVidsModal />
 		</div>
 	{/if}
 </section>
