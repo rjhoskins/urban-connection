@@ -126,7 +126,6 @@
 		if (isLoading) return;
 		console.log('handleModalVideoIdChange', currDomain, currSubDomain);
 
-		modal.close();
 		switch (currDomain) {
 			case 0:
 				if (currDomain <= 0 && currSubDomain == 0 && modal.highestSubDomain! <= 0) {
@@ -195,8 +194,6 @@
 	}
 
 	onMount(async () => {
-		modal.close();
-
 		await applyCurrentProgress();
 
 		console.log('All reactive state:', {

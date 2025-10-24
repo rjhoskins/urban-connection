@@ -2,6 +2,15 @@
 	import { applyAction, deserialize, enhance } from '$app/forms';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Card from '$lib/components/ui/card/card.svelte';
+	import { onMount } from 'svelte';
+	import { getModalStateContext } from '$lib/modal-state.svelte';
+	import { videoIdMap } from '$lib/constants';
+	const modal = getModalStateContext();
+
+	onMount(() => {
+		modal.setModalEmbeddedId(videoIdMap.get('modal-closing')!);
+		modal.open();
+	});
 </script>
 
 <section class="grid place-items-center">
