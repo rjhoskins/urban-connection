@@ -10,7 +10,9 @@ const assessments = pgTable('assessments', {
 	participantEmail: varchar('participant_email', { length: 256 }).notNull().unique(),
 	schoolId: integer('school_id').references(() => schools.id),
 	sentBy: varchar('sent_by', { length: 256 }).references(() => users.id),
-	status: assessmentStatusEnum('status').default('sent'),
+	// isUsed: integer('used').default(0).notNull(), not needed since has status
+	tokenCode: varchar('token_code', { length: 6 }).unique(),
+	status: assessmentStatusEnum('status').default('started'), // default now started to reflect first visit
 	...timestamps
 });
 

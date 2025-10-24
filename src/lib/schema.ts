@@ -239,7 +239,8 @@ export const createUserSchema = z.object({
 
 export const AssessmentTokenInviteSchema = z.object({
 	sentBy: z.string().min(1, 'must be a valid user'),
-	schoolId: z.string().min(1, 'School ID is required')
+	schoolId: z.string().min(1, 'School ID is required'),
+	code: z.string().length(6, 'Assessment code must be exactly 6 characters long')
 });
 
 export type AdminInvite = z.infer<typeof adminInviteSchema>;

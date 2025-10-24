@@ -8,7 +8,7 @@ const assessmentSubDomains = pgTable('assessment_sub_domains', {
 	id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
 	name: varchar('name').notNull().unique(),
 	description: varchar('description').notNull(),
-	videoData: jsonb('video_data').notNull(),
+	// videoData: jsonb('video_data').notNull(),
 	domainId: integer('domain_id')
 		.notNull()
 		.references(() => assessmentDomains.id),

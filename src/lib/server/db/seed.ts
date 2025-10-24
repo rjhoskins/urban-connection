@@ -55,7 +55,6 @@ async function seed() {
 				const possibleSubDomain = await createSubDomainIfNotExists({
 					description: data[i].subDomains[j].description,
 					name: data[i].subDomains[j].name,
-					videoData,
 					domainId: currDomain?.id!
 				});
 				if (!possibleSubDomain?.id) {
@@ -104,17 +103,15 @@ async function createDomainIfNotExists(name: string) {
 async function createSubDomainIfNotExists({
 	name,
 	domainId,
-	description,
-	videoData
+	description
 }: {
 	name: string;
 	domainId: number;
 	description: string;
-	videoData: any;
 }) {
 	const [subDomain] = await db
 		.insert(assessmentSubDomains)
-		.values({ name, domainId, description, videoData })
+		.values({ name, domainId, description })
 		.onConflictDoNothing({ target: assessmentSubDomains.name })
 		.returning({ id: assessmentSubDomains.id });
 	return subDomain;

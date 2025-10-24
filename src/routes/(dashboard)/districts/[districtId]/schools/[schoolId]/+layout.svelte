@@ -13,6 +13,7 @@
 	import { createAssessmentInviteToken } from '$lib/utils';
 	import toast from 'svelte-french-toast';
 	import { Stripe } from 'stripe';
+	import { nanoid } from 'nanoid';
 
 	let { data, children }: { data: LayoutData; children: Snippet } = $props();
 	const { adminData, school, assessmentData, memberData, stripeProducts } = data;
@@ -28,7 +29,8 @@
 	function copyAsssessmentLink() {
 		const assessmentToken = createAssessmentInviteToken({
 			sentBy: data.user?.id as string,
-			schoolId: school.id
+			schoolId: school.id,
+			code: nanoid(6)
 		});
 		if (browser) {
 			const assessmentLink = `${window.location.origin}/urban-connection-project-assessment?assessmentToken=${assessmentToken}`;

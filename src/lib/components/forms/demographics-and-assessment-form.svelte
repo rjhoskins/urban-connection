@@ -33,10 +33,6 @@
 		assessmentToken
 	} = $props();
 
-	onMount(() => {
-		console.log('form mounted');
-	});
-
 	async function handleInitialize(
 		event:
 			| (MouseEvent & {
@@ -59,7 +55,7 @@
 		if (name) currAssessment.setAssessmentParticipantName(name.toString());
 
 		const decodedeAssessmentToken = decodeAssessmentInviteToken(assessmentToken as string);
-		const schoolId = parseInt(decodedeAssessmentToken.schoolId);
+		const schoolId = decodedeAssessmentToken.schoolId;
 		console.log('data', data);
 		const parseRes = createMixedBagAssessmentAndDemographics.safeParse({
 			...formDataToObject(data),
@@ -89,8 +85,8 @@
 				currDemgraphicsData: resData.currDemographicsData,
 				currAssessmentData: resData.currAssessmentData
 			});
-			formLastAnsweredQuestionIdInDomain = positionData.lastAnsweredQuestionIdInDomain;
-			formLastAnsweredQuestionIdInSubdomain = positionData.lastAnsweredQuestionIdInSubdomain;
+			formLastAnsweredQuestionIdInDomain = positionData.lastCompletedDomainId;
+			formLastAnsweredQuestionIdInSubdomain = positionData.lastCompletedSubDomainId;
 			console.log('positionData', positionData);
 			formUpdatedAssessmentProgress();
 			demoAndAssessmentformData = positionData.assessmentQuestionsCopy;
@@ -179,18 +175,18 @@
 	<form method="POST" id={'demoAndAssessmentForm'} class=" flex flex-col gap-2">
 		{#if isDemographicsQuestions}
 			<!-- ostensibly the first assessment Q -->
-			<input type="hidden" name="isDemographics" value="true" />
+			<input type="hidden" name="isDemographics" value={true} />
 		{/if}
 
 		{#if isLastQuestion}
-			<input type="hidden" name="isLastQuestion" value="true" />
+			<input type="hidden" name="isLastQuestion" value={true} />
 		{/if}
 		<input type="hidden" name="assessmentToken" value={assessmentToken} />
 
-		{#if demoAndAssessmentformData[currDomain].subDomains[currSubDomain].name.toLowerCase() == 'demographics'}
+		{#if demoAndAssessmentformData?.[currDomain]?.subDomains?.[currSubDomain]?.name.toLowerCase() == 'demographics'}
 			<Card class="flex max-w-prose flex-col gap-4 p-4 shadow-md">
 				<!-- demographics inputs -->
-				{#each demoAndAssessmentformData[currDomain].subDomains[currSubDomain].fields as field, i (field.placeholder)}
+				{#each demoAndAssessmentformData?.[currDomain]?.subDomains?.[currSubDomain]?.fields as field, i (field.placeholder)}
 					{#if field.type === 'select'}
 						<div class="">
 							<label for={field.fieldName} class="block text-sm/6 font-medium text-gray-900"
@@ -254,7 +250,7 @@
 			</Card>
 		{:else}
 			<!-- assessment inputs -->
-			{#each demoAndAssessmentformData[currDomain].subDomains[currSubDomain].questions, questionIdx (questionIdx)}
+			{#each demoAndAssessmentformData?.[currDomain]?.subDomains?.[currSubDomain]?.questions, questionIdx (questionIdx)}
 				<Card class="question flex max-w-prose gap-4  p-8">
 					<div class="flex flex-col gap-1.5">
 						<p class="text-lg font-normal text-black/70">

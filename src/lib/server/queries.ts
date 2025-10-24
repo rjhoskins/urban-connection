@@ -238,7 +238,7 @@ export async function createSchool(
 }
 
 export async function generateQuestionnaire() {
-	let res = await db
+	const generateQuestionnaireRes = await db
 		.select({
 			domain: {
 				id: assessmentDomains.id,
@@ -261,9 +261,11 @@ export async function generateQuestionnaire() {
 		.from(assessmentQuestions)
 		.innerJoin(assessmentSubDomains, eq(assessmentQuestions.subDomainId, assessmentSubDomains.id))
 		.innerJoin(assessmentDomains, eq(assessmentDomains.id, assessmentSubDomains.domainId));
+	const transformedAssessmentQuestionsResponses = transformAssessmentData(generateQuestionnaireRes);
+	// if (dev) console.log('question data', transformedAssessmentQuestionsResponses);
+	return transformedAssessmentQuestionsResponses || null;
 
 	//@ts-ignore
-	return transformAssessmentData(res);
 }
 
 export async function getHtmlTemplateTypes() {
@@ -328,14 +330,6 @@ export async function createNewUserWithDetails(
 	{ id, username, name, role = 'school_admin', phone }: CreateUser,
 	trx?: PgTransaction<PostgresJsQueryResultHKT, any, any>
 ): Promise<{ id: string }> {
-	if (dev)
-		console.log('createNewUserWithDetails =================> ', {
-			id,
-			username,
-			name,
-			role,
-			phone
-		});
 	const queryBuilder = trx ? trx.insert(users) : db.insert(users);
 	const [newUser] = await queryBuilder
 		.values({
@@ -401,6 +395,12 @@ export async function getDistrictAdmin(districtId: number) {
 	return res || null;
 }
 
+export async function getSchoolById(id: number): Promise<number | null> {
+	const [res] = await db.select({ schoolId: schools.id }).from(schools).where(eq(schools.id, id));
+
+	if (dev) console.log('getSchoolById res => ', res);
+	return res?.schoolId || null;
+}
 export async function getSchoolIDForSchoolAdmin(userId: string): Promise<number | null> {
 	const [res] = await db
 		.select({ schoolId: schools.id })
@@ -904,12 +904,14 @@ export async function createAssessment({
 	participantName,
 	participantEmail,
 	schoolId,
-	sentBy
+	sentBy,
+	tokenCode
 }: {
 	participantName: string;
 	participantEmail: string;
 	schoolId: number;
 	sentBy: string;
+	tokenCode: string;
 }): Promise<{ id: number } | null> {
 	const [newAssessment] = await db
 		.insert(assessments)
@@ -917,9 +919,11 @@ export async function createAssessment({
 			participantName,
 			participantEmail,
 			schoolId,
-			sentBy
+			sentBy,
+			tokenCode
+			// status: 'started' is default
 		})
-		.returning({ id: assessments.id });
+		.returning({ id: assessments.id, status: assessments.status });
 
 	return newAssessment || null;
 }
@@ -1109,6 +1113,20 @@ export async function getSchoolDetailsById(
 
 	return results || null;
 }
+export const getSchoolAssessmentIDByTokenCode = async ({
+	schoolId,
+	code
+}: {
+	schoolId: number;
+	code: string;
+}) => {
+	const [res] = await db
+		.select({ id: assessments.id, status: assessments.status })
+		.from(assessments)
+		.where(and(eq(assessments.tokenCode, code), eq(assessments.schoolId, schoolId)));
+	if (dev) console.log('getSchoolAssessmentIDByTokenCode => ', res);
+	return res || null;
+};
 
 export const getAssessmentByParticipantEmail = async ({
 	email,
@@ -1128,7 +1146,7 @@ export const getAssessmentByParticipantEmail = async ({
 export const getDemographicsDataByAssessmentId = async (assessmentId: number) => {
 	const [res] = await db
 		.select({
-			subjectTaught: assessmentDemographics.subjectTaught,
+			subjectTaught: assessmentDemographics.educationLevel,
 			yearsTeaching: assessmentDemographics.yearsTeaching
 		})
 		.from(assessmentDemographics)
@@ -1145,7 +1163,7 @@ export const getAssessmentDataByAssessmentId = async (assessmentId: number) => {
 		})
 		.from(assessmentQuestionsResponses)
 		.where(eq(assessmentQuestionsResponses.assessmentId, assessmentId));
-	if (dev) console.log('getAssessmentDataByAssessmentId => ', res);
+	if (dev) console.log('getAss essmentDataByAssessmentId => ', res);
 	return res || null;
 };
 

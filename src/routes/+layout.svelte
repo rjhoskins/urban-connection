@@ -4,6 +4,10 @@
 
 	import { initFlash } from 'sveltekit-flash-message';
 	import { page } from '$app/state';
+	import { afterNavigate, beforeNavigate } from '$app/navigation';
+	import { globals } from '$lib/store/globals.svelte';
+	import { setModalStateContext } from '$lib/modal-state.svelte';
+	setModalStateContext();
 
 	const flash = initFlash(page, {
 		clearOnNavigate: true,
@@ -16,12 +20,29 @@
 			toast[$flash.type]($flash.message);
 		}
 	});
+	beforeNavigate(() => {
+		console.log('beforeNavigate');
+		globals.setLoading(true);
+	});
+	afterNavigate(() => {
+		console.log('afterNavigate');
+		globals.setLoading(false);
+	});
 
 	// const flash = getFlash(page);
 	let { children, data } = $props();
 </script>
 
 <div class="relative flex h-full flex-col bg-[#FAFAFB]">
+	<!-- {#if globals.isLoading || globals.isFetching}
+		<div class="absolute inset-0 z-50 flex h-full w-full items-center justify-center bg-white">
+			<div
+				class="flex h-16 w-16 animate-spin items-center justify-center rounded-full border-4 border-solid border-[#B23532] border-t-transparent"
+			>
+				<p>loading...</p>
+			</div>
+		</div> 
+	{:else}{/if} -->
 	{@render children()}
 
 	<Toaster />

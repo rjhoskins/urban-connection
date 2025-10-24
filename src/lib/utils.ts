@@ -26,19 +26,22 @@ export function decodeAdminUserInviteToken(token: string) {
 
 export function createAssessmentInviteToken({
 	sentBy,
-	schoolId
+	schoolId,
+	code
 }: {
 	sentBy: string;
 	schoolId: number | string;
+	code?: string; // optional random string to ensure uniqueness
 }) {
-	const data = `${sentBy}|${schoolId}`;
+	const currCode = code ?? nanoid(6);
+	const data = `${sentBy}|${schoolId}|${currCode}`;
 	return btoa(data);
 }
 
 export function decodeAssessmentInviteToken(token: string) {
 	const data = atob(token);
-	const [sentBy, schoolId] = data.split('|');
-	return { sentBy, schoolId };
+	const [sentBy, schoolId, code] = data.split('|');
+	return { sentBy, schoolId: parseInt(schoolId), code };
 }
 
 export function handleTypeSafeError(error: unknown, message: any, form: any) {
@@ -149,7 +152,13 @@ export function slugify(text: string): string {
 		.replace(/-+$/, ''); // Remove hyphens from end
 }
 
-export function transformAssessmentData(rawData: AssessmentData) {
+export function transformAssessmentData(
+	rawData: {
+		domain: { id: number; name: string; type: 'domain' };
+		subdomain: { id: number; name: string; description: string; type: 'sub-domain' };
+		question: { id: number; text: string; value: boolean | null; subdomainId: number };
+	}[]
+): AssessmentData[] {
 	// Group by domains first
 	const domainMap = new Map();
 
@@ -158,7 +167,11 @@ export function transformAssessmentData(rawData: AssessmentData) {
 			domain,
 			subdomain,
 			question
-		}: { domain: Domain; subdomain: Subdomain; question: Question } = item;
+		}: {
+			domain: { id: number; name: string; type: 'domain' };
+			subdomain: { id: number; name: string; description: string; type: 'sub-domain' };
+			question: { id: number; text: string; value: boolean | null; subdomainId: number };
+		} = item;
 
 		// Initialize domain if it doesn't exist
 		if (!domainMap.has(domain.id)) {
@@ -266,14 +279,15 @@ export function applyAssessmentResponsesToQuestionsAndGetCurrentPositions({
 	// console.log('currDemgraphicsData  ====> ', currDemgraphicsData);
 	// console.log('currAssessmentData  ====> ', currAssessmentData);
 
-	let lastAnsweredQuestionIdInDomain;
-	let lastAnsweredQuestionIdInSubdomain;
+	let lastCompletedDomainId;
+	let lastCompletedSubDomainId;
 	let domainIdsArr: any[] = [];
 	let subdomainIdsArr: any[] = [];
 	assessmentQuestionsCopy.forEach((domain: any) => {
 		domainIdsArr.push(domain.id);
+		// console.log('domain outer ====> ', domain);
 		if (domain.type === 'demographics') {
-			// console.log('demographics  ====> ');
+			// console.log('demographics', domain);
 			domain.subDomains.forEach((subdomain: any) => {
 				subdomain.fields.forEach((field: any) => {
 					if (field.fieldName) {
@@ -283,7 +297,8 @@ export function applyAssessmentResponsesToQuestionsAndGetCurrentPositions({
 			});
 			return;
 		} else {
-			domain.subDomains.forEach((subdomain: any, idx: number) => {
+			// console.log('not demographics  ====> ', domain);
+			domain?.subDomains?.forEach((subdomain: any, idx: number) => {
 				subdomainIdsArr.push(subdomain.id);
 				subdomain.questions.forEach((question: any) => {
 					const questionHasResponse = currAssessmentData.some(
@@ -291,11 +306,11 @@ export function applyAssessmentResponsesToQuestionsAndGetCurrentPositions({
 					);
 
 					if (questionHasResponse) {
-						lastAnsweredQuestionIdInSubdomain = subdomain.id;
-						// console.log('lastAnsweredQuestionIdInSubdomain  ====> ', lastAnsweredQuestionIdInSubdomain);
+						lastCompletedSubDomainId = subdomain.id;
+						// console.log('lastCompletedSubDomainId  ====> ', lastCompletedSubDomainId);
 						// console.log('question  ====> ', question);
-						lastAnsweredQuestionIdInDomain = domain.id;
-						// console.log('lastAnsweredQuestionIdInDomain  ====> ', lastAnsweredQuestionIdInDomain);
+						lastCompletedDomainId = domain.id;
+						// console.log('lastCompletedDomainId  ====> ', lastCompletedDomainId);
 
 						const foundResponse = currAssessmentData.find(
 							(response: any) => response.questionId === question.id
@@ -308,7 +323,7 @@ export function applyAssessmentResponsesToQuestionsAndGetCurrentPositions({
 						} else {
 							question.value = null;
 						}
-						// question.value = questionResponse || null;
+						question.value = questionResponse || null;
 					}
 				});
 			});
@@ -321,8 +336,8 @@ export function applyAssessmentResponsesToQuestionsAndGetCurrentPositions({
 
 	return {
 		assessmentQuestionsCopy,
-		lastAnsweredQuestionIdInDomain,
-		lastAnsweredQuestionIdInSubdomain
+		lastCompletedDomainId,
+		lastCompletedSubDomainId
 	};
 }
 

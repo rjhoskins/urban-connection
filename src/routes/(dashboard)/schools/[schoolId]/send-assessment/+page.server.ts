@@ -6,6 +6,7 @@ import { createAssessmentInviteToken, handleLogFlashReturnFormError } from '$lib
 import { setFlash } from 'sveltekit-flash-message/server';
 import { redirect } from '@sveltejs/kit';
 import { createAssessment, getLatestHtmlTemplateDataByType } from '$lib/server/queries';
+import { nanoid } from 'nanoid';
 
 export const load: PageServerLoad = async (event) => {
 	const form = await superValidate(zod(sendAssessmentInviteSchem));
@@ -48,7 +49,8 @@ export const actions: Actions = {
 
 			const assessmentToken = createAssessmentInviteToken({
 				sentBy: event.locals.user.id,
-				schoolId: parseInt(event.params.schoolId)
+				schoolId: parseInt(event.params.schoolId),
+				code: nanoid(6)
 			});
 
 			const inviteLink = `${event.url.origin}/urban-connection-project-assessment?assessmentToken=${assessmentToken}`;
