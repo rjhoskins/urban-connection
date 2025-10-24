@@ -64,32 +64,25 @@
 	);
 
 	async function applyCurrentProgress() {
-		console.log(
-			'Applying current progress from form:',
-			lastAnsweredDomain,
-			lastAnsweredSubdomainId
-		);
-		if (lastAnsweredDomain && lastAnsweredSubdomainId) {
+		if (currDemgraphicsData) {
 			const domainIndex = formData.findIndex((domain) => domain.id === lastAnsweredDomain);
 			const subDomainIndex = formData[domainIndex].subDomains.findIndex(
 				(subDomain: { id: number }) => subDomain.id === lastAnsweredSubdomainId
 			);
-			console.log(
-				'Applied progress:',
-				domainIndex,
-				subDomainIndex,
-				lastAnsweredDomain,
-				lastAnsweredSubdomainId
-			);
+
 			(function setToNextSubdomainOrDomain() {
 				if (subDomainIndex + 1 < formData[domainIndex]?.subDomains.length) {
-					currDomain = domainIndex;
+					console.log('1');
+					currDomain = domainIndex + 1;
+					console.log('2');
 					currSubDomain = subDomainIndex + 1;
 				} else if (domainIndex + 1 < formData.length) {
+					console.log('2');
 					currDomain = domainIndex + 1;
 					currSubDomain = 0;
 				} else {
-					currDomain = domainIndex;
+					console.log('3');
+					currDomain = domainIndex + 1;
 					currSubDomain = subDomainIndex;
 				}
 			})();
@@ -213,17 +206,18 @@
 
 		await applyCurrentProgress();
 
-		// console.log('All reactive state:', {
-		// 	formData: $state.snapshot(formData)
-		// 	// currDomain: $state.snapshot(currDomain),
-		// 	// currSubDomain: $state.snapshot(currSubDomain),
-		// 	// currOnPageVideoId: $state.snapshot(currOnPageVideoId),
-		// 	// currModalVideoId: $state.snapshot(currModalVideoId),
-		// 	// isDemographicsQuestions: $state.snapshot(isDemographicsQuestions),
-		// 	// currQuestionsProgress: $state.snapshot(currQuestionsProgress),
-		// 	// isLastQuestion: $state.snapshot(isLastQuestion),
-		// 	// totalQuestions: $state.snapshot(totalQuestions)
-		// });
+		console.log('All reactive state:', {
+			currDemgraphicsData,
+			lastAnsweredDomain,
+			formData: $state.snapshot(formData),
+			currDomain: $state.snapshot(currDomain),
+			currSubDomain: $state.snapshot(currSubDomain),
+			currOnPageVideoId: $state.snapshot(currOnPageVideoId),
+			isDemographicsQuestions: $state.snapshot(isDemographicsQuestions),
+			currQuestionsProgress: $state.snapshot(currQuestionsProgress),
+			isLastQuestion: $state.snapshot(isLastQuestion),
+			totalQuestions: $state.snapshot(totalQuestions)
+		});
 	});
 	$effect(() => {
 		if (isLoading) return;
