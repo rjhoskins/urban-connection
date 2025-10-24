@@ -88,6 +88,8 @@
 		}
 		isLoading = false;
 		modal.handleHighestPositionUpdates({ currDomain, currSubDomain });
+		await tick();
+		handleOnPageVideoIdChange({ currDomain, currSubDomain });
 	}
 
 	function handleOnPageVideoIdChange({
@@ -130,7 +132,9 @@
 		currSubDomain: number;
 	}) {
 		if (isLoading) return;
+		console.log('handleModalVideoIdChange', currDomain, currSubDomain);
 
+		modal.close();
 		switch (currDomain) {
 			case 0:
 				if (currDomain <= 0 && currSubDomain == 0 && modal.highestSubDomain! <= 0) {
@@ -139,7 +143,9 @@
 				}
 				break;
 			case 1:
-				if (currSubDomain == 1 && modal.highestSubDomain! <= 0) {
+				console.log('handleModalVideoIdChange case 1');
+				if (currDomain == 1 && modal.highestSubDomain <= 0) {
+					console.log('handleModalVideoIdChange case 1 0');
 					modal.setModalEmbeddedId(videoIdMap.get('modal-instructions-preload') ?? '');
 					modal.open();
 				}
