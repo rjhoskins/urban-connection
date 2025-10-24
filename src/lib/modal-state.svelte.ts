@@ -18,7 +18,7 @@ interface ModalsState {
 
 export class ModalsStateClass implements ModalsState {
 	// properties
-	isOpen = $state(true);
+	isOpen = $state(false);
 	buttonTitle = $state('');
 	isInitialModal = false;
 	isMuted = $state(0);
