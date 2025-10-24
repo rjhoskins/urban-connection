@@ -72,25 +72,22 @@
 
 			(function setToNextSubdomainOrDomain() {
 				if (subDomainIndex + 1 < formData[domainIndex]?.subDomains.length) {
-					console.log('1');
 					currDomain = domainIndex + 1;
-					console.log('2');
 					currSubDomain = subDomainIndex + 1;
 				} else if (domainIndex + 1 < formData.length) {
-					console.log('2');
-					currDomain = domainIndex + 1;
+					currDomain = domainIndex;
 					currSubDomain = 0;
+					if (currDemgraphicsData) {
+						currDomain = domainIndex + 1;
+					}
 				} else {
-					console.log('3');
 					currDomain = domainIndex + 1;
 					currSubDomain = subDomainIndex;
 				}
 			})();
-
-			modal.handleHighestPositionUpdates({ currDomain, currSubDomain });
 		}
 		isLoading = false;
-		setTimeout(() => {}, 300);
+		modal.handleHighestPositionUpdates({ currDomain, currSubDomain });
 	}
 
 	function handleOnPageVideoIdChange({
@@ -142,7 +139,7 @@
 				}
 				break;
 			case 1:
-				if (currSubDomain == 0 && modal.highestSubDomain! <= 0) {
+				if (currSubDomain == 1 && modal.highestSubDomain! <= 0) {
 					modal.setModalEmbeddedId(videoIdMap.get('modal-instructions-preload') ?? '');
 					modal.open();
 				}
@@ -154,7 +151,7 @@
 					modal.setModalEmbeddedId(videoIdMap.get('modal-domain-representation') ?? '');
 					modal.open();
 				}
-				if (currSubDomain == 3 && modal.highestSubDomain! < 3) {
+				if (currSubDomain == 3 && modal.highestSubDomain! <= 3) {
 					modal.setModalEmbeddedId(videoIdMap.get('modal-domain-summaryInstructions') ?? '');
 					modal.open();
 				}
@@ -221,6 +218,8 @@
 	});
 	$effect(() => {
 		if (isLoading) return;
+		modal.handleHighestPositionUpdates({ currDomain, currSubDomain });
+		handleModalVideoIdChange({ currDomain, currSubDomain });
 		handleOnPageVideoIdChange({ currDomain, currSubDomain });
 	});
 </script>
@@ -304,7 +303,7 @@
 								<button
 									type="button"
 									onclick={() => openInstructionsModal()}
-									class={`${modal.hideButton ? 'hidden' : 'inline-flex'}  bg-primary text-primary-foreground hover:bg-primary/90 text   h-10 w-fit items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-6 [&_svg]:shrink-0`}
+									class={` bg-primary  text-primary-foreground hover:bg-primary/90 text inline-flex   h-10 w-fit items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-6 [&_svg]:shrink-0`}
 								>
 									<Video class="mr-2 h-16 w-16" />
 									<p>Instructions</p>

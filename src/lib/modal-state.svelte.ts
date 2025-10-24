@@ -26,7 +26,7 @@ export class ModalsStateClass implements ModalsState {
 	highestSubDomain = $state(0);
 
 	videoId = $state('');
-	hideButton = $state(false);
+
 	initialVideoShown = false;
 
 	setVideoId(id: string) {
@@ -48,6 +48,10 @@ export class ModalsStateClass implements ModalsState {
 		currDomain: number;
 		currSubDomain: number;
 	}) {
+		console.log('handling highest position updates', {
+			currDomain,
+			currSubDomain
+		});
 		this.highestDomain = Math.max(this.highestDomain, currDomain);
 		this.highestSubDomain = Math.max(this.highestSubDomain, currSubDomain);
 	}
@@ -81,9 +85,6 @@ export class ModalsStateClass implements ModalsState {
 	}
 	close() {
 		this.isOpen = false;
-		setTimeout(() => {
-			this.hideButton = false;
-		}, 500);
 	}
 	toggle() {
 		this.isOpen = !this.isOpen;
