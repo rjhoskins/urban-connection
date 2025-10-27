@@ -72,11 +72,41 @@ export const load = async (event) => {
 	console.log('Assessment data call:', await getAssessmentData(schoolId));
 	console.log('Member data call:', await memberDataFunc());
 
-	return {
-		stripeProducts: await stripe.products.list({ limit: 2, active: true }),
-		adminData: await adminDataFunc(),
-		school: await schoolDataFunc(),
-		assessmentData: await getAssessmentData(schoolId),
-		memberData: await memberDataFunc()
-	};
+	const start = performance.now();
+	const [stripeProducts, adminData, school, assessmentData, memberData] = await Promise.all([
+		(async () => {
+			const t0 = performance.now();
+			const result = await stripe.products.list({ limit: 2, active: true });
+			console.log(`Stripe products fetch took ${performance.now() - t0}ms`);
+			return result;
+		})(),
+		(async () => {
+			const t0 = performance.now();
+			const result = await adminDataFunc();
+			console.log(`Admin data fetch took ${performance.now() - t0}ms`);
+			return result;
+		})(),
+		(async () => {
+			const t0 = performance.now();
+			const result = await schoolDataFunc();
+			console.log(`School data fetch took ${performance.now() - t0}ms`);
+			return result;
+		})(),
+		(async () => {
+			const t0 = performance.now();
+			const result = await getAssessmentData(schoolId);
+			console.log(`Assessment data fetch took ${performance.now() - t0}ms`);
+			return result;
+		})(),
+		(async () => {
+			const t0 = performance.now();
+			const result = await memberDataFunc();
+			console.log(`Member data fetch took ${performance.now() - t0}ms`);
+			return result;
+		})()
+	]);
+
+	console.log(`Total data fetch took ${performance.now() - start}ms`);
+
+	return { stripeProducts, adminData, school, assessmentData, memberData };
 };

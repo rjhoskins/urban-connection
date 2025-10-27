@@ -1,9 +1,11 @@
 <script lang="ts">
+	import { dev } from '$app/environment';
 	import AssessmentDomainProgressCard from '$lib/components/assessment-domain-progress-card.svelte';
 	import DemographicsAndAssessmentForm from '$lib/components/forms/demographics-and-assessment-form.svelte';
 	import Card from '$lib/components/ui/card/card.svelte';
 	import { ASSESSMENT_PROGRESS_IMG_MAP, videoIdMap } from '$lib/constants';
 	import { getModalStateContext } from '$lib/modal-state.svelte';
+	import { logIfDev } from '$lib/utils.js';
 	import { Video } from 'lucide-svelte';
 	const modal = getModalStateContext();
 	import { onMount, tick } from 'svelte';
@@ -92,7 +94,7 @@
 		currSubDomain: number;
 	}) {
 		if (isLoading) return;
-		// console.log('currDomain or currSubDomain changed:', currDomain, currSubDomain);
+		// logIfDev('currDomain or currSubDomain changed:', currDomain, currSubDomain);
 		switch (currDomain) {
 			// 1-based indexing bc mixing it is fun
 			// actually jk - case 0 is demographics
@@ -124,7 +126,7 @@
 		currSubDomain: number;
 	}) {
 		if (isLoading) return;
-		console.log('handleModalVideoIdChange', currDomain, currSubDomain);
+		if (dev) logIfDev('handleModalVideoIdChange', currDomain, currSubDomain);
 
 		switch (currDomain) {
 			case 0:
@@ -196,7 +198,7 @@
 	onMount(async () => {
 		await applyCurrentProgress();
 
-		console.log('All reactive state:', {
+		logIfDev('All reactive state:', {
 			currDemgraphicsData,
 			lastAnsweredDomain,
 			formData: $state.snapshot(formData),

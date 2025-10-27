@@ -3,6 +3,7 @@
 	import { Video } from 'lucide-svelte';
 	import { onMount, tick } from 'svelte';
 	import { getModalStateContext } from '$lib/modal-state.svelte';
+	import { logIfDev } from '$lib/utils';
 	const modal = getModalStateContext();
 
 	function handleOutSideClick(event: MouseEvent) {
@@ -17,14 +18,14 @@
 	}
 
 	$effect(() => {
-		// console.log('modal state changed', {
-		// 	isOpen: modal.isOpen,
-		// 	buttonTitle: modal.buttonTitle,
-		// 	hideButton: modal.hideButton,
-		// 	videoId: modal.videoId,
-		// 	highestDomain: modal.highestDomain,
-		// 	highestSubDomain: modal.highestSubDomain
-		// });
+		logIfDev('modal state changed', {
+			isOpen: modal.isOpen,
+			buttonTitle: modal.buttonTitle,
+			hideButton: modal.hideButton,
+			videoId: modal.videoId,
+			highestDomain: modal.highestDomain,
+			highestSubDomain: modal.highestSubDomain
+		});
 	});
 </script>
 

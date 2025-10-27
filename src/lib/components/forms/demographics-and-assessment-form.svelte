@@ -4,20 +4,17 @@
 	import { Button } from '$lib/components/ui/button';
 	import Card from '$lib/components/ui/card/card.svelte';
 	import type { ActionResult } from '@sveltejs/kit';
-	import { updateFlash } from 'sveltekit-flash-message';
-	import { page } from '$app/state';
 	import { ZERO_BASED_ALPHABET_NUMBERING } from '$lib/constants';
 	import Input from '../ui/input/input.svelte';
-	import { setFlash } from 'sveltekit-flash-message/server';
 	import toast from 'svelte-french-toast';
 	import { currAssessment } from '$lib/store/assessment.svelte';
 	import { createMixedBagAssessmentAndDemographics } from '$lib/types/assessment';
 	import {
 		applyAssessmentResponsesToQuestionsAndGetCurrentPositions,
 		decodeAssessmentInviteToken,
-		formDataToObject
+		formDataToObject,
+		logIfDev
 	} from '$lib/utils';
-	import { onMount } from 'svelte';
 
 	let {
 		demoAndAssessmentformData = $bindable(),
@@ -45,9 +42,9 @@
 		event.preventDefault();
 
 		const form = event.currentTarget.closest('form');
-		console.log('handleInitialize', form);
+		logIfDev('handleInitialize', form);
 		const data = new FormData(form!);
-		console.log('handleInitialize data', data);
+		logIfDev('handleInitialize data', data);
 
 		const isDemographics = data.get('isDemographics');
 
@@ -56,7 +53,7 @@
 
 		const decodedeAssessmentToken = decodeAssessmentInviteToken(assessmentToken as string);
 		const schoolId = decodedeAssessmentToken.schoolId;
-		console.log('data', data);
+		logIfDev('data', data);
 		const parseRes = createMixedBagAssessmentAndDemographics.safeParse({
 			...formDataToObject(data),
 			schoolId
@@ -78,29 +75,47 @@
 			body: data
 		});
 		const result: ActionResult = deserialize(await response.text());
-		const resData = result.type === 'success' ? result.data : undefined;
-		if (resData?.currAssessmentData || resData?.currDemographicsData) {
-			const positionData = applyAssessmentResponsesToQuestionsAndGetCurrentPositions({
-				assessmentQuestions: currAssessment.assessmentQuestions,
-				currDemgraphicsData: resData.currDemographicsData,
-				currAssessmentData: resData.currAssessmentData
-			});
-			formLastAnsweredQuestionIdInDomain = positionData.lastCompletedDomainId;
-			formLastAnsweredQuestionIdInSubdomain = positionData.lastCompletedSubDomainId;
-			console.log('positionData', positionData);
-			formUpdatedAssessmentProgress();
-			demoAndAssessmentformData = positionData.assessmentQuestionsCopy;
+		logIfDev('HERE RACE CONDITION WORKAROUND => initialize result', result);
+
+		//basically successful init
+		if (
+			result.type === 'success' &&
+			result.data?.currAssessmentData &&
+			result.data?.currDemographicsData &&
+			result.data?.currAssessmentId
+		) {
+			//workaround for current race condition issues
+			logIfDev('HERE RACE CONDITION WORKAROUND => initialize result', result);
+			// logIfDev('HERE RACE CONDITION WORKAROUND => initialize result', );
+			const url = window.location.href;
+			window.location = url;
+			return;
 		}
 
-		if (result.type === 'success' && result.data?.currAssessmentId) {
-			currAssessment.setAssessmentId(result.data.currAssessmentId);
-		}
+		// PREVIOUS NOT WORKING DUE TO RACE CONDITION ISSUES - HENCE THE ABOVE WORKAROUND
+		// TODO: FIX THIS PROPERLY LATER
+		// if (resData?.currAssessmentData || resData?.currDemographicsData) {
+		// 	const positionData = applyAssessmentResponsesToQuestionsAndGetCurrentPositions({
+		// 		assessmentQuestions: currAssessment.assessmentQuestions,
+		// 		currDemgraphicsData: resData.currDemographicsData,
+		// 		currAssessmentData: resData.currAssessmentData
+		// 	});
+		// 	formLastAnsweredQuestionIdInDomain = positionData.lastCompletedDomainId;
+		// 	formLastAnsweredQuestionIdInSubdomain = positionData.lastCompletedSubDomainId;
+		// 	logIfDev('positionData', positionData);
+		// 	formUpdatedAssessmentProgress();
+		// 	demoAndAssessmentformData = positionData.assessmentQuestionsCopy;
+		// }
 
-		//svelte is too fast
-		await new Promise((resolve) => setTimeout(resolve, 0));
+		// if (result.type === 'success' && result.data?.currAssessmentId) {
+		// 	currAssessment.setAssessmentId(result.data.currAssessmentId);
+		// }
 
-		handleNext();
-		applyAction(result);
+		// //svelte is too fast
+		// await new Promise((resolve) => setTimeout(resolve, 0));
+
+		// handleNext();
+		// applyAction(result);
 	}
 
 	async function handleIntermediateSubmit(
@@ -119,7 +134,7 @@
 
 		formData.append('assessmentId', `${currAssessment.currAssessmentId}`);
 
-		console.log('handleIntermediateSubmit data', formData);
+		logIfDev('handleIntermediateSubmit data', formData);
 
 		if (!form?.action) throw new Error('Form action is required');
 		const response = await fetch(form.action, {
@@ -144,7 +159,7 @@
 			  })
 	) {
 		event.preventDefault();
-		console.log('handleFinish');
+		logIfDev('handleFinish');
 
 		const form = event.currentTarget.closest('form');
 		const formData = new FormData(form!);

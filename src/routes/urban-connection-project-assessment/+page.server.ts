@@ -25,6 +25,8 @@ import { request } from 'http';
 import { setFlash } from 'sveltekit-flash-message/server';
 import { message } from 'sveltekit-superforms';
 
+// http://localhost:5173/urban-connection-project-assessment?assessmentToken=VHpsV1VPYlpwMDhSTWl4NHwyMXwzMzVBQnA=
+
 export async function load({ params, url, cookies }) {
 	console.log('page load ====> ');
 	const assessmentToken = await url.searchParams.get('assessmentToken');
@@ -185,10 +187,10 @@ export const actions = {
 				// set assessment status to started on demographics completion
 				await setAssessmentStatus({ assessmentId: currAssessment.id, status: 'started' });
 
-				//all set here demographics wise
+				//JOB DONE  demographics wise
 				return {
 					success: true,
-					isDemographics: true,
+					demographicsSuccess: true,
 					currAssessmentId: currAssessment.id,
 					currAssessmentData: await getAssessmentDataByAssessmentId(currAssessment.id),
 					currDemographicsData: newDemographicsData

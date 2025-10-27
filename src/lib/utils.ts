@@ -6,6 +6,7 @@ import { message, type SuperValidated } from 'sveltekit-superforms';
 import { setFlash } from 'sveltekit-flash-message/server';
 import type { Cookies, RequestEvent } from '@sveltejs/kit';
 import type { Domain, Question, Subdomain, AssessmentData } from './types/assessment';
+import { dev } from '$app/environment';
 
 type Message = { status: 'error' | 'success' | 'warning'; text: string };
 
@@ -358,4 +359,10 @@ export function formDataToObject(formData: FormData) {
 		obj[key] = value;
 	}
 	return obj;
+}
+
+export function logIfDev(message: string, ...optionalParams: any[]) {
+	if (dev) {
+		console.log(message, ...optionalParams);
+	}
 }
