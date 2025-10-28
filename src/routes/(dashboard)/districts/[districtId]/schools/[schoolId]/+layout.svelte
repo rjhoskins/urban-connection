@@ -184,12 +184,12 @@
 
 		{#if browser}
 			<div class="buttons mt-4 flex items-center justify-between gap-2">
-				<!-- <Button
+				<Button
 					variant={`${!page.url.pathname.includes('results') ? 'secondary' : 'default'}`}
 					href={`${page.url.pathname}/results`}
 					class="mb-4">Assessment Totals</Button
 				>
-				<Button
+				<!-- <Button
 					variant={`${!page.url.pathname.includes('member-data') ? 'secondary' : 'default'}`}
 					href={`${page.url.pathname}/member-data`}
 					class="mb-4">Members</Button
