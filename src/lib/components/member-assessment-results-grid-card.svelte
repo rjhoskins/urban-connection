@@ -33,11 +33,8 @@
 				<p class="text-[11px] text-black/70">{school.name}</p>
 			</div>
 
-			<Button
-				class={`${progress === 0 ? ' pointer-events-none opacity-70' : ''}`}
-				href={isNested
-					? `${page.url.pathname}/assessments/${id}`
-					: `${window.location.origin}/schools/${school.id}/assessments/${id}`}>View Details</Button
+			<Button href={isNested ? `${page.url.pathname}/schools/${id}` : `${page.url.pathname}/${id}`}
+				>View School</Button
 			>
 		</div>
 		<div class="bottom flex justify-between text-xs text-black/70">

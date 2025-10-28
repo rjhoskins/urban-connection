@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { dev } from '$app/environment';
 	import AssessmentDomainProgressCard from '$lib/components/assessment-domain-progress-card.svelte';
 	import DemographicsAndAssessmentForm from '$lib/components/forms/demographics-and-assessment-form.svelte';
 	import Card from '$lib/components/ui/card/card.svelte';
@@ -126,7 +125,7 @@
 		currSubDomain: number;
 	}) {
 		if (isLoading) return;
-		if (dev) logIfDev('handleModalVideoIdChange', currDomain, currSubDomain);
+		logIfDev('handleModalVideoIdChange', currDomain, currSubDomain);
 
 		switch (currDomain) {
 			case 0:

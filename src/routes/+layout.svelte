@@ -8,7 +8,15 @@
 	import { globals } from '$lib/store/globals.svelte';
 	import { setModalStateContext } from '$lib/modal-state.svelte';
 	import YoutubeVidsModal from '$lib/components/youtube-vids-modal.svelte';
+	import { onMount } from 'svelte';
+	import { browser } from '$app/environment';
 	setModalStateContext();
+	const modalPages = ['urban-connection-project-assessment', 'thank-you'];
+	const isModalsPage = $derived.by(() => {
+		const currPage = page.url.pathname;
+		if (modalPages.includes(currPage)) return true;
+		return false;
+	});
 
 	const flash = initFlash(page, {
 		clearOnNavigate: true,
@@ -29,6 +37,7 @@
 		console.log('afterNavigate');
 		globals.setLoading(false);
 	});
+	onMount(() => {});
 
 	// const flash = getFlash(page);
 	let { children, data } = $props();
@@ -48,7 +57,9 @@
 
 	<Toaster />
 	<!-- controlled with state -->
-	<YoutubeVidsModal />
+	{#if browser && isModalsPage}
+		<YoutubeVidsModal />
+	{/if}
 </div>
 
 <!-- "safelist hack" -->

@@ -7,15 +7,14 @@
 	import { cn } from '$lib/utils';
 	import MemberAssessmentResultsListTableRow from './member-assessment-results-list-table-row.svelte';
 	import { onMount } from 'svelte';
-	let { members, school, page, isNested = false } = $props();
+	let { members, page, isNested = false } = $props();
 	let sortedMembers = $state(members);
 
 	let sortBy = $state('name');
 	let sortDirection = $state('desc');
 
 	const tableHeaders = [
-		{ name: 'Name', class: '', sortBy: 'name' },
-		{ name: 'School', sortBy: 'assessmentCount' },
+		{ name: 'School', class: '', sortBy: 'name' },
 		{ name: 'Completed ', sortBy: 'completed' },
 		{ name: 'Score', sortBy: 'score' },
 		{ name: 'Action', class: '[&>div]:!block [&>div]:!text-right' }
@@ -110,7 +109,7 @@
 	</Table.Header>
 	<Table.Body>
 		{#each sortedMembers as member, idx (member.id)}
-			<MemberAssessmentResultsListTableRow {page} {member} {school} {idx} />
+			<MemberAssessmentResultsListTableRow {page} {member} {idx} />
 		{/each}
 	</Table.Body>
 </Table.Root>

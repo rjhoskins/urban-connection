@@ -59,11 +59,11 @@
 		</Card>
 	</div>
 	<Card class="mt-5 mb-14 flex justify-end gap-4 p-4">
-		<!-- <Button
+		<Button
 			class="flex items-center justify-center"
 			variant={`${!isGridView ? 'default' : 'secondary'}`}
 			onclick={() => (isGridView = false)}><List /><span>List</span></Button
-		> -->
+		>
 		<Button
 			variant={`${isGridView ? 'default' : 'secondary'}`}
 			class="flex items-center justify-center"
@@ -77,8 +77,7 @@
 				<SchoolGridCard isNested {page} {school} />
 			{/each}
 		{:else}
-			<p>here</p>
-			<!-- <MemberAssessmentResultsListTable {school} {page} members={data.memberData} /> -->
+			<MemberAssessmentResultsListTable {page} members={data.memberAssessmentData} />
 		{/if}
 	</div>
 </section>

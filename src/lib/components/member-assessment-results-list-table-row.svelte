@@ -3,8 +3,9 @@
 	import Button from './ui/button/button.svelte';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { getScoreBackgroundColor } from '$lib/utils';
-	let { member, idx, school, page, isNested = false } = $props();
-	const { id, name, completedAt, pointsTotal, questionsTotal } = member;
+	let { member, idx, page } = $props();
+	let isNested = page.url.pathname.includes('districts');
+	const { id, name, completedAt, pointsTotal, questionsTotal, assessmentCount } = member;
 	const progress = $derived.by(() => {
 		if (pointsTotal && questionsTotal) {
 			return (pointsTotal / questionsTotal) * 100;
@@ -24,26 +25,21 @@
 		{name}
 	</Table.Cell>
 	<Table.Cell>
-		{school.name}
+		{assessmentCount}
 	</Table.Cell>
 	<Table.Cell>
-		{formattedDate}
-	</Table.Cell>
-	<Table.Cell>
-		<div
-			class={`md grid w-fit place-content-center rounded-md p-1 font-bold ${getScoreBackgroundColor(progress)}`}
-		>
-			{Math.round(progress)}%
-		</div>
+		{#if progress}
+			<div
+				class={`md grid w-fit place-content-center rounded-md p-1 font-bold ${getScoreBackgroundColor(progress)}`}
+			>
+				{Math.round(progress)}%
+			</div>
+		{:else}-{/if}
 	</Table.Cell>
 	<Table.Cell class="text-right">
-		<Button
-			class={`${progress === 0 ? ' pointer-events-none opacity-70' : ''}`}
-			href={isNested
-				? `${page.url.pathname}/assessments/${id}`
-				: `${window.location.origin}/schools/${school.id}/assessments/${id}`}
-		>
-			View Details
+		<!-- class={`${progress === 0 ? ' pointer-events-none opacity-70' : ''}`} -->
+		<Button href={isNested ? `${page.url.pathname}/schools/${id}` : `${page.url.pathname}/${id}`}>
+			View School
 		</Button>
 	</Table.Cell>
 </Table.Row>

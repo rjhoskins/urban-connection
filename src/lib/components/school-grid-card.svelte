@@ -1,10 +1,14 @@
 <script>
 	import * as Card from '$lib/components/ui/card';
+	import { getScoreBackgroundColor } from '$lib/utils';
+	import { onMount } from 'svelte';
 	import Button from './ui/button/button.svelte';
 	import Progress from './ui/progress/progress.svelte';
 	let { school, page, isNested = false } = $props();
 	const { name, id, assessmentCount, pointsTotal, questionsTotal } = school;
 	const totalAssessmentScorePercentage = Math.round((pointsTotal / questionsTotal) * 100) || 0;
+
+	const scoreColor = getScoreBackgroundColor(totalAssessmentScorePercentage);
 </script>
 
 <Card.Root
@@ -28,9 +32,20 @@
 		{#if assessmentCount > 0}
 			<div class="flex justify-between text-sm text-black/70">
 				<p class="">Total Score:</p>
-				<p class="rounded-md bg-[#CCFFBD] px-1 py-0.5">{totalAssessmentScorePercentage}%</p>
+				<p
+					class={`rounded-md
+					${getScoreBackgroundColor(totalAssessmentScorePercentage)}
+					px-1
+					py-0.5`}
+				>
+					{totalAssessmentScorePercentage}%
+				</p>
 			</div>
-			<Progress barBgColor="bg-[#CCFFBD]" class="h-[7px]" value={totalAssessmentScorePercentage} />
+			<Progress
+				barBgColor={`${getScoreBackgroundColor(totalAssessmentScorePercentage)}`}
+				class="h-[7px]"
+				value={totalAssessmentScorePercentage}
+			/>
 		{:else}
 			<p class="text-primary/50">No assessments taken yet</p>
 		{/if}
