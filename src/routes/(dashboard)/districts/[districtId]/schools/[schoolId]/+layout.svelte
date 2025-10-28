@@ -10,10 +10,11 @@
 	import type { LayoutData } from './$types';
 	import { onMount, type Snippet } from 'svelte';
 	import DonutChart from '$lib/components/charts/DonutChart.svelte';
-	import { createAssessmentInviteToken } from '$lib/utils';
+	import { createAssessmentInviteToken, getScoreBackgroundColor } from '$lib/utils';
 	import toast from 'svelte-french-toast';
 	import { Stripe } from 'stripe';
 	import { nanoid } from 'nanoid';
+	import SchoolDashboardAssessmentStatsBars from '$lib/components/school-dashboard-assessment-stats-bars.svelte';
 
 	let { data, children }: { data: LayoutData; children: Snippet } = $props();
 	const { adminData, school, assessmentData, memberData, stripeProducts } = data;
@@ -179,35 +180,16 @@
 	</Card.Root>
 
 	<Card.Root class="right row-start-2 flex flex-col gap-3 rounded-md p-9 shadow-md">
-		<div class="buttons flex items-center justify-between gap-2"></div>
-		<div class="flex items-center justify-between">
-			<div class="flex gap-2">
-				<p>Total Assessments:</p>
-				<p>{totalAssessments}</p>
-			</div>
-		</div>
-		{#each chartData as progress (progress.category)}
-			{@render ProgressIndicator(progress)}
-		{/each}
+		<SchoolDashboardAssessmentStatsBars {chartData} {totalPointsPercentage} {totalAssessments} />
 
-		<div class="">
-			<div class="flex items-center justify-between">
-				<p class="text-2xl text-black/70">Total Score</p>
-				<p class="rounded-md bg-[#CCFFBD] px-1 py-0.5 text-xs">
-					{Math.round(totalPointsPercentage)}%
-				</p>
-			</div>
-
-			<Progress barBgColor="bg-[#34C759]" class="h-[7px]" value={totalPointsPercentage} />
-		</div>
 		{#if browser}
 			<div class="buttons mt-4 flex items-center justify-between gap-2">
-				<Button
+				<!-- <Button
 					variant={`${!page.url.pathname.includes('results') ? 'secondary' : 'default'}`}
 					href={`${page.url.pathname}/results`}
 					class="mb-4">Assessment Totals</Button
 				>
-				<!-- <Button
+				<Button
 					variant={`${!page.url.pathname.includes('member-data') ? 'secondary' : 'default'}`}
 					href={`${page.url.pathname}/member-data`}
 					class="mb-4">Members</Button
@@ -221,15 +203,3 @@
 <section class="max-w-7xl">
 	{@render children?.()}
 </section>
-
-{#snippet ProgressIndicator(data: { category: any; value: any; chartColor: any; labelColor: any })}
-	<div class="">
-		<div class="flex items-center justify-between">
-			<p class="text-2xl text-black/70">{data.category}</p>
-			<p class={`rounded-md bg-[${data.labelColor}] px-1 py-0.5 text-xs`}>
-				{Math.round(data.value)}%
-			</p>
-		</div>
-		<Progress barBgColor={`bg-[${data.chartColor}]`} class="h-[7px]" value={data.value} />
-	</div>
-{/snippet}
