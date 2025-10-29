@@ -2,7 +2,8 @@
 	import type { PageData } from './$types';
 	import * as Card from '$lib/components/ui/card';
 	import { Progress } from '$lib/components/ui/progress';
-	import { globals } from '$lib/store/globals.svelte';
+	import { getGlobalsContext } from '$lib/store/globals-state.svelte';
+	const globals = getGlobalsContext();
 	import { onMount } from 'svelte';
 
 	let { data }: { data: PageData } = $props();

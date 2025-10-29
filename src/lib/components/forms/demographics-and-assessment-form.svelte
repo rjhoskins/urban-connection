@@ -7,7 +7,8 @@
 	import { ZERO_BASED_ALPHABET_NUMBERING } from '$lib/constants';
 	import Input from '../ui/input/input.svelte';
 	import toast from 'svelte-french-toast';
-	import { currAssessment } from '$lib/store/assessment.svelte';
+	import { getGlobalsContext } from '$lib/store/globals-state.svelte';
+	const globals = getGlobalsContext();
 	import { createMixedBagAssessmentAndDemographics } from '$lib/types/assessment';
 	import {
 		applyAssessmentResponsesToQuestionsAndGetCurrentPositions,
@@ -19,6 +20,7 @@
 	let {
 		demoAndAssessmentformData = $bindable(),
 		currDomain = $bindable(),
+		currAssessmentData = $bindable(),
 		currSubDomain = $bindable(),
 		handleNext = $bindable(),
 		handlePrev = $bindable(),
@@ -49,7 +51,6 @@
 		const isDemographics = data.get('isDemographics');
 
 		const name = data.get('name');
-		if (name) currAssessment.setAssessmentParticipantName(name.toString());
 
 		const decodedeAssessmentToken = decodeAssessmentInviteToken(assessmentToken as string);
 		const schoolId = decodedeAssessmentToken.schoolId;
@@ -66,7 +67,6 @@
 			toast.error(`form error: ${errorStrArray}`);
 			return;
 		}
-		if (name) currAssessment.setAssessmentParticipantName(name.toString());
 
 		//data => server
 		if (!form?.action) throw new Error('Form action is required');
@@ -85,6 +85,8 @@
 			result.data?.currAssessmentId
 		) {
 			//workaround for current race condition issues
+			globals.assessmentParticipantName = name ? name.toString() : '';
+			globals.currAssessmentId = result.data.currAssessmentId;
 			logIfDev('HERE RACE CONDITION WORKAROUND => initialize result', result);
 			// logIfDev('HERE RACE CONDITION WORKAROUND => initialize result', );
 			const url = window.location.href;
@@ -132,7 +134,7 @@
 		const form = event.currentTarget.closest('form');
 		const formData = new FormData(form!);
 
-		formData.append('assessmentId', `${currAssessment.currAssessmentId}`);
+		// formData.append('assessmentId'`);
 
 		logIfDev('handleIntermediateSubmit data', formData);
 
@@ -163,7 +165,7 @@
 
 		const form = event.currentTarget.closest('form');
 		const formData = new FormData(form!);
-		formData.append('assessmentId', `${currAssessment.currAssessmentId}`);
+		// formData.append('assessmentId', `${currAssessment.currAssessmentId}`);
 		formData.append('isLastQuestion', 'true');
 
 		// handleFormDataChange({ event, data });

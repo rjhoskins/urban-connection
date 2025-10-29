@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { globals } from '$lib/store/globals.svelte';
+	import { getGlobalsContext } from '$lib/store/globals-state.svelte';
+	const globals = getGlobalsContext();
 
 	import type { LayoutData } from './$types';
 	import { onMount, type Snippet } from 'svelte';

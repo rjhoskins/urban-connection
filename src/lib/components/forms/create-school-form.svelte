@@ -15,7 +15,8 @@
 	import { dev } from '$app/environment';
 	import { LoaderCircle, TriangleAlert } from 'lucide-svelte';
 	import { beforeNavigate, goto } from '$app/navigation';
-	import { globals } from '$lib/store/globals.svelte';
+	import { getGlobalsContext } from '$lib/store/globals-state.svelte';
+	const globals = getGlobalsContext();
 
 	let { isDistrict = $bindable(), data } = $props();
 	const { districts } = data;

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import * as Card from '$lib/components/ui/card';
-	import { globals } from '$lib/store/globals.svelte';
+	import { getGlobalsContext } from '$lib/store/globals-state.svelte';
+	const globals = getGlobalsContext();
 	import Progress from '$lib/components/ui/progress/progress.svelte';
 	import { Button } from '$lib/components/ui/button/index.js';
 

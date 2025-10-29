@@ -343,11 +343,19 @@ export function applyAssessmentResponsesToQuestionsAndGetCurrentPositions({
 }
 
 export function getScoreBackgroundColor(score: number) {
-	//added these to
 	if (score > 80) {
 		return 'bg-[#CCFFBD]';
 	} else if (score > 50) {
 		return 'bg-[#F9F5D8]';
+	} else {
+		return 'bg-[#FEF4F5]';
+	}
+}
+export function getProgressBarBackgroundColor(score: number) {
+	if (score > 80) {
+		return 'bg-[#34C759]';
+	} else if (score > 50) {
+		return 'bg-[#C9B53D]';
 	} else {
 		return 'bg-[#FEF4F5]';
 	}

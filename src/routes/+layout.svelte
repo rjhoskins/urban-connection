@@ -1,22 +1,13 @@
 <script lang="ts">
-	import toast, { Toaster } from 'svelte-french-toast';
 	import '../app.css';
-
+	import toast, { Toaster } from 'svelte-french-toast';
 	import { initFlash } from 'sveltekit-flash-message';
 	import { page } from '$app/state';
 	import { afterNavigate, beforeNavigate } from '$app/navigation';
-	import { globals } from '$lib/store/globals.svelte';
-	import { setModalStateContext } from '$lib/modal-state.svelte';
-	import YoutubeVidsModal from '$lib/components/youtube-vids-modal.svelte';
+	import { setGlobalsContext, getGlobalsContext } from '$lib/store/globals-state.svelte';
+	setGlobalsContext();
+	const globals = getGlobalsContext();
 	import { onMount } from 'svelte';
-	import { browser } from '$app/environment';
-	setModalStateContext();
-	const modalPages = ['urban-connection-project-assessment', 'thank-you'];
-	const isModalsPage = $derived.by(() => {
-		const currPage = page.url.pathname;
-		if (modalPages.includes(currPage)) return true;
-		return false;
-	});
 
 	const flash = initFlash(page, {
 		clearOnNavigate: true,
@@ -56,10 +47,6 @@
 	{@render children()}
 
 	<Toaster />
-	<!-- controlled with state -->
-	{#if browser && isModalsPage}
-		<YoutubeVidsModal />
-	{/if}
 </div>
 
 <!-- "safelist hack" -->

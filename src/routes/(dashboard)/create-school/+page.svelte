@@ -5,7 +5,8 @@
 
 	let { data } = $props();
 	import { onMount } from 'svelte';
-	import { globals } from '$lib/store/globals.svelte';
+	import { getGlobalsContext } from '$lib/store/globals-state.svelte';
+	const globals = getGlobalsContext();
 	onMount(() => {
 		console.log('mounted');
 		console.log('data', data);

@@ -6,7 +6,8 @@
 	import Button from './ui/button/button.svelte';
 	import { getScoreBackgroundColor } from '$lib/utils';
 
-	let { member, idx, school, isNested = false } = $props();
+	const isNested = page.url.pathname.includes('districts');
+	let { member, idx, school } = $props();
 	const { id, name, completedAt, pointsTotal, questionsTotal } = member;
 	const progress = $derived.by(() => {
 		if (pointsTotal && questionsTotal) {
@@ -29,7 +30,8 @@
 	>
 		<div class="top flex justify-between">
 			<div class="flex flex-col gap-1">
-				<p class="text-sm">{name ? name : `Teacher ${idx + 1}`}</p>
+				<p class="text-sm">{isNested ? name : `Teacher ${idx + 1}`}</p>
+
 				<p class="text-[11px] text-black/70">{school.name}</p>
 			</div>
 

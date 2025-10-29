@@ -4,11 +4,12 @@
 	import { onMount } from 'svelte';
 	import Button from './ui/button/button.svelte';
 	import Progress from './ui/progress/progress.svelte';
-	let { school, page, isNested = false } = $props();
+	let { school, page } = $props();
 	const { name, id, assessmentCount, pointsTotal, questionsTotal } = school;
 	const totalAssessmentScorePercentage = Math.round((pointsTotal / questionsTotal) * 100) || 0;
 
 	const scoreColor = getScoreBackgroundColor(totalAssessmentScorePercentage);
+	const isNested = page.url.pathname.includes('districts');
 </script>
 
 <Card.Root

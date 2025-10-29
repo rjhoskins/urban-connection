@@ -1,6 +1,8 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import { globals } from '$lib/store/globals.svelte';
+
+	import { getGlobalsContext } from '$lib/store/globals-state.svelte';
+	const globals = getGlobalsContext();
 
 	let { data }: { data: PageData } = $props();
 	import UCAdminPanel from '$lib/components/uc-admin-panel.svelte';

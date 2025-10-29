@@ -45,7 +45,7 @@
 		<p>Score</p>
 		<p>{Math.round(totalDomainScore * 100)}%</p>
 	</div>
-	<Progress barBgColor="bg-green-700" value={totalDomainScore * 100} />
+	<Progress value={totalDomainScore * 100} />
 
 	<div class="my-3">
 		<!-- <p class="my-3 text-xl">Questions</p> -->

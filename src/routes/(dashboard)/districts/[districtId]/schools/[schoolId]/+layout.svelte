@@ -1,7 +1,7 @@
 <script lang="ts">
 	import * as Card from '$lib/components/ui/card';
-	import { globals } from '$lib/store/globals.svelte';
-	import Progress from '$lib/components/ui/progress/progress.svelte';
+	import { getGlobalsContext } from '$lib/store/globals-state.svelte';
+	const globals = getGlobalsContext();
 	import { Button } from '$lib/components/ui/button/index.js';
 	import AdminContactDetailsCard from '$lib/components/admin-contact-details-card.svelte';
 	import { page } from '$app/state';
@@ -21,6 +21,16 @@
 	const products = $state(stripeProducts.data);
 	let numMembersShown = $state(data.memberData.length);
 	let isGridView = $state(true);
+	const baseUrl = $derived.by(() => {
+		if (
+			browser &&
+			(page.url.pathname.includes('results') || page.url.pathname.includes('member-data'))
+		) {
+			return page.url.pathname.split('/').slice(0, -1).join('/');
+		} else {
+			return '';
+		}
+	});
 
 	let pageTitle = $state(`${school.name} | Dashboard`);
 	onMount(() => {
@@ -78,17 +88,10 @@
 			labelColor: '#CCFFBD'
 		},
 		{
-			category: 'Started',
+			category: 'Incomplete',
 			value: assessmentsStartedPercentage,
 			chartColor: '#C9B53D',
 			labelColor: '#F9F5D8'
-		},
-
-		{
-			category: 'Not Started',
-			value: assessmentsNotStartedPercentage,
-			chartColor: '#B23532',
-			labelColor: '#FEF4F5'
 		}
 	];
 
@@ -186,14 +189,18 @@
 			<div class="buttons mt-4 flex items-center justify-between gap-2">
 				<Button
 					variant={`${!page.url.pathname.includes('results') ? 'secondary' : 'default'}`}
-					href={`${page.url.pathname}/results`}
+					href={`${baseUrl}/results`}
 					class="mb-4">Assessment Totals</Button
 				>
-				<!-- <Button
+				<Button
 					variant={`${!page.url.pathname.includes('member-data') ? 'secondary' : 'default'}`}
-					href={`${page.url.pathname}/member-data`}
+					href={`${baseUrl}/member-data`}
 					class="mb-4">Members</Button
-				> -->
+				>
+
+				<!-- //member-data -->
+				<!-- http://localhost:5173/districts/4/schools/14/results -->
+				<!-- http://localhost:5173/districts/4/schools/14/member-data -->
 			</div>
 		{/if}
 	</Card.Root>

@@ -6,7 +6,8 @@
 		{ name: 'Home', href: '/' },
 		{ name: 'Contact Us', href: '/contact-us' }
 	];
-	import { globals } from '../../store/globals.svelte';
+	import { getGlobalsContext } from '$lib/store/globals-state.svelte';
+	const globals = getGlobalsContext();
 	let pageTitle = $state(globals.pageName);
 	let expanded = $state(false);
 	import Button from '../ui/button/button.svelte';
@@ -20,6 +21,6 @@
 		<p class="text-2xl text-[#45464E] capitalize">
 			{globals.pageName || 'The Urban Connection Project...'}
 		</p>
-		<SignOutAvaterButton text={'Admin'} />
+		<SignOutAvaterButton text={'Logout'} />
 	</div>
 </nav>

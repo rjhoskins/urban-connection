@@ -195,6 +195,7 @@
 	}
 
 	onMount(async () => {
+		console.log('Mounted assessment page with data:', data);
 		await applyCurrentProgress();
 
 		logIfDev('All reactive state:', {

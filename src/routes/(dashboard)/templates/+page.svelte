@@ -4,7 +4,8 @@
 	import * as Card from '$lib/components/ui/card';
 	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
-	import { globals } from '$lib/store/globals.svelte';
+	import { getGlobalsContext } from '$lib/store/globals-state.svelte';
+	const globals = getGlobalsContext();
 
 	let { data }: { data: PageData } = $props();
 	const { templateTypes } = data;

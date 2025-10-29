@@ -5,7 +5,8 @@
 	import HtmlEmailTextPreview from '$lib/components/html-email-text-preview.svelte';
 	import { TEMPLATE_TITLES } from '$lib/constants.js';
 	import { onMount } from 'svelte';
-	import { globals } from '$lib/store/globals.svelte.js';
+	import { getGlobalsContext } from '$lib/store/globals-state.svelte';
+	const globals = getGlobalsContext();
 
 	let { data } = $props();
 

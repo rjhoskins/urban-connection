@@ -8,7 +8,8 @@
 	let numSchoolsShown = $state(data.schools.length);
 	let isGridView = $state(true);
 	import { onMount } from 'svelte';
-	import { globals } from '$lib/store/globals.svelte';
+	import { getGlobalsContext } from '$lib/store/globals-state.svelte';
+	const globals = getGlobalsContext();
 	import { Card } from '$lib/components/ui/card';
 	import { Button } from '$lib/components/ui/button';
 	import { browser } from '$app/environment';

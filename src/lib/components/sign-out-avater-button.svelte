@@ -15,7 +15,6 @@
 <div class={cn('mb-auto flex justify-start gap-2 font-normal  text-white', className)}>
 	<form class="" method="post" action="/auth?/logout" use:enhance>
 		<Button type="submit" class={cn('mb-auto flex justify-start gap-2 font-normal  text-white')}>
-			<span class="">{text}</span>
 			<svg
 				width="24"
 				height="24"
@@ -41,6 +40,7 @@
 					/>
 				</svg>
 			</svg>
+			<span class="">{text}</span>
 		</Button>
 	</form>
 

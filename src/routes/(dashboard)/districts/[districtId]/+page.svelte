@@ -7,7 +7,8 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Grid2X2, List } from 'lucide-svelte';
 	import { onMount } from 'svelte';
-	import { globals } from '$lib/store/globals.svelte';
+	import { getGlobalsContext } from '$lib/store/globals-state.svelte';
+	const globals = getGlobalsContext();
 	import MemberAssessmentResultsListTable from '$lib/components/member-assessment-results-list-table.svelte';
 
 	interface School {

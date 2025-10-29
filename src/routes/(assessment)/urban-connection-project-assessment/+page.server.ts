@@ -19,11 +19,9 @@ import {
 	handleLogFlashReturnFormError,
 	transformAssessmentQuestionsResponses
 } from '$lib/utils.js';
-import { error, fail, redirect, type RequestEvent, type ServerLoadEvent } from '@sveltejs/kit';
-import { is } from 'drizzle-orm';
-import { request } from 'http';
+import { error, fail, redirect, type RequestEvent } from '@sveltejs/kit';
+
 import { setFlash } from 'sveltekit-flash-message/server';
-import { message } from 'sveltekit-superforms';
 
 // http://localhost:5173/urban-connection-project-assessment?assessmentToken=VHpsV1VPYlpwMDhSTWl4NHwyMXwzMzVBQnA=
 
@@ -186,6 +184,13 @@ export const actions = {
 
 				// set assessment status to started on demographics completion
 				await setAssessmentStatus({ assessmentId: currAssessment.id, status: 'started' });
+				console.log({
+					success: true,
+					demographicsSuccess: true,
+					currAssessmentId: currAssessment.id,
+					currAssessmentData: await getAssessmentDataByAssessmentId(currAssessment.id),
+					currDemographicsData: newDemographicsData
+				});
 
 				//JOB DONE  demographics wise
 				return {

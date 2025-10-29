@@ -27,11 +27,7 @@
 		</p>
 	</div>
 
-	<Progress
-		barBgColor={`${getScoreBackgroundColor(totalPointsPercentage)}`}
-		class="h-[7px]"
-		value={totalPointsPercentage}
-	/>
+	<Progress class="h-[7px]" value={totalPointsPercentage} />
 </div>
 
 {#snippet ProgressIndicator(data: { category: any; value: any; chartColor: any; labelColor: any })}

@@ -7,8 +7,9 @@
 	import { cn } from '$lib/utils';
 	import MemberAssessmentResultsListTableRow from './member-assessment-results-list-table-row.svelte';
 	import { onMount } from 'svelte';
-	let { members, page, isNested = false } = $props();
+	let { members, page } = $props();
 	let sortedMembers = $state(members);
+	const isNested = page.url.pathname.includes('districts');
 
 	let sortBy = $state('name');
 	let sortDirection = $state('desc');
