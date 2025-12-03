@@ -91,7 +91,7 @@
 										bind:checked={$formData.isDistrict}
 									/>
 									<div class="space-y-0.5">
-										<Form.Label>Create District</Form.Label>
+										<Form.Label>Add District Admin</Form.Label>
 										<Form.Description
 											>Create a distrct admin for the selected district</Form.Description
 										>
