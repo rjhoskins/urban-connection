@@ -5,8 +5,8 @@
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 
 	import * as Card from '$lib/components/ui/card';
-	import { inviteNewUserSchema } from '$lib/schema.js';
-	import { decodeAdminUserInviteToken } from '$lib/utils';
+	import { inviteNewAdminUserSchema } from '$lib/schema.js';
+	// import { decodeAdminUserInviteToken } from '$lib/utils';
 	/** @type {{ data: import('./$types').PageData, form: import('./$types').ActionData }} */
 	import { Field, Control, Label, FieldErrors, Description } from 'formsnap';
 	import { superForm } from 'sveltekit-superforms';
@@ -15,24 +15,29 @@
 	import { dev } from '$app/environment';
 	import { LoaderCircle } from 'lucide-svelte';
 	import HtmlEmailTextPreview from '../html-email-text-preview.svelte';
+	import { onMount } from 'svelte';
 
-	let { page, data, token, canEditForm } = $props();
-	const { name, email, inviteId } = decodeAdminUserInviteToken(token);
+	let { page, data, unusedAdminUserInvite, canEditForm } = $props();
+	const { name, email, adminInviteId } = unusedAdminUserInvite;
 	const form = superForm(data.inviteForm, {
 		dataType: 'json',
-		validators: zodClient(inviteNewUserSchema)
+		validators: zodClient(inviteNewAdminUserSchema)
 	});
 	const { form: formData, enhance, message, delayed } = form;
 
 	$effect(() => {
 		$formData.name = name;
 		$formData.email = email;
-		$formData.inviteId = inviteId;
+		$formData.adminInviteId = adminInviteId;
 	});
 </script>
 
 {#if !canEditForm}
-	<HtmlEmailTextPreview data={data.emailForm.data} {token} />
+	<HtmlEmailTextPreview
+		data={data.emailForm.data}
+		{unusedAdminUserInvite}
+		disableLink={!canEditForm}
+	/>
 {/if}
 
 <form class="flex flex-col gap-3" method="POST" action="?/invite" use:enhance>
@@ -57,12 +62,12 @@
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
-	<!-- inviteId -->
-	<Form.Field class="hidden space-y-0" {form} name="inviteId">
+	<!-- publicId -->
+	<Form.Field class="hidden space-y-0" {form} name="adminInviteId">
 		<Form.Control>
 			{#snippet children({ props })}
 				<Form.Label class="sr-only">Admin InviteId</Form.Label>
-				<Input type="hidden" {...props} bind:value={$formData.inviteId} />
+				<Input type="hidden" {...props} bind:value={$formData.adminInviteId} />
 			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />
@@ -73,7 +78,7 @@
 			<LoaderCircle class="animate-spin" />
 			Sending...
 		{:else}
-			Send Invite
+			Send Invitez
 		{/if}</Form.Button
 	>
 

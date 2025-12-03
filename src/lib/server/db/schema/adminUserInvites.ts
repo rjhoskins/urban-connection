@@ -7,27 +7,27 @@ import { invitesEnum } from './userInvites';
 import users from './users';
 import schools from './schools';
 import districts from './districts';
+import { ulid } from 'ulid';
 
 const adminUserInvites = pgTable(
 	'admin_user_invites',
 	{
-		id: varchar('id', { length: 256 }).primaryKey(),
-		name: varchar('name', { length: 256 }).notNull(), // from the invite form
-		email: varchar('email').notNull(),
+		id: varchar({ length: 26 })
+			.$defaultFn(() => ulid())
+			.primaryKey(),
+		name: varchar({ length: 256 }).notNull(), // from the invite form
+		email: varchar().notNull(),
 		isSent: boolean('is_sent').default(false),
-
-		invitee: varchar('invitee', { length: 256 }).references((): AnyPgColumn => users.id), // user who received the invite (if they sign up, this is their id)
-		inviter: varchar('inviter', { length: 256 }).references((): AnyPgColumn => users.id),
-		//	.notNull(), // user who created the invite
-		expiration: timestamp('expiration', { mode: 'string' })
+		invitee: varchar({ length: 26 }).references((): AnyPgColumn => users.id), // user who received the invite (if they sign up, this is their id)
+		inviter: varchar({ length: 26 }).references((): AnyPgColumn => users.id),
+		expiration: timestamp({ mode: 'string' })
 			.notNull()
 			.default(sql`NOW() + INTERVAL '10 days'`),
-		isUsed: boolean('is_used').default(false),
-
-		role: userRolesEnum('role').default('school_admin'),
-		inviteType: invitesEnum('invite_type').default('school'),
-		schoolId: integer('school_id').references((): AnyPgColumn => schools.id),
-		districtId: integer('district_id').references((): AnyPgColumn => districts.id),
+		isUsed: boolean().default(false).notNull(),
+		role: userRolesEnum().default('school_admin'),
+		inviteType: invitesEnum().default('school'),
+		schoolId: varchar({ length: 26 }).references((): AnyPgColumn => schools.id),
+		districtId: varchar({ length: 26 }).references((): AnyPgColumn => districts.id),
 
 		...timestamps
 	},

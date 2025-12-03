@@ -25,12 +25,10 @@
 <Card.Root class="mx-auto max-w-xl shadow-xl">
 	<Card.Header>
 		<Card.Title class="flex items-center justify-center gap-2 pb-6 text-3xl">
-			<ShieldAlertIcon class="size-8 text-red-700" /><span>Oops! Unauthorized Access</span
-			></Card.Title
+			<ShieldAlertIcon class="size-8 text-red-700" /><span>Oops! Murphy’s Law?</span></Card.Title
 		>
 		<Card.Description class="text-primary text-lg">
-			Looks like you don't have the right access key for page or assessment. But while you're here,
-			why not take our "Unauthorized User Assessment"?</Card.Description
+			Well, this is unexpected. It seems like Murphy’s Law is in full effect here.</Card.Description
 		>
 	</Card.Header>
 	<Card.Content>

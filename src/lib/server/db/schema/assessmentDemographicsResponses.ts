@@ -3,17 +3,20 @@ import { timestamps } from './db-utils';
 import schools from './schools';
 import assessments from './assessments';
 import { relations } from 'drizzle-orm';
+import { ulid } from 'ulid';
 
 const assessmentDemographics = pgTable(
 	'assessment_demographics_responses',
 	{
-		id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-		educationLevel: varchar('education_level', { length: 64 }),
-		yearsTeaching: integer('years_teaching'),
-		schoolId: integer('school_id')
+		id: varchar({ length: 26 })
+			.$defaultFn(() => ulid())
+			.primaryKey(),
+		educationLevel: varchar({ length: 64 }),
+		yearsTeaching: integer(),
+		schoolId: varchar({ length: 26 })
 			.references(() => schools.id)
 			.notNull(),
-		assessmentId: integer('assessment_id')
+		assessmentId: varchar({ length: 26 })
 			.references(() => assessments.id)
 			.notNull(),
 		...timestamps

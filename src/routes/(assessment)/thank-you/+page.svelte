@@ -8,8 +8,7 @@
 	const modal = getModalStateContext();
 
 	onMount(() => {
-		modal.setModalEmbeddedId(videoIdMap.get('modal-closing')!);
-		modal.open();
+		modal.handleManualVideoSelect('modal-closing');
 	});
 </script>
 

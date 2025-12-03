@@ -4,14 +4,17 @@ import users from './users';
 import { relations } from 'drizzle-orm';
 import districts from './districts';
 import { timestamps } from './db-utils';
+import { ulid } from 'ulid';
 
 const districtAdmins = pgTable('district_admins', {
-	id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-	userId: varchar('user_id', { length: 256 })
+	id: varchar({ length: 26 })
+		.$defaultFn(() => ulid())
+		.primaryKey(),
+	userId: varchar({ length: 26 })
 		.notNull()
 		.references(() => users.id)
 		.unique(), //  only one district admin per district
-	districtId: integer('district_id')
+	districtId: varchar({ length: 26 })
 		.notNull()
 		.references(() => district.id),
 	...timestamps

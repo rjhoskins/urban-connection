@@ -4,16 +4,18 @@ import schools from './schools';
 import { relations } from 'drizzle-orm';
 import users from './users';
 import { timestamps } from './db-utils';
+import { ulid } from 'ulid';
 
 const schoolAdmins = pgTable('school_admins', {
-	id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-	userId: varchar('user_id', { length: 256 })
+	id: varchar('id', { length: 26 })
+		.$defaultFn(() => ulid())
+		.primaryKey(),
+	userId: varchar('user_id', { length: 26 })
 		.notNull()
 		.references(() => users.id), //many is okay
-	schoolId: integer('school_id')
+	schoolId: varchar({ length: 26 })
 		.notNull()
 		.references(() => schools.id),
-	// assessmentToken: varchar('assessment_token', { length: 256 }),
 	...timestamps
 });
 

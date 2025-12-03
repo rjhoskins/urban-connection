@@ -6,7 +6,7 @@
 	const adminData = [
 		{
 			title: 'View  Organization',
-			linkurl: '/districts',
+			linkurl: '/districts?&view=home',
 			description: 'View dashboard and manage district.',
 			imgUrl: '/img/person-gear.png',
 			imgStyleDimensions: 'height: 65px; width: 65px;'
@@ -14,14 +14,18 @@
 		{
 			title: 'Send Assessment Invitation',
 			linkurl: '/districts',
-			description: 'Navigate to a school to add an admin or access your assessment invite link.',
+			description: 'Navigate to a school to send assessment invitations.',
+			hasClickMessage: true,
+			clickMessage: 'Navigate to a school to send assessment invitations.',
 			imgUrl: '/img/person-gear.png',
 			imgStyleDimensions: 'height: 65px; width: 65px;'
 		},
 		{
 			title: 'Invite School Admin Invitation',
 			linkurl: '/districts',
-			description: 'Navigate to a school to access your assessment invite link.',
+			description: 'Navigate to a school to invite a school admin.',
+			hasClickMessage: true,
+			clickMessage: 'Navigate to a school to add an admin or access your assessment invite link.',
 			imgUrl: '/img/person-gear.png',
 			imgStyleDimensions: 'height: 65px; width: 65px;'
 		},
@@ -29,6 +33,8 @@
 			title: 'View Assessment Results',
 			linkurl: '/districts?&view=results',
 			description: 'View assessment results for the your district.',
+			hasClickMessage: true,
+			clickMessage: 'Navigate to a school to add an admin or access your assessment invite link.',
 			imgUrl: '/img/person-gear.png',
 			imgStyleDimensions: 'height: 65px; width: 65px;'
 		}

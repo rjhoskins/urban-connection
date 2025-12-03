@@ -1,223 +1,293 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import AssessmentDomainProgressCard from '$lib/components/assessment-domain-progress-card.svelte';
-	import DemographicsAndAssessmentForm from '$lib/components/forms/demographics-and-assessment-form.svelte';
+	import AssessmentQuestionsForm from '$lib/components/forms/assessment-questions-form.svelte';
+
 	import Card from '$lib/components/ui/card/card.svelte';
 	import { ASSESSMENT_PROGRESS_IMG_MAP, videoIdMap } from '$lib/constants';
 	import { getModalStateContext } from '$lib/modal-state.svelte';
 	import { logIfDev } from '$lib/utils.js';
+	import { is, type max } from 'drizzle-orm';
+
 	import { Video } from 'lucide-svelte';
 	const modal = getModalStateContext();
 	import { onMount, tick } from 'svelte';
 
+	// http://localhost:5173/urban-connection-project-assessment?assessmentId=MrdTxI9byd
+
 	let { data } = $props();
 	let {
-		assessmentToken,
 		assessmentQuestions,
-		currDemgraphicsData,
-		currAssessmentData,
 		// svelte-ignore non_reactive_update
-		lastAnsweredQuestionIdInDomain: lastAnsweredDomain,
+		assessmentId,
+		answeredAssessmentQuestionsData,
+		// svelte-ignore non_reactive_update
+		lastAnsweredQuestionIdInDomain: lastAnsweredDomainId,
 		// svelte-ignore non_reactive_update
 		lastAnsweredQuestionIdInSubdomain: lastAnsweredSubdomainId
 	} = data;
 	let isLoading = $state(true);
-	let formData = $state(assessmentQuestions);
-	let currDomain = $state(0);
-	let currSubDomain = $state(0);
-	let currOnPageVideoId = $state('');
+	let formData = $state(answeredAssessmentQuestionsData);
 
 	const totalQuestions = $derived.by(() => {
 		let totalQuestions = 0;
 		return totalQuestions;
 	});
 	// svelte-ignore state_referenced_locally
-	const domains = assessmentQuestions
-		.filter((domain) => domain?.name?.toLowerCase() !== 'demographics')
-		.map((domain) => {
-			return {
-				name: domain.name,
-				imgUrl: ASSESSMENT_PROGRESS_IMG_MAP.get(domain.name) || ''
-				// status: 'not-started'
-			};
-		});
+	const domains = assessmentQuestions.map((domain) => {
+		return {
+			name: domain.name,
+			imgUrl: ASSESSMENT_PROGRESS_IMG_MAP.get(domain.name) || ''
+			// status: 'not-started'
+		};
+	});
 
-	function setOnPageEmbeddedId(videoId: string) {
-		currOnPageVideoId = videoId;
-	}
-
-	let isDemographicsQuestions = $derived(
-		formData?.[currDomain]?.subDomains?.[currSubDomain]?.name.toLowerCase() == 'demographics'
-	);
 	let currQuestionsProgress = $derived(
-		assessmentQuestions?.[currDomain]?.subDomains?.[currSubDomain]?.questions?.length || 0
+		assessmentQuestions?.[modal.currDomain]?.subDomains?.[modal.currSubDomain]?.questions?.length ||
+			0
 	);
 
-	let isLastQuestion = $derived(
-		formData.length == currDomain + 1 && formData[currDomain].subDomains.length == currSubDomain + 1
-	);
+	let isLastQuestion = $derived.by(() => {
+		const lastDomainIdx = formData.length - 1;
+		if (modal.currDomain < lastDomainIdx) return false;
+		const lastSubDomainIdx = formData[modal.currDomain]?.subDomains.length - 1;
+		if (modal.currSubDomain < lastSubDomainIdx) return false;
+		return true;
+	});
+
+	let currOnPageVideoId = $derived.by(() => {
+		switch (modal.currDomain) {
+			case 0:
+				if (modal.currSubDomain !== 0) return;
+				return videoIdMap.get('onPage-domain-awareness') ?? '';
+				break;
+			case 1:
+				if (modal.currSubDomain !== 0) return;
+				return videoIdMap.get('onPage-domain-societalAwareness') ?? '';
+				break;
+			case 2:
+				if (modal.currSubDomain !== 0) return;
+				return videoIdMap.get('onPage-domain-systems') ?? '';
+				break;
+			case 3:
+				if (modal.currSubDomain !== 0) return;
+				return videoIdMap.get('onPage-domain-buildingRelationships') ?? '';
+				break;
+			case 4:
+				if (modal.currSubDomain !== 0) return;
+				videoIdMap.get('onPage-domain-rigorousAndAccessibleContent') ?? '';
+				break;
+			default:
+				return '';
+				break;
+		}
+	});
 
 	async function applyCurrentProgress() {
-		if (currDemgraphicsData) {
-			const domainIndex = formData.findIndex((domain) => domain.id === lastAnsweredDomain);
-			const subDomainIndex = formData[domainIndex].subDomains.findIndex(
+		//start
+		if (!lastAnsweredDomainId && !lastAnsweredSubdomainId) {
+			console.log('start & setting indices....');
+			modal.currDomain = 0;
+			modal.currSubDomain = 0;
+			console.log('set indices & state');
+		} else {
+			//resume
+			const currDomainIndex = formData.findIndex((domain) => domain.id === lastAnsweredDomainId);
+			const currSubDomainIndex = formData[currDomainIndex]?.subDomains.findIndex(
 				(subDomain: { id: number }) => subDomain.id === lastAnsweredSubdomainId
 			);
+			console.log('resume indices:', {
+				lastAnsweredDomainId,
+				lastAnsweredSubdomainId,
+				currDomainIndex,
+				currSubDomainIndex
+			});
+			(function setToHighestSeenDomainAndSubdomain() {
+				if (
+					isDomainAtLastIndex(currDomainIndex) &&
+					isSubdomainAtLastIndex({
+						domainIdx: currDomainIndex,
+						subDomainIdx: currSubDomainIndex
+					})
+				) {
+					//at end of assessment
+					console.log('At last index of domain and subdomain, putting to max seen');
+					modal.currDomain = currDomainIndex;
+					modal.currSubDomain = currSubDomainIndex;
 
-			(function setToNextSubdomainOrDomain() {
-				if (subDomainIndex + 1 < formData[domainIndex]?.subDomains.length) {
-					currDomain = domainIndex + 1;
-					currSubDomain = subDomainIndex + 1;
-				} else if (domainIndex + 1 < formData.length) {
-					currDomain = domainIndex;
-					currSubDomain = 0;
-					if (currDemgraphicsData) {
-						currDomain = domainIndex + 1;
-					}
+					modal.setDomainAndSubDomain({
+						domainIdx: currDomainIndex,
+						subDomainIdx: currSubDomainIndex
+					});
+				} else if (
+					isSubdomainAtLastIndex({
+						domainIdx: currDomainIndex,
+						subDomainIdx: currSubDomainIndex
+					})
+				) {
+					console.log(
+						`At ${modal.currDomain}|${modal.currSubDomain} last subdomain:${modal.currSubDomain} => next domain`
+					);
+					modal.currDomain = currDomainIndex + 1;
+					modal.currSubDomain = 0;
+
+					modal.setDomainAndSubDomain({
+						domainIdx: currDomainIndex + 1,
+						subDomainIdx: 0
+					});
 				} else {
-					currDomain = domainIndex + 1;
-					currSubDomain = subDomainIndex;
+					console.log(`At ${modal.currDomain}|${modal.currSubDomain}, next subdomain`);
+					modal.setDomainAndSubDomain({
+						domainIdx: currDomainIndex,
+						subDomainIdx: currSubDomainIndex + 1
+					});
 				}
 			})();
 		}
+
 		isLoading = false;
-		modal.handleHighestPositionUpdates({ currDomain, currSubDomain });
-		await tick();
-		handleOnPageVideoIdChange({ currDomain, currSubDomain });
+		modal.handlePositionChange();
 	}
 
-	function handleOnPageVideoIdChange({
-		currDomain,
-		currSubDomain
-	}: {
-		currDomain: number;
-		currSubDomain: number;
-	}) {
-		if (isLoading) return;
-		// logIfDev('currDomain or currSubDomain changed:', currDomain, currSubDomain);
-		switch (currDomain) {
-			// 1-based indexing bc mixing it is fun
-			// actually jk - case 0 is demographics
-			case 1:
-				if (currSubDomain !== 0) return;
-				setOnPageEmbeddedId(videoIdMap.get('onPage-domain-societalAwareness') ?? '');
-				break;
-			case 2:
-				if (currSubDomain !== 0) return;
-				setOnPageEmbeddedId(videoIdMap.get('onPage-domain-systems') ?? '');
-				break;
-			case 3:
-				if (currSubDomain !== 0) return;
-				setOnPageEmbeddedId(videoIdMap.get('onPage-domain-buildingRelationships') ?? '');
-				break;
-			case 4:
-				if (currSubDomain !== 0) return;
-				setOnPageEmbeddedId(videoIdMap.get('onPage-domain-rigorousAndAccessibleContent') ?? '');
-				break;
-			default:
-				break;
-		}
+	function isDomainAtLastIndex(domainIdx: number): boolean {
+		// console.log('isDomainAtLastIndex:', {
+		// 	domainIdx,
+		// 	formDataLength: formData.length,
+		// 	isLast: domainIdx == formData.length - 1
+		// });
+		const lastDomainIdx = formData.length - 1;
+		return domainIdx == lastDomainIdx;
 	}
-	function handleModalVideoIdChange({
-		currDomain,
-		currSubDomain
+
+	function isSubdomainAtLastIndex({
+		domainIdx,
+		subDomainIdx
 	}: {
-		currDomain: number;
-		currSubDomain: number;
-	}) {
-		if (isLoading) return;
-		logIfDev('handleModalVideoIdChange', currDomain, currSubDomain);
-
-		switch (currDomain) {
-			case 0:
-				if (currDomain <= 0 && currSubDomain == 0 && modal.highestSubDomain! <= 0) {
-					modal.setModalEmbeddedId(videoIdMap.get('modal-instructions-preload')!);
-					modal.open();
-				}
-				break;
-			case 1:
-				if (modal.highestSubDomain <= 0) {
-					modal.setModalEmbeddedId(videoIdMap.get('modal-instructions-preload')!);
-					modal.open();
-				}
-				if (currSubDomain == 1 && modal.highestSubDomain <= 1) {
-					modal.setModalEmbeddedId(videoIdMap.get('modal-domain-mentorship')!);
-					modal.open();
-				}
-				if (currSubDomain == 2 && modal.highestSubDomain! <= 2) {
-					modal.setModalEmbeddedId(videoIdMap.get('modal-domain-representation')!);
-					modal.open();
-				}
-				if (currSubDomain == 3 && modal.highestSubDomain! <= 3) {
-					modal.setModalEmbeddedId(videoIdMap.get('modal-domain-summaryInstructions')!);
-					modal.open();
-				}
-				break;
-
-			default:
-				break;
-		}
+		domainIdx: number;
+		subDomainIdx: number;
+	}): boolean {
+		const currDomainSubDomainLastIdx = formData[domainIdx]?.subDomains.length - 1;
+		const isLast = subDomainIdx == currDomainSubDomainLastIdx;
+		console.log('isSubdomainAtLastIndex:', {
+			domainIdx,
+			sudz: subDomainIdx,
+			currDomainSubDomainLastIdx,
+			currSubDomainsLength: formData[domainIdx]?.subDomains.length,
+			isLast
+		});
+		return isLast;
 	}
 
 	function next() {
+		console.log('next indices START:', {
+			currDomain: modal.currDomain,
+			currSubDomain: modal.currSubDomain
+		});
 		if (
-			formData.length == currDomain + 1 &&
-			formData[currDomain].subDomains.length == currSubDomain + 1
+			isDomainAtLastIndex(modal.currDomain) &&
+			isSubdomainAtLastIndex({
+				domainIdx: modal.currDomain,
+				subDomainIdx: modal.currSubDomain
+			})
 		) {
+			//at end of assessment should already be here from applyCurrentProgress
 			return;
+		} else if (
+			(console.log('checking next indices:', {
+				currDomain: modal.currDomain,
+				currSubDomain: modal.currSubDomain
+			}),
+			isSubdomainAtLastIndex({
+				domainIdx: modal.currDomain,
+				subDomainIdx: modal.currSubDomain
+			}))
+		) {
+			console.log('checking next indices 2nd:', {
+				currDomain: modal.currDomain,
+				currSubDomain: modal.currSubDomain
+			}),
+				(modal.currDomain = modal.currDomain + 1);
+			modal.currSubDomain = 0;
+		} else {
+			modal.currSubDomain += 1;
 		}
 
-		if (formData[currDomain].subDomains.length === currSubDomain + 1) {
-			if (formData.length === currDomain + 1) {
-				return;
-			}
-			currDomain += 1;
-			currSubDomain = 0;
-		} else {
-			currSubDomain += 1;
-		}
+		modal.handlePositionChange();
 	}
 
 	function previous() {
-		if (currSubDomain === 0) {
-			if (currDomain === 0) {
-				return;
-			}
-			currDomain -= 1;
-			currSubDomain = formData[currDomain].subDomains.length - 1;
+		console.log('prev indices:', {
+			currDomain: modal.currDomain,
+			currSubDomain: modal.currSubDomain
+		});
+		if (modal.currDomain === 0 && modal.currSubDomain === 0) {
+			// start of assessment
+			return;
+		} else if (modal.currSubDomain === 0) {
+			// start of prior domain
+			modal.setDomainAndSubDomain({
+				domainIdx: modal.currDomain - 1,
+				subDomainIdx: formData[modal.currDomain - 1].subDomains.length - 1
+			});
 		} else {
-			currSubDomain -= 1;
+			// middle of prior
+			modal.setDomainAndSubDomain({
+				domainIdx: modal.currDomain,
+				subDomainIdx: modal.currSubDomain - 1
+			});
 		}
+		modal.handlePositionChange();
 	}
 
 	function openInstructionsModal() {
-		modal.setModalEmbeddedId(videoIdMap.get('modal-instructions-btn') ?? '');
-		modal.open();
+		modal.handleManualVideoSelect('modal-instructions-btn');
 	}
 
 	onMount(async () => {
-		console.log('Mounted assessment page with data:', data);
 		await applyCurrentProgress();
+		// console.log('Mounted assessment page with data:', data);
+		console.log('============MOUNTED==============', {
+			answeredAssessmentQuestionsData,
+			assessmentQuestions
+		});
 
-		logIfDev('All reactive state:', {
-			currDemgraphicsData,
-			lastAnsweredDomain,
-			formData: $state.snapshot(formData),
-			currDomain: $state.snapshot(currDomain),
-			currSubDomain: $state.snapshot(currSubDomain),
-			currOnPageVideoId: $state.snapshot(currOnPageVideoId),
-			isDemographicsQuestions: $state.snapshot(isDemographicsQuestions),
-			currQuestionsProgress: $state.snapshot(currQuestionsProgress),
-			isLastQuestion: $state.snapshot(isLastQuestion),
-			totalQuestions: $state.snapshot(totalQuestions)
+		logIfDev(' REACTIVE STATE:', {
+			// formData: $state.snapshot(formData),
+			// currDomain: $state.snapshot(modal.currDomain),
+			// currSubDomain: $state.snapshot(modal.currSubDomain),
+			currYTModalVideoId: $state.snapshot(modal.currYTModalVideoId),
+			ytModalIsOpen: $state.snapshot(modal.ytModalIsOpen),
+			ytIsManualVid: $state.snapshot(modal.ytIsManualVid),
+			// currModalVideoId: $state.snapshot(modal.currModalVideoId),
+			maxSeenDomain: $state.snapshot(modal.maxSeenDomain),
+			maxSeenSubDomain: $state.snapshot(modal.maxSeenSubDomain)
+			// currQuestionsProgress: $state.snapshot(currQuestionsProgress),
+			// isLastQuestion: $state.snapshot(isLastQuestion),
+			// totalQuestions: $state.snapshot(totalQuestions)
 		});
 	});
+
 	$effect(() => {
-		if (isLoading) return;
-		modal.handleHighestPositionUpdates({ currDomain, currSubDomain });
-		handleModalVideoIdChange({ currDomain, currSubDomain });
-		handleOnPageVideoIdChange({ currDomain, currSubDomain });
+		logIfDev(' REACTIVE STATE CHANGE:', {
+			// formData: $state.snapshot(formData),
+			currDomain: $state.snapshot(modal.currDomain),
+			currSubDomain: $state.snapshot(modal.currSubDomain),
+			currModalVideoId: $state.snapshot(modal.currModalVideoId),
+			isOpen: $state.snapshot(modal.isOpen),
+			maxSeenDomain: $state.snapshot(modal.maxSeenDomain),
+			maxSeenSubDomain: $state.snapshot(modal.maxSeenSubDomain),
+			manualIsOpen: $state.snapshot(modal.manualIsOpen)
+			// currModalVideoId: $state.snapshot(modal.currModalVideoId),
+			// currQuestionsProgress: $state.snapshot(currQuestionsProgress),
+			// isLastQuestion: $state.snapshot(isLastQuestion),
+			// totalQuestions: $state.snapshot(totalQuestions)
+		});
 	});
+
+	$inspect(modal.isOpen);
 </script>
+
+<!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->
 
 <section class="">
 	{#if isLoading}
@@ -228,128 +298,91 @@
 		</div>
 	{:else}
 		<div class="mx-auto max-w-7xl space-y-5 p-2 lg:p-8">
-			<h1 class="text-3xl">Culturally Responsive teaching Progress Monitoring Assessment</h1>
-			{#if isDemographicsQuestions}
-				<Card class="p-4 shadow-md">
-					{formData[currDomain].subDomains[currSubDomain].description}
-				</Card>
-			{:else}
-				<!-- TODO: PHASE 2 -->
-				<!-- <Card class="p-4 shadow-md">
-				<div class="flex grow flex-col gap-2 text-sm font-normal">
-					<div class="flex grow flex-col gap-2">
-						<div class="flex justify-between">
-							<p>Assessment Progress</p>
-							<p>{Math.round(0.5 * 100)}%</p>
+			<div class="grid grid-cols-4 gap-4 py-4">
+				{#each domains as domain, index (index)}
+					<AssessmentDomainProgressCard
+						posIndex={index}
+						currDomain={modal.currDomain}
+						name={domain.name}
+						imgUrl={domain.imgUrl}
+					/>
+				{/each}
+			</div>
+			<div class=" grid grid-cols-2 gap-6">
+				<div class="left col-span-1 flex flex-col gap-4 space-y-3">
+					{#if modal.currSubDomain === 0}
+						<div class="aspect-w-16 aspect-h-9 overflow-hidden rounded-3xl">
+							{@html `<iframe class="h-[315px] w-full" src="https://www.youtube.com/embed/${currOnPageVideoId}?rel=0&autoplay=&controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`}
 						</div>
-					</div>
-					<Progress barBgColor="bg-primary" class="h-[9px]" value={0.5 * 100} />
-				</div>
-			</Card> -->
-				<!-- TODO: PHASE 2 -->
-				<div class="grid grid-cols-4 gap-4 py-4">
-					{#each domains as domain, index (index)}
-						<!-- +1 bc demographics not included -->
-						<AssessmentDomainProgressCard
-							posIndex={index + 1}
-							{currDomain}
-							name={domain.name}
-							imgUrl={domain.imgUrl}
-						/>
-					{/each}
-				</div>
-				<div class=" grid grid-cols-2 gap-6">
-					<div class="left col-span-1 flex flex-col gap-4 space-y-3">
-						{#if currSubDomain === 0}
+					{/if}
+					{#if formData?.[modal.currDomain]?.subDomains?.[modal.currSubDomain]?.name}
+						<div class="flex items-center gap-4">
+							<p class="text-2xl font-bold">
+								{formData[modal.currDomain].subDomains[modal.currSubDomain].name}
+							</p>
+							<p class="text-primary rounded-full bg-[#F9F5D8] p-2 py-1 text-sm font-normal">
+								{formData[modal.currDomain].subDomains[modal.currSubDomain].questions?.length} descriptors
+							</p>
+						</div>
+						{#if modal.currDomain === 0 && modal.currSubDomain === 0}
 							<div class="aspect-w-16 aspect-h-9 overflow-hidden rounded-3xl">
-								{@html `<iframe class="h-[315px] w-full" src="https://www.youtube.com/embed/${currOnPageVideoId}?rel=0&autoplay=&controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`}
+								{@html `<iframe class="h-[315px] w-full" src="https://www.youtube.com/embed/${videoIdMap.get('onPage-subDomain-awarenessIntro')}?rel=0&autoplay=0&controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`}
 							</div>
 						{/if}
-						{#if formData?.[currDomain]?.subDomains?.[currSubDomain]?.name}
-							<div class="flex items-center gap-4">
-								<p class="text-2xl font-bold">
-									{formData[currDomain].subDomains[currSubDomain].name}
+					{/if}
+					<div class="rounded-md bg-[#EFF2FE]/50 p-4">
+						<p class=" mb-4 text-lg font-bold">Read the indicator summary below.</p>
+						<div class="text-basetext-[#334155]">
+							{#if formData?.[modal.currDomain]?.subDomains?.[modal.currSubDomain] && formData?.[modal.currDomain]?.subDomains?.[modal.currSubDomain]?.description}
+								<p class="">
+									{formData?.[modal.currDomain]?.subDomains?.[modal.currSubDomain]?.description!}
 								</p>
-								<p class="text-primary rounded-full bg-[#F9F5D8] p-2 py-1 text-sm font-normal">
-									{formData[currDomain].subDomains[currSubDomain].questions?.length} descriptors
-								</p>
-							</div>
-							{#if currDomain === 1 && currSubDomain === 0}
-								<div class="aspect-w-16 aspect-h-9 overflow-hidden rounded-3xl">
-									{@html `<iframe class="h-[315px] w-full" src="https://www.youtube.com/embed/${videoIdMap.get('onPage-subDomain-awarenessIntro')}?rel=0&autoplay=0&controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`}
-								</div>
 							{/if}
-						{/if}
-						<div class="rounded-md bg-[#EFF2FE]/50 p-4">
-							<p class=" mb-4 text-lg font-bold">Read the indicator summary below.</p>
-							<div class="text-basetext-[#334155]">
-								{#if formData?.[currDomain]?.subDomains?.[currSubDomain] && formData?.[currDomain]?.subDomains?.[currSubDomain]?.description}
-									<p class="">
-										{formData?.[currDomain]?.subDomains?.[currSubDomain]?.description!}
-									</p>
-								{/if}
-							</div>
 						</div>
-					</div>
-					<div class="">
-						<div class="prose space-y-3 p-4">
-							<div class="mb-4 flex items-center gap-4">
-								<p class="text-lg font-bold">Instructions</p>
-								<button
-									type="button"
-									onclick={() => openInstructionsModal()}
-									class={` bg-primary  text-primary-foreground hover:bg-primary/90 text inline-flex   h-10 w-fit items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-6 [&_svg]:shrink-0`}
-								>
-									<Video class="mr-2 h-16 w-16" />
-									<p>Instructions</p>
-								</button>
-							</div>
-							<p>
-								Now, considering the information you read in the indicator summary, determine if
-								each of the descriptors below are represented at your school.
-							</p>
-							<p>
-								<span class="font-bold">Note: </span> Descriptor scoring is not a measurement of perfection.
-							</p>
-							<p>
-								If a descriptor is an expectation regularly expressed and supported by
-								administration, select <span class="font-bold">Yes.</span> Otherwise, select
-								<span class="font-bold">No</span>.
-							</p>
-							<p>Select <span class="font-bold">Next</span> after answering each descriptor.</p>
-						</div>
-						<DemographicsAndAssessmentForm
-							bind:demoAndAssessmentformData={formData}
-							{currDomain}
-							{currSubDomain}
-							{assessmentToken}
-							handleNext={next}
-							handlePrev={previous}
-							{isDemographicsQuestions}
-							{isLastQuestion}
-							formUpdatedAssessmentProgress={() => applyCurrentProgress()}
-							bind:formLastAnsweredQuestionIdInDomain={lastAnsweredDomain}
-							bind:formLastAnsweredQuestionIdInSubdomain={lastAnsweredSubdomainId}
-						/>
 					</div>
 				</div>
-			{/if}
-			{#if isDemographicsQuestions}
-				<DemographicsAndAssessmentForm
-					bind:demoAndAssessmentformData={formData}
-					{currDomain}
-					{currSubDomain}
-					{assessmentToken}
-					handleNext={next}
-					handlePrev={previous}
-					{isDemographicsQuestions}
-					{isLastQuestion}
-					formUpdatedAssessmentProgress={() => applyCurrentProgress()}
-					bind:formLastAnsweredQuestionIdInDomain={lastAnsweredDomain}
-					bind:formLastAnsweredQuestionIdInSubdomain={lastAnsweredSubdomainId}
-				/>
-			{/if}
-			<!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->
+				<div class="">
+					<div class="prose space-y-3 p-4">
+						<div class="mb-4 flex items-center gap-4">
+							<p class="text-lg font-bold">Instructions</p>
+							<button
+								type="button"
+								onclick={() => openInstructionsModal()}
+								class={` bg-primary  text-primary-foreground hover:bg-primary/90 text inline-flex   h-10 w-fit items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-6 [&_svg]:shrink-0`}
+							>
+								<Video class="mr-2 h-16 w-16" />
+								<p>Instructions</p>
+							</button>
+						</div>
+						<p>
+							Now, considering the information you read in the indicator summary, determine if each
+							of the descriptors below are represented at your school.
+						</p>
+						<p>
+							<span class="font-bold">Note: </span> Descriptor scoring is not a measurement of perfection.
+						</p>
+						<p>
+							If a descriptor is an expectation regularly expressed and supported by administration,
+							select <span class="font-bold">Yes.</span> Otherwise, select
+							<span class="font-bold">No</span>.
+						</p>
+						<p>Select <span class="font-bold">Next</span> after answering each descriptor.</p>
+					</div>
+					<AssessmentQuestionsForm
+						bind:assessmentformData={formData}
+						currDomain={modal.currDomain}
+						currSubDomain={modal.currSubDomain}
+						{assessmentId}
+						handleNext={next}
+						handlePrev={previous}
+						isFirstQuestion={modal.currDomain === 0 && modal.currSubDomain === 0}
+						{isLastQuestion}
+						formUpdatedAssessmentProgress={() => applyCurrentProgress()}
+						bind:formLastAnsweredQuestionIdInDomain={lastAnsweredDomainId}
+						bind:formLastAnsweredQuestionIdInSubdomain={lastAnsweredSubdomainId}
+					/>
+				</div>
+			</div>
 		</div>
 	{/if}
 </section>

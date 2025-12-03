@@ -24,13 +24,8 @@
 		{Math.round((school.pointsTotal / school.questionsTotal) * 100) || 0}%
 	</Table.Cell>
 	<Table.Cell class="text-right">
-		<Button
-			href={isNested
-				? `${page.url.pathname}/schools/${school.id}`
-				: `${page.url.pathname}/${school.id}`}
-			class=""
-		>
-			View School
-		</Button>
+		{#if isNested}
+			<Button href={`${page.url.pathname}/schools/${school.id}`} class="">View Schoolz</Button>
+		{/if}
 	</Table.Cell>
 </Table.Row>

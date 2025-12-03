@@ -8,7 +8,6 @@
 	import { superForm } from 'sveltekit-superforms';
 	import SuperDebug from 'sveltekit-superforms';
 
-	import { inviteNewUserSchema } from '$lib/schema.js';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { dev } from '$app/environment';
 	import { applyAction, deserialize } from '$app/forms';
@@ -16,11 +15,12 @@
 	import * as Dialog from '../ui/dialog';
 	import { Button } from '../ui/button';
 	import { goto, invalidateAll } from '$app/navigation';
+	import { inviteNewCoAdminUserSchema } from '$lib/schema';
 
 	let { page, data } = $props();
 
 	const form = superForm(data.form, {
-		validators: zodClient(inviteNewUserSchema),
+		validators: zodClient(inviteNewCoAdminUserSchema),
 		onSubmit: () => {
 			console.log('onSubmit');
 		},

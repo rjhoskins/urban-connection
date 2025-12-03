@@ -1,5 +1,4 @@
 <script lang="ts">
-	/** @type {{ data: import('./$types').PageData, form: import('./$types').ActionData }} */
 	import { Pencil, X } from 'lucide-svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Form from '$lib/components/ui/form/index.js';
@@ -16,7 +15,7 @@
 	import { deserialize } from '$app/forms';
 	import toast from 'svelte-french-toast';
 
-	let { formisEditing = $bindable(), data, token, page, canEditForm } = $props();
+	let { formisEditing = $bindable(), data, unusedAdminUserInvite, page, canEditForm } = $props();
 
 	const thisForm = superForm(
 		defaults(data.emailForm.data || {}, zodClient(schoolAdminUserInviteHTMLEmailTemplateSchema)),
@@ -226,7 +225,7 @@
 		<!-- END editor -->
 	</Card.Content>
 {:else}
-	<HtmlEmailTextPreview data={$emailForm} {token} />
+	<HtmlEmailTextPreview data={$emailForm} {unusedAdminUserInvite} disableLink={!canEditForm} />
 {/if}
 
 <!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->

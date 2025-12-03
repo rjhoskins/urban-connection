@@ -89,7 +89,6 @@ export const actions: Actions = {
 		}
 
 		try {
-			const userId = generateUserId();
 			const passwordHash = await hash(form.data.password, {
 				// recommended minimum parameters
 				memoryCost: 19456,
@@ -115,10 +114,3 @@ export const actions: Actions = {
 		return redirect(302, '/');
 	}
 };
-
-function generateUserId() {
-	// ID with 120 bits of entropy, or about the same as UUID v4.
-	const bytes = crypto.getRandomValues(new Uint8Array(15));
-	const id = encodeBase32LowerCase(bytes);
-	return id;
-}

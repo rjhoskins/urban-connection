@@ -1,4 +1,4 @@
-import { number, z, ZodIssueCode } from 'zod';
+import { z, ZodIssueCode } from 'zod';
 import { districts } from './data/data';
 // keep for register form until deprecated
 export const createNewUserOrLoginSchema = z.object({
@@ -48,15 +48,42 @@ export const createNewUserFromInviteSchema = z
 		message: "Passwords don't match",
 		path: ['confirm'] // path of error);
 	});
+export const registerExistingUserFromInviteSchema = z
+	.object({
+		// name: z.string(),
+		email: z.string(),
+		// .email({ message: 'invalid email' }),
+		adminInviteId: z.string().length(26, { message: 'invalid invite id' }),
+		password: z
+			.string()
+			.nonempty({ message: 'password is required' })
+			.min(4, { message: 'password should be at least four characters' })
+			.max(50, { message: 'password should be less than 50 characters' })
+			.max(50, { message: 'name should be less than 50 characters' }),
+		confirm: z
+			.string()
+			.nonempty({ message: 'password is required' })
+			.min(4, { message: 'password should be at least four characters' })
+			.max(50, { message: 'password should be less than 50 characters' })
+	})
+	.refine((data) => data.password === data.confirm, {
+		message: "Passwords don't match",
+		path: ['confirm'] // path of error);
+	});
 
 export const newUserTokenSchema = z.object({
 	name: z.string(),
 	inviteId: z.string(),
 	email: z.string().email({ message: 'invalid token' })
 });
-export const inviteNewUserSchema = z.object({
+export const inviteNewCoAdminUserSchema = z.object({
 	name: z.string(),
-	inviteId: z.string(),
+	email: z.string().email({ message: 'invalid email' }),
+	phone: z.string().optional()
+});
+export const registerNewAdminUserSchema = z.object({
+	name: z.string(),
+	adminInviteId: z.string(),
 	email: z.string().email({ message: 'invalid email' }),
 	phone: z.string().optional()
 });
@@ -88,7 +115,7 @@ export const createSchoolSchema = z
 		// .nonempty({ message: 'school name is required' })
 		// .min(4, { message: 'school name should be at least four characters' })
 		// .max(50, { message: 'school name should be less than 50 characters' }),
-		districtId: z.number().min(1, { message: 'district is required' }).default(0), //TODO IN OTHER SCHEMASS WHEN DISTRICTS ARE IMPLEMENTED
+		districtId: z.string(),
 		adminName: z
 			.string()
 			.nonempty({ message: 'admin name is required' })
@@ -174,9 +201,9 @@ export type UserInviteHTMLEmailTemplateType = z.infer<
 export const themes = ['light', 'dark'] as const;
 export const languages = ['en', 'es', 'fr'] as const;
 export const errorPageList = [
-	"I promise not to peek at assessments I'm not supposed to see",
-	'I understand that some assessments are double top secret',
-	"I'll be patient and wait for assessments I'm authorized to take"
+	'I expect that something will go wrong exactly when I need it most',
+	'I’ve lost progress online just when I thought I was finished',
+	'I know that links, buttons, or pages can fail at the worst possible moment'
 ] as const;
 export const allergies = ['peanuts', 'dairy', 'gluten', 'soy', 'shellfish'] as const;
 export const colors = {
@@ -204,7 +231,6 @@ export const schema = z.object({
 type Color = keyof typeof colors;
 
 export const adminInviteSchema = z.object({
-	id: z.string(),
 	name: z.string().nonempty(),
 	email: z.string().email(),
 	isSent: z.boolean().default(false).optional(),
@@ -217,12 +243,11 @@ export const adminInviteSchema = z.object({
 		.default('school_admin')
 		.optional(),
 	inviteType: z.enum(['school', 'district']).default('school'),
-	schoolId: z.number().nullable().optional(),
-	districtId: z.number().nullable()
+	schoolId: z.string().nullable().optional(),
+	districtId: z.string().nullable()
 });
 
 export const createUserSchema = z.object({
-	id: z.string(),
 	username: z
 		.string()
 		// .email({ message: 'invalid email, should be your school email' })
@@ -240,7 +265,8 @@ export const createUserSchema = z.object({
 export const AssessmentTokenInviteSchema = z.object({
 	sentBy: z.string().min(1, 'must be a valid user'),
 	schoolId: z.string().min(1, 'School ID is required'),
-	code: z.string().length(6, 'Assessment code must be exactly 6 characters long')
+	code: z.string().length(6, 'Assessment code must be exactly 6 characters long'),
+	participantEmail: z.string().optional()
 });
 
 export type AdminInvite = z.infer<typeof adminInviteSchema>;

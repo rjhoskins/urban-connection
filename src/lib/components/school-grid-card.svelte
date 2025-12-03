@@ -12,8 +12,9 @@
 	const isNested = page.url.pathname.includes('districts');
 </script>
 
+<!-- <pre>{JSON.stringify(page, null, 2)}</pre> -->
 <Card.Root
-	class="flex flex-col gap-6 px-4 py-2.5 transition-shadow duration-300 ease-in-out hover:shadow-lg"
+	class="flex max-w-1/2 flex-col gap-6 px-4 py-2.5 transition-shadow duration-300 ease-in-out hover:shadow-lg"
 >
 	<div class="top flex justify-between">
 		<div class="left flex flex-col justify-between">
@@ -24,9 +25,9 @@
 				{/if}
 			</div>
 		</div>
-		<Button href={isNested ? `${page.url.pathname}/schools/${id}` : `${page.url.pathname}/${id}`}
-			>View School</Button
-		>
+		{#if isNested}
+			<Button href={`${page.url.pathname}/schools/${id}`}>View School</Button>
+		{/if}
 	</div>
 
 	<div class="bottom flex grow flex-col gap-2">

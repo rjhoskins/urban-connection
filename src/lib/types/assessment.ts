@@ -39,29 +39,12 @@ export const createAssessmentDemographicsAndAssessmentResponseFormSchema = z
 	})
 	.catchall(z.string().regex(/^[01]?$/, "Responses must be '0', '1', or an empty string"));
 
-export const createMixedBagAssessmentAndDemographics = z.object({
-	isDemographics: z.coerce.boolean(),
-	// yearsTeaching: z.string().regex(/^\d+$/, 'yearsTeaching must be a numeric string'),
-	email: z.string().email('Please enter a valid email.'),
-	name: z.string().nonempty('Name is required'),
-	yearsTeaching: z.coerce.number().min(1, 'Years teaching must be non-zero and positive'),
-	schoolId: z.coerce.number(),
-	educationLevel: z.string().nonempty('Subject taught is required'),
-	assessmentToken: z.string({
-		message: 'Assessment token seems to be  missing, try re-opening the assessment link'
-	})
-});
-
-export type CreateMixedBagAssessmentAndDemographicsInput = z.infer<
-	typeof createMixedBagAssessmentAndDemographics
->;
-
 const createAssessmentQuestionResponseSchema = z
 	.object({
-		assessmentId: z.coerce.number(),
 		questionId: z.coerce.number(),
-		isValidSubdomainGroup: z.boolean().default(false),
-		response: z.union([z.literal(0), z.literal(1), z.null()]).default(null)
+		assessmentId: z.coerce.number(),
+		response: z.union([z.literal(0), z.literal(1), z.null()]).default(null),
+		isValidSubdomainGroup: z.boolean().default(false)
 	})
 	.array();
 

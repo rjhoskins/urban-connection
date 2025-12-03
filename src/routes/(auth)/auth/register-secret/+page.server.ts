@@ -9,7 +9,6 @@ import type { Actions, PageServerLoad } from '../$types';
 import { setFlash } from 'sveltekit-flash-message/server';
 import { checkRegisteredUserExists, simpleRegisterToBeDEPRICATED } from '$lib/server/queries';
 import { dev } from '$app/environment';
-import { generateUserId } from '$lib/utils';
 
 export const load: PageServerLoad = async ({ url }) => {
 	if (!dev) return redirect(302, '/');
@@ -54,15 +53,17 @@ export const actions: Actions = {
 
 		try {
 			const newUser = await simpleRegisterToBeDEPRICATED({
-				id: generateUserId(),
-				username: username,
+				username,
 				passwordHash
 			});
 			// Create session and set cookie
 			const sessionToken = auth.generateSessionToken();
+			console.log('USER => ', newUser);
 			const session = await auth.createSession(sessionToken, newUser.id);
+			console.log('session CREATED okay => ', session);
 			if (!session?.expiresAt) throw new Error('Session creation failed');
 			auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
+			console.log('Session created and cookie set');
 		} catch (error) {
 			const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
 			setFlash({ type: 'error', message: errorMessage }, event.cookies);

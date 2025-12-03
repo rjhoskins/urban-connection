@@ -14,16 +14,16 @@ import {
 	assessmentDemographics,
 	assessmentQuestionsResponses,
 	assessments,
-	assessmentStatusEnum
+	assessmentStatusEnum,
+	assessmentInvites
 } from '$lib/server/db/schema';
 import type { PostgresJsQueryResultHKT } from 'drizzle-orm/postgres-js';
 import type { PgEnum, PgTransaction } from 'drizzle-orm/pg-core';
 import db from './db';
 import type { AdminInvite, CreateUser, UserInviteHTMLEmailTemplateType } from '$lib/schema';
-import { transformAssessmentData } from '$lib/utils';
-import type { CreateQuestionResponseInput } from '$lib/types/assessment';
-import { scaleQuantile } from 'd3';
-import type district from './db/schema/districts';
+import { logIfDev, transformAssessmentData } from '$lib/utils';
+import { admin } from 'googleapis/build/src/apis/admin';
+import district from './db/schema/districts';
 
 export async function simpleRegisterToBeDEPRICATED(
 	{
@@ -139,7 +139,7 @@ export async function updateUserWithPassword(
 	return updatedUser || null;
 }
 
-export async function updateRegisterInviteWithInviteeAndMarkUsed(
+export async function updateAdminInviteWithInviteeAndMarkUsed(
 	{
 		userEmail,
 		inviteeId
@@ -151,8 +151,8 @@ export async function updateRegisterInviteWithInviteeAndMarkUsed(
 ): Promise<{
 	id: string;
 	inviteType: 'school' | 'district' | null;
-	schoolId: number | null;
-	districtId: number | null;
+	schoolId: string | null;
+	districtId: string | null;
 }> {
 	const queryBuilder = trx ? trx.update(adminUserInvites) : db.update(adminUserInvites);
 	const [inviteRes] = await queryBuilder
@@ -164,6 +164,7 @@ export async function updateRegisterInviteWithInviteeAndMarkUsed(
 			schoolId: adminUserInvites.schoolId,
 			districtId: adminUserInvites.districtId
 		});
+	logIfDev('updateAdminInviteWithInviteeAndMarkUsed inviteRes => ', inviteRes);
 	return inviteRes || null;
 }
 
@@ -173,10 +174,10 @@ export async function createDistrictAdmin(
 		districtId
 	}: {
 		userId: string;
-		districtId: number;
+		districtId: string;
 	},
 	trx?: PgTransaction<PostgresJsQueryResultHKT, any, any>
-): Promise<{ id: number }> {
+): Promise<{ id: string } | null> {
 	const queryBuilder = trx ? trx.insert(districtAdmins) : db.insert(districtAdmins);
 	const [result] = await queryBuilder
 		.values({ userId, districtId: districtId })
@@ -190,7 +191,7 @@ export async function createSchoolAdmin(
 		schoolId
 	}: {
 		userId: string;
-		schoolId: number;
+		schoolId: string;
 	},
 	trx?: PgTransaction<PostgresJsQueryResultHKT, any, any>
 ) {
@@ -200,23 +201,42 @@ export async function createSchoolAdmin(
 		.returning({ id: schoolAdmins.id });
 	return result || null;
 }
-export async function updateSchoolAdminWithToken(
-	{
-		userId,
-		token
-	}: {
-		userId: string;
-		token: string;
-	},
-	trx?: PgTransaction<PostgresJsQueryResultHKT, any, any>
-) {
-	const queryBuilder = trx ? trx.update(schoolAdmins) : db.update(schoolAdmins);
-	const [result] = await queryBuilder
-		.set({ assessmentToken: token })
-		.where(eq(schoolAdmins.userId, userId))
-		.returning({ id: schoolAdmins.id });
-	return result || null;
-}
+
+const adminInviteReturningSelect = {
+	adminInviteId: adminUserInvites.id,
+	name: adminUserInvites.name,
+	email: adminUserInvites.email
+};
+
+export const getUnusedAdminInviteById = async ({ inviteId }: { inviteId: string }) => {
+	const [res] = await db
+		.select({
+			...adminInviteReturningSelect,
+			schoolId: adminUserInvites.schoolId,
+			districtId: adminUserInvites.districtId
+		})
+		.from(adminUserInvites)
+		.where(and(eq(adminUserInvites.id, inviteId), eq(adminUserInvites.isUsed, false)));
+	logIfDev('getUnusedAdminInviteById res => ', res);
+	return res || null;
+};
+// export async function updateSchoolAdminWithToken(
+// 	{
+// 		userId,
+// 		token
+// 	}: {
+// 		userId: string;
+// 		token: string;
+// 	},
+// 	trx?: PgTransaction<PostgresJsQueryResultHKT, any, any>
+// ) {
+// 	const queryBuilder = trx ? trx.update(schoolAdmins) : db.update(schoolAdmins);
+// 	const [result] = await queryBuilder
+// 		.set({ assessmentToken: token })
+// 		.where(eq(schoolAdmins.userId, userId))
+// 		.returning({ id: schoolAdmins.id });
+// 	return result || null;
+// }
 
 export async function createSchool(
 	{
@@ -225,11 +245,11 @@ export async function createSchool(
 		createdBy
 	}: {
 		name: string;
-		districtId: number;
+		districtId: string;
 		createdBy: string;
 	},
 	trx?: PgTransaction<PostgresJsQueryResultHKT, any, any>
-): Promise<{ id: number }> {
+): Promise<{ id: string } | null> {
 	const queryBuilder = trx ? trx.insert(schools) : db.insert(schools);
 	const [result] = await queryBuilder
 		.values({ name, districtId, createdBy })
@@ -313,8 +333,8 @@ export async function createAdminUserInvite(
 ): Promise<{
 	id: string;
 	inviteType: 'school' | 'district' | null;
-	schoolId: number | null;
-	districtId: number | null;
+	schoolId: string | null;
+	districtId: string | null;
 }> {
 	const queryBuilder = trx ? trx.insert(adminUserInvites) : db.insert(adminUserInvites);
 	const [result] = await queryBuilder.values({ ...inviteData }).returning({
@@ -327,13 +347,12 @@ export async function createAdminUserInvite(
 }
 
 export async function createNewUserWithDetails(
-	{ id, username, name, role = 'school_admin', phone }: CreateUser,
+	{ username, name, role = 'school_admin', phone }: CreateUser,
 	trx?: PgTransaction<PostgresJsQueryResultHKT, any, any>
-): Promise<{ id: string }> {
+): Promise<{ id: string } | null> {
 	const queryBuilder = trx ? trx.insert(users) : db.insert(users);
 	const [newUser] = await queryBuilder
 		.values({
-			id,
 			username,
 			name,
 			role,
@@ -351,7 +370,7 @@ export async function getDistrictsWithSchools() {
 			schools: sql`COALESCE(
 				json_agg(json_build_object('id', ${schools.id}, 'name', ${schools.name})) 
 			  FILTER (WHERE ${schools.id} IS NOT NULL), 
-			  '[]'
+			  '[]'::json
 		  ) `
 		})
 		.from(districts)
@@ -361,58 +380,116 @@ export async function getDistrictsWithSchools() {
 	return districtsRes || null;
 }
 
-export async function getDistrictWithSchools(districtId: number) {
-	const [districtsRes] = await db
-		.select({
-			id: districts.id,
-			name: districts.name,
-			schools: sql`COALESCE(
-				json_agg(json_build_object('id', ${schools.id}, 'name', ${schools.name})) 
-			  FILTER (WHERE ${schools.id} IS NOT NULL), 
-			  '[]'
-		  ) `
-		})
-		.from(districts)
-		.leftJoin(schools, eq(schools.districtId, districts.id))
-		.groupBy(districts.id)
-		.where(eq(districts.id, districtId));
-	if (dev) console.log(districtsRes);
-	return districtsRes || null;
+export async function getDistrictWithSchools(districtId: string) {
+	const [distinctWithSchoolsRes] = await db.query.districts.findMany({
+		where: eq(districts.id, districtId),
+		with: {
+			schools: true
+		}
+	});
+	return distinctWithSchoolsRes || null;
 }
 
-export async function getDistrictAdmin(districtId: number) {
-	const [res] = await db
-		.select({
-			adminName: users.name,
-			adminPhone: users.phone,
-			adminEmail: users.username
-		})
-		.from(districtAdmins)
-		.innerJoin(users, eq(districtAdmins.userId, users.id))
-		.where(eq(districtAdmins.districtId, districtId));
+export async function getDistrictAdmin(districtId: string) {
+	const res = await db.query.districtAdmins.findFirst({
+		where: eq(districtAdmins.districtId, districtId),
+		columns: { id: true },
+		with: {
+			user: { columns: { name: true, phone: true, username: true } }
+		}
+	});
+	if (dev) console.log('getSchoolByIdWithAdmins res => ', res);
+	return res || null;
+	// const [res] = await db
+	// 	.select({
+	// 		name: users.name,
+	// 		user:
+	// 		phone: users.phone,
+	// 		email: users.username
+	// 	})
+	// 	.from(districtAdmins)
+	// 	.innerJoin(users, eq(districtAdmins.userId, users.id))
+	// 	.where(eq(districtAdmins.districtId, districtId));
 
-	if (dev) console.log('getDisctrictAdmin res => ', res);
+	// if (dev) console.log('getDisctrictAdmin res => ', res);
+	// return res || null;
+}
+
+export async function getSchoolById({ id }: { id: string }): Promise<{ schoolId: string } | null> {
+	const [res] = await db.select({ schoolId: schools.id }).from(schools).where(eq(schools.id, id));
+	if (dev) console.log('getSchoolById res => ', res);
 	return res || null;
 }
 
-export async function getSchoolById(id: number): Promise<number | null> {
-	const [res] = await db.select({ schoolId: schools.id }).from(schools).where(eq(schools.id, id));
+export async function getSchoolDataById({ id }: { id: string }): Promise<
+	| {
+			schoolId: string;
+			schoolName: string;
+			admins: { id: string; name: string; email: string; phone: string }[];
+	  }[]
+	| null
+> {
+	const res = await db
+		.select({
+			schoolId: schools.id,
+			schoolName: schools.name,
+			paid: isNotNull(schools.stripePaymentId),
+			admins: sql`COALESCE(
+			json_agg(json_build_object('id', ${users.id}, 'name', ${users.name}, 'email', ${users.username}, 'phone', ${users.phone})) 
+		  FILTER (WHERE ${users.id} IS NOT NULL), 
+		  '[]'::json
+	  ) `
+		})
+		.from(schools)
+		.where(eq(schools.id, id))
+		.innerJoin(schoolAdmins, eq(schoolAdmins.schoolId, schools.id))
+		.innerJoin(users, eq(schoolAdmins.userId, users.id))
+		.groupBy(schools.id);
 
 	if (dev) console.log('getSchoolById res => ', res);
-	return res?.schoolId || null;
+	return res || null;
 }
-export async function getSchoolIDForSchoolAdmin(userId: string): Promise<number | null> {
+export async function getSchoolByIdWithAdmins({ id }: { id: string }): Promise<
+	any[] | null
+	// {
+	// id: string;
+	// name: string;
+	// admins: { id: string; name: string; phone: string}[];
+	// assessments: { id: string; status: typeof assessmentStatusEnum.enumValues[number]}[];
+	//   }[]
+
+	// | null
+> {
+	const res = await db.query.schools.findFirst({
+		where: eq(schools.id, id),
+		columns: { id: true, name: true, districtId: true },
+		extras: { isPaid: isNotNull(schools.stripePaymentId).as('is_paid') },
+		with: {
+			admins: {
+				columns: { id: true },
+				with: { user: { columns: { name: true, phone: true, username: true } } }
+			},
+			assessments: { columns: { id: true, status: true } }
+		}
+	});
+	if (dev) console.log('getSchoolByIdWithAdmins res => ', res);
+	return res || null;
+}
+
+export async function getSchoolByAdminId({ userId }: { userId: string }) {
 	const [res] = await db
-		.select({ schoolId: schools.id })
+		.select({
+			id: schools.id
+		})
 		.from(schools)
 		.innerJoin(schoolAdmins, eq(schoolAdmins.schoolId, schools.id))
+		.innerJoin(users, eq(schoolAdmins.userId, users.id))
 		.where(eq(schoolAdmins.userId, userId));
-
-	if (dev) console.log('getSchoolIDForSchoolAdmin res => ', res);
-	return res?.schoolId || null;
+	logIfDev('getSchoolByAdminId res => ', res);
+	return res || null;
 }
 
-export async function getSchoolsForSuperAdmin(): Promise<{ id: number; name: string }[]> {
+export async function getSchoolsForSuperAdmin(): Promise<{ id: string; name: string }[]> {
 	const res = await db.select({ id: schools.id, name: schools.name }).from(schools);
 
 	if (dev) console.log('getSchoolsForSuperAdmin res => ', res);
@@ -420,8 +497,8 @@ export async function getSchoolsForSuperAdmin(): Promise<{ id: number; name: str
 }
 
 export async function getSchoolMemberAssessmentTotalsForSchoolAndDistrictAdminBySchool(
-	schoolId: number
-): Promise<{ id: number; pointsTotal: number; questionsTotal: number }[]> {
+	schoolId: string
+): Promise<{ id: string; pointsTotal: number; questionsTotal: number }[]> {
 	const res = await db
 		.select({
 			id: assessments.id,
@@ -452,7 +529,7 @@ export async function getSchoolMemberAssessmentTotalsForSchoolAndDistrictAdminBy
 }
 
 export async function getDistrictAssessmentTotals(): Promise<
-	{ id: number; pointsTotal: number; questionsTotal: number }[]
+	{ id: string; pointsTotal: number; questionsTotal: number }[]
 > {
 	const res = await db
 		.select({
@@ -484,9 +561,50 @@ export async function getDistrictAssessmentTotals(): Promise<
 	return res || null;
 }
 
+export async function getSchoolMemberAssessmentTotalsForSchoolBySchoolId(id: string): Promise<
+	| {
+			id: string;
+			name: string;
+			assessmentCount: number;
+			pointsTotal: number;
+			questionsTotal: number;
+			completedAt: string;
+			status: (typeof assessmentStatusEnum.enumValues)[number];
+	  }[]
+	| null
+> {
+	const res = await db
+		.select({
+			id: assessments.id,
+			name: assessments.participantName,
+			assessmentCount: sql`count(distinct ${assessments.id})`.mapWith(Number),
+			pointsTotal: sql`sum(case when ${assessmentQuestionsResponses.isValidSubdomainGroup} = true
+				 then ${assessmentQuestionsResponses.response} else 0 end)`.mapWith(Number),
+			questionsTotal: sql`count(${assessmentQuestionsResponses.response})`.mapWith(Number),
+			completedAt: assessments.updatedAt,
+			status: assessments.status
+		})
+		.from(assessments)
+		.leftJoin(schools, eq(schools.id, assessments.schoolId))
+		.where(eq(assessments.schoolId, id))
+		.leftJoin(
+			assessmentQuestionsResponses,
+			eq(assessments.id, assessmentQuestionsResponses.assessmentId)
+		)
+		.leftJoin(
+			assessmentQuestions,
+			eq(assessmentQuestions.id, assessmentQuestionsResponses.questionId)
+		)
+		.groupBy(assessments.id, schools.id)
+		.orderBy(assessments.createdAt);
+
+	logIfDev('getSchoolMemberAssessmentTotalsForSchoolBySchoolId res => ', res);
+	return res || null;
+}
+
 export async function getSchoolMemberAssessmentTotalsForSchoolAndDistrictAdminByDistrict(
-	districtId: number
-): Promise<{ id: number; name: string; pointsTotal: number; questionsTotal: number }[]> {
+	districtId: string
+): Promise<{ id: string; name: string; pointsTotal: number; questionsTotal: number }[]> {
 	const res = await db
 		.select({
 			id: schools.id,
@@ -517,8 +635,8 @@ export async function getSchoolMemberAssessmentTotalsForSchoolAndDistrictAdminBy
 }
 
 export async function getSchoolMemberAssessmentTotalsForSuperUser(
-	schoolId: number
-): Promise<{ id: number; name: string; pointsTotal: number; questionsTotal: number }[]> {
+	schoolId: string
+): Promise<{ id: string; name: string; pointsTotal: number; questionsTotal: number }[]> {
 	const res = await db
 		.select({
 			id: assessments.id,
@@ -549,7 +667,7 @@ export async function getSchoolMemberAssessmentTotalsForSuperUser(
 }
 
 export async function getSchoolsWithAssessmentCountAndScoreData(): Promise<
-	{ id: number; name: string; assessmentCount: number }[]
+	{ id: string; name: string; assessmentCount: number }[]
 > {
 	const res = db
 		.select({
@@ -580,7 +698,7 @@ export async function getSchoolsWithAssessmentCountAndScoreData(): Promise<
 
 export async function getSchoolsForDistrictAdmin(
 	userId: string
-): Promise<{ id: number; name: string; districtId: number }[] | undefined> {
+): Promise<{ id: string; name: string; districtId: string }[] | undefined> {
 	const res = await db
 		.select({
 			id: schools.id,
@@ -596,7 +714,7 @@ export async function getSchoolsForDistrictAdmin(
 	return res || null;
 }
 
-export async function getSchoolForSchoolAdmin(userId: string, schoolId: number) {
+export async function getSchoolForSchoolAdmin({ userId, id }: { userId: string; id: string }) {
 	const [res] = await db
 		.select({
 			id: schools.id,
@@ -607,7 +725,7 @@ export async function getSchoolForSchoolAdmin(userId: string, schoolId: number) 
 		})
 		.from(schoolAdmins)
 		.innerJoin(schools, eq(schoolAdmins.schoolId, schools.id))
-		.where(and(eq(schoolAdmins.userId, userId), eq(schoolAdmins.schoolId, schoolId)));
+		.where(and(eq(schoolAdmins.userId, userId), eq(schoolAdmins.id, id)));
 
 	if (dev) console.log('getSchoolForSchoolAdmin res => ', res);
 	return res || null;
@@ -627,14 +745,15 @@ export async function getLoggedInSchoolAdminsSchool(userId: string) {
 	if (dev) console.log('getSchoolForSchoolAdmin res => ', res);
 	return res || null;
 }
+
+const getDistrictSelect = {
+	id: districts.id,
+	name: districts.name
+};
+
 export async function getLoggedInDistrictAdminsDistrict(userId: string) {
-	const [res] = await db
-		.select({
-			id: districts.id,
-			name: districts.name,
-			createdAt: districts.createdAt,
-			createdBy: districts.createdBy || null
-		})
+	const res = await db
+		.select(getDistrictSelect)
 		.from(districts)
 		.innerJoin(districtAdmins, eq(districtAdmins.districtId, districts.id))
 		.where(eq(districtAdmins.userId, userId));
@@ -642,8 +761,21 @@ export async function getLoggedInDistrictAdminsDistrict(userId: string) {
 	if (dev) console.log('getLoggedInDistrictAdminsDistrict res => ', res);
 	return res || null;
 }
+export async function getLoggedInSuperAdminsDistrict() {
+	const res = await db.query.districts.findMany({
+		columns: { id: true, name: true },
+		with: {
+			schools: {
+				columns: { id: true, name: true }
+			}
+		}
+	});
 
-export async function getSchoolForSuperAdmin(schoolId: number) {
+	if (dev) console.log('getLoggedInSuperAdminsDistrict res => ', res);
+	return res || null;
+}
+
+export async function getSchoolForSuperAdmin(schoolId: string) {
 	const [res] = await db
 		.select({
 			id: schools.id,
@@ -659,7 +791,7 @@ export async function getSchoolForSuperAdmin(schoolId: number) {
 	return res || null;
 }
 
-export async function getSchoolForDistrictAdmin(userId: string, schoolId: number) {
+export async function getSchoolForDistrictAdmin(userId: string, schoolId: string) {
 	const [res] = await db
 		.select({
 			id: schools.id,
@@ -677,7 +809,7 @@ export async function getSchoolForDistrictAdmin(userId: string, schoolId: number
 	return res || null;
 }
 
-export async function getSchoolAdminBySchoolId(schoolId: number) {
+export async function getSchoolAdminBySchoolId({ id }: { id: string }) {
 	const res = await db
 		.select({
 			adminName: users.name,
@@ -686,7 +818,7 @@ export async function getSchoolAdminBySchoolId(schoolId: number) {
 		})
 		.from(schoolAdmins)
 		.innerJoin(users, eq(schoolAdmins.userId, users.id))
-		.where(eq(schoolAdmins.schoolId, schoolId));
+		.where(eq(schoolAdmins.schoolId, id));
 
 	if (dev) console.log('getSchoolAdmin res => ', res);
 	return res || null;
@@ -705,32 +837,34 @@ export async function getDistricts() {
 	return districtsRes || null;
 }
 
-export async function addDemographicsData(values: CreateDemographicsResponseInput) {
-	if (dev) console.log('addDemographicsData values => ', values);
-	if (!values.assessmentId || !values.schoolId) {
-		throw new Error('assessmentId and schoolId are required');
-	}
-	const [newDemo] = await db
-		.insert(assessmentDemographics)
+export async function createDemographicsData(
+	{
+		assessmentId,
+		schoolId,
+		yearsTeaching,
+		educationLevel
+	}: {
+		assessmentId: string;
+		schoolId: string;
+		yearsTeaching: number;
+		educationLevel: string;
+	},
+	trx?: PgTransaction<PostgresJsQueryResultHKT, any, any>
+) {
+	const queryBuilder = trx ? trx.insert(assessmentDemographics) : db.insert(assessmentDemographics);
+	const [newDemo] = await queryBuilder
 		.values({
-			assessmentId: values.assessmentId,
-			schoolId: values.schoolId,
-			yearsTeaching: values.yearsTeaching,
-			educationLevel: values.educationLevel
-		})
-		.onConflictDoUpdate({
-			target: [assessmentDemographics.assessmentId, assessmentDemographics.schoolId],
-			set: {
-				educationLevel: sql`excluded.education_level`,
-				yearsTeaching: sql`excluded.years_teaching`
-			}
+			assessmentId,
+			schoolId,
+			yearsTeaching,
+			educationLevel
 		})
 		.returning({ id: assessmentDemographics.id });
 
 	return newDemo;
 }
 
-export async function addQuestionsData(values: CreateQuestionResponseInput) {
+export async function addQuestionsData(values: any) {
 	if (dev) console.log('addQuestionsData values => ', values);
 	const [newQuestionData] = await db
 		.insert(assessmentQuestionsResponses)
@@ -751,7 +885,7 @@ export async function setAssessmentStatus({
 	assessmentId,
 	status
 }: {
-	assessmentId: number;
+	assessmentId: string;
 	status: (typeof assessmentStatusEnum.enumValues)[number];
 }) {
 	const [result] = await db
@@ -763,7 +897,7 @@ export async function setAssessmentStatus({
 	return result || null;
 }
 
-export async function getAssessmentData(schoolId: number) {
+export async function getAssessmentDataBySchoolId(schoolId: string) {
 	const results = await db
 		.select({ id: assessments.id, status: assessments.status })
 		.from(assessments)
@@ -771,16 +905,16 @@ export async function getAssessmentData(schoolId: number) {
 
 	return results || [];
 }
-export async function getSchoolAssessmentDataWithSummaryResult(schoolId: number) {
+export async function getSchoolAssessmentDataWithSummaryResult(schoolId: string) {
 	const results = await db
-		.select({ id: assessments.id, status: assessments.status })
+		.select({ id: assessments.id, status: assessments.status, completedAt: assessments.updatedAt })
 		.from(assessments)
 		.where(eq(assessments.schoolId, schoolId));
 
 	return results || [];
 }
 
-export async function getSchoolAssessmentResultsData(schoolId: number) {
+export async function getSchoolAssessmentResultsData(schoolId: string) {
 	const results = await db
 		.select({
 			assessmentId: assessments.id,
@@ -803,7 +937,7 @@ export async function getSchoolAssessmentResultsData(schoolId: number) {
 		.where(eq(assessments.schoolId, schoolId));
 	return results || null;
 }
-export async function getSingleAssessmentResultsDataForSuperAdmin(assessmentId: number) {
+export async function getSingleAssessmentResultsDataForSuperAdmin(assessmentId: string) {
 	const results = await db
 		.select({
 			participantName: assessments.participantName,
@@ -830,7 +964,7 @@ export async function getSingleAssessmentResultsDataForSuperAdmin(assessmentId: 
 	return results || null;
 }
 export async function getSingleAssessmentResultsDataForSchoolAndDistrictAdmin(
-	assessmentId: number
+	assessmentId: string
 ) {
 	const results = await db
 		.select({
@@ -856,7 +990,7 @@ export async function getSingleAssessmentResultsDataForSchoolAndDistrictAdmin(
 	return results || null;
 }
 
-export async function getQuestionData(schoolId: number) {
+export async function getQuestionData(schoolId: string) {
 	const results = await db
 		.select({ id: assessments.id, status: assessments.status })
 		.from(assessments)
@@ -865,7 +999,7 @@ export async function getQuestionData(schoolId: number) {
 	return results || null;
 }
 
-export async function getSchoolDomainResultsData(schoolId: number) {
+export async function getSchoolDomainResultsData(schoolId: string) {
 	const results = await db
 		.select({
 			domainId: assessmentDomains.id,
@@ -890,7 +1024,7 @@ export async function getSchoolDomainResultsData(schoolId: number) {
 
 export async function getDistrictAdminsDistrictIdByUserId(
 	userId: string
-): Promise<{ districtId: number; userId: string } | null> {
+): Promise<{ districtId: string; userId: string } | null> {
 	const [districtRes] = await db
 		.select({ districtId: districtAdmins.districtId, userId: districtAdmins.userId })
 		.from(districtAdmins)
@@ -900,30 +1034,60 @@ export async function getDistrictAdminsDistrictIdByUserId(
 	return districtRes || null;
 }
 
-export async function createAssessment({
-	participantName,
-	participantEmail,
+export async function createAssessmentInvite({
 	schoolId,
-	sentBy,
-	tokenCode
+	createdBy
 }: {
-	participantName: string;
-	participantEmail: string;
-	schoolId: number;
-	sentBy: string;
-	tokenCode: string;
-}): Promise<{ id: number } | null> {
-	const [newAssessment] = await db
-		.insert(assessments)
+	schoolId: string;
+	createdBy: string;
+}): Promise<{ id: string } | null> {
+	const [newAssessmentInvite] = await db
+		.insert(assessmentInvites)
 		.values({
-			participantName,
-			participantEmail,
 			schoolId,
-			sentBy,
-			tokenCode
-			// status: 'started' is default
+			createdBy
 		})
-		.returning({ id: assessments.id, status: assessments.status });
+		.returning({ id: assessmentInvites.id });
+	logIfDev('createAssessmentInvite newAssessmentInvite => ', newAssessmentInvite);
+	return newAssessmentInvite || null;
+}
+export async function getAssessmentInviteById({
+	id
+}: {
+	id: string;
+}): Promise<{ id: string; schoolId: string; createdBy: string | null } | null> {
+	const currAssessment = await db.query.assessmentInvites.findFirst({
+		where: eq(assessmentInvites.id, id),
+		columns: { id: true, schoolId: true, createdBy: true }
+	});
+	logIfDev('getAssessmentInviteById currAssessment => ', currAssessment);
+	return currAssessment || null;
+}
+export async function createAssessment(
+	{
+		participantName,
+		participantEmail,
+		schoolId,
+		createdBy,
+		assessmentInviteId
+	}: {
+		participantName: string;
+		participantEmail: string;
+		schoolId: string;
+		createdBy: string;
+		assessmentInviteId: string;
+	},
+	trx?: PgTransaction<PostgresJsQueryResultHKT, any, any>
+): Promise<{ id: string } | null> {
+	const queryBuilder = trx ? trx.insert(assessments) : db.insert(assessments);
+	const [newAssessment] = await queryBuilder.values({
+		participantName,
+		participantEmail,
+		schoolId,
+		createdBy,
+		assessmentInviteId
+		// status: 'started' is default
+	});
 
 	return newAssessment || null;
 }
@@ -976,7 +1140,7 @@ export async function getAllTimeQuestionResponsesStatsByQuestion() {
 	return results || [];
 }
 
-export async function getAllTimeQuestionResponsesByDomainForDistrict(districtId: number) {
+export async function getAllTimeQuestionResponsesByDomainForDistrict(districtId: string) {
 	const results = await db
 		.select({
 			domainId: assessmentDomains.id,
@@ -1004,7 +1168,7 @@ export async function getAllTimeQuestionResponsesByDomainForDistrict(districtId:
 	return results || [];
 }
 
-export async function getAllTimeQuestionResponsesStatsByQuestionForDistrict(districtId: number) {
+export async function getAllTimeQuestionResponsesStatsByQuestionForDistrict(districtId: string) {
 	const results = await db
 		.select({
 			questionId: assessmentQuestions.id,
@@ -1031,7 +1195,7 @@ export async function getAllTimeQuestionResponsesStatsByQuestionForDistrict(dist
 	return results || [];
 }
 
-export async function getAllTimeQuestionResponsesByDomainForSchool(schoolId: number) {
+export async function getAllTimeQuestionResponsesByDomainForSchool(schoolId: string) {
 	const results = await db
 		.select({
 			domainId: assessmentDomains.id,
@@ -1058,7 +1222,7 @@ export async function getAllTimeQuestionResponsesByDomainForSchool(schoolId: num
 	return results || [];
 }
 
-export async function getAllTimeQuestionResponsesStatsByQuestionForSchool(schoolId: number) {
+export async function getAllTimeQuestionResponsesStatsByQuestionForSchool(schoolId: string) {
 	const results = await db
 		.select({
 			questionId: assessmentQuestions.id,
@@ -1084,12 +1248,9 @@ export async function getAllTimeQuestionResponsesStatsByQuestionForSchool(school
 	return results || [];
 }
 
-export async function getDistrictDetailsById(districtId: number) {
+export async function getDistrictDetailsById(districtId: string) {
 	const [results] = await db
-		.select({
-			id: districts.id,
-			name: districts.name
-		})
+		.select(getDistrictSelect)
 		.from(districts)
 		.where(eq(districts.id, districtId));
 
@@ -1097,7 +1258,7 @@ export async function getDistrictDetailsById(districtId: number) {
 }
 
 export async function getSchoolDetailsById(
-	schoolId: number,
+	schoolId: string,
 	trx?: PgTransaction<PostgresJsQueryResultHKT, any, any>
 ) {
 	const retVals = {
@@ -1113,37 +1274,39 @@ export async function getSchoolDetailsById(
 
 	return results || null;
 }
-export const getSchoolAssessmentIDByTokenCode = async ({
-	schoolId,
-	code
-}: {
-	schoolId: number;
-	code: string;
-}) => {
+// export const getSchoolAssessmentIDByTokenCode = async ({
+// 	schoolId,
+// 	code
+// }: {
+// 	schoolId: string;
+// 	code: string;
+// }) => {
+// 	const [res] = await db
+// 		.select({ id: assessments.id, status: assessments.status })
+// 		.from(assessments)
+// 		.where(and(eq(assessments.tokenCode, code), eq(assessments.schoolId, schoolId)));
+// 	if (dev) console.log('getSchoolAssessmentIDByTokenCode => ', res);
+// 	return res || null;
+// };
+
+export const getAssessmentById = async ({ id }: { id: string }) => {
 	const [res] = await db
 		.select({ id: assessments.id, status: assessments.status })
 		.from(assessments)
-		.where(and(eq(assessments.tokenCode, code), eq(assessments.schoolId, schoolId)));
-	if (dev) console.log('getSchoolAssessmentIDByTokenCode => ', res);
+		.where(eq(assessments.id, id));
+	if (dev) console.log('getAssessmentById => ', res);
 	return res || null;
 };
-
-export const getAssessmentByParticipantEmail = async ({
-	email,
-	schoolId
-}: {
-	email: string;
-	schoolId: number;
-}) => {
+export const getAssessmentByParticipantEmail = async ({ email }: { email: string }) => {
 	const [res] = await db
 		.select({ id: assessments.id, status: assessments.status })
 		.from(assessments)
-		.where(and(eq(assessments.participantEmail, email), eq(assessments.schoolId, schoolId)));
+		.where(eq(assessments.participantEmail, email));
 	if (dev) console.log('getAssessmentByParticipantEmail => ', res);
 	return res || null;
 };
 
-export const getDemographicsDataByAssessmentId = async (assessmentId: number) => {
+export const getDemographicsDataByAssessmentId = async (assessmentId: string) => {
 	const [res] = await db
 		.select({
 			subjectTaught: assessmentDemographics.educationLevel,
@@ -1155,7 +1318,7 @@ export const getDemographicsDataByAssessmentId = async (assessmentId: number) =>
 	return res || null;
 };
 
-export const getAssessmentDataByAssessmentId = async (assessmentId: number) => {
+export const getAssessmentDataByAssessmentId = async (assessmentId: string) => {
 	const res = await db
 		.select({
 			questionId: assessmentQuestionsResponses.questionId,
@@ -1163,7 +1326,7 @@ export const getAssessmentDataByAssessmentId = async (assessmentId: number) => {
 		})
 		.from(assessmentQuestionsResponses)
 		.where(eq(assessmentQuestionsResponses.assessmentId, assessmentId));
-	if (dev) console.log('getAss essmentDataByAssessmentId => ', res);
+	if (dev) console.log('getAssessmentDataByAssessmentId => ', res);
 	return res || null;
 };
 
@@ -1172,7 +1335,7 @@ export async function updateSchoolStripeData({
 	stripePaymentId,
 	stripeData
 }: {
-	schoolId: number;
+	schoolId: string;
 	stripePaymentId: string | null;
 	stripeData: any | null;
 }) {

@@ -4,32 +4,14 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL is not set');
 const client = postgres(process.env.DATABASE_URL);
-export const db = drizzle(client);
+export const db = drizzle(client, {
+	casing: 'snake_case'
+});
 
 import { TEST_RUBRIC_DATA2, RUBRIC_DATA, TEST_RUBRIC_DATA } from '$lib/constants';
 import { assessmentDomains, assessmentQuestions, assessmentSubDomains } from './schema';
 
 const data = RUBRIC_DATA;
-const videoData = {
-	iframe: {
-		width: 560,
-		height: 315,
-		src: 'https://www.youtube.com/embed/ZrL_n3d6YOY?si=HvRNagTqeH0VsTx_',
-		title: 'YouTube video player',
-		frameborder: 0,
-		allow: [
-			'accelerometer',
-			'autoplay',
-			'clipboard-write',
-			'encrypted-media',
-			'gyroscope',
-			'picture-in-picture',
-			'web-share'
-		],
-		referrerpolicy: 'strict-origin-when-cross-origin',
-		allowfullscreen: true
-	}
-};
 
 async function seed() {
 	console.log('🌱 Starting seed...');

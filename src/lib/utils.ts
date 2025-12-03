@@ -1,6 +1,6 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { nanoid } from 'nanoid';
+import { ulid } from 'ulid';
 import type { UserInviteHTMLEmailTemplateType } from './schema';
 import { message, type SuperValidated } from 'sveltekit-superforms';
 import { setFlash } from 'sveltekit-flash-message/server';
@@ -14,49 +14,14 @@ export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
 }
 
-export function createAdminUserInviteToken(name: string, email: string, inviteId: string) {
-	const data = `${name}|${email}|${inviteId}`;
-	return btoa(data);
-}
-
-export function decodeAdminUserInviteToken(token: string) {
-	const data = atob(token);
-	const [name, email, inviteId] = data.split('|');
-	return { name, email, inviteId };
-}
-
-export function createAssessmentInviteToken({
-	sentBy,
-	schoolId,
-	code
-}: {
-	sentBy: string;
-	schoolId: number | string;
-	code?: string; // optional random string to ensure uniqueness
-}) {
-	const currCode = code ?? nanoid(6);
-	const data = `${sentBy}|${schoolId}|${currCode}`;
-	return btoa(data);
-}
-
-export function decodeAssessmentInviteToken(token: string) {
-	const data = atob(token);
-	const [sentBy, schoolId, code] = data.split('|');
-	return { sentBy, schoolId: parseInt(schoolId), code };
-}
-
 export function handleTypeSafeError(error: unknown, message: any, form: any) {
 	const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
 	return message(form, 'Unexpected error: ' + errorMessage, { status: 500 });
 }
 
-export function generateUserId() {
-	return nanoid(16);
-}
-
 interface HandleLogFlashReturnFormErrorParams {
 	type: 'error' | 'success';
-	form: SuperValidated<any>;
+	form: SuperValidated<any> | null;
 	message: string | Message;
 	status: 400 | 401 | 402 | 403 | 404 | 500;
 	event: RequestEvent;
@@ -69,16 +34,14 @@ export function handleLogFlashReturnFormError({
 	status: statusNum,
 	event
 }: HandleLogFlashReturnFormErrorParams) {
-	console.error(messageText);
 	setFlash({ type, message: messageText.toString() }, event.cookies);
 	return message(form, { status: type, text: messageText.toString() });
 }
 
-export function generateInviteEmail(
+export function generateAdminInviteEmail(
 	htmlEmailContent: UserInviteHTMLEmailTemplateType,
 	inviteLink: string
 ) {
-	console.log('htmlEmailContent  ====> ', htmlEmailContent);
 	return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -155,9 +118,9 @@ export function slugify(text: string): string {
 
 export function transformAssessmentData(
 	rawData: {
-		domain: { id: number; name: string; type: 'domain' };
-		subdomain: { id: number; name: string; description: string; type: 'sub-domain' };
-		question: { id: number; text: string; value: boolean | null; subdomainId: number };
+		domain: { id: string; name: string; type: 'domain' };
+		subdomain: { id: string; name: string; description: string; type: 'sub-domain' };
+		question: { id: string; text: string; value: boolean | null; subdomainId: string };
 	}[]
 ): AssessmentData[] {
 	// Group by domains first
@@ -169,9 +132,9 @@ export function transformAssessmentData(
 			subdomain,
 			question
 		}: {
-			domain: { id: number; name: string; type: 'domain' };
-			subdomain: { id: number; name: string; description: string; type: 'sub-domain' };
-			question: { id: number; text: string; value: boolean | null; subdomainId: number };
+			domain: { id: string; name: string; type: 'domain' };
+			subdomain: { id: string; name: string; description: string; type: 'sub-domain' };
+			question: { id: string; text: string; value: boolean | null; subdomainId: string };
 		} = item;
 
 		// Initialize domain if it doesn't exist
@@ -187,7 +150,7 @@ export function transformAssessmentData(
 		const domainObj = domainMap.get(domain.id);
 
 		// Find or create subdomain
-		let subdomainObj = domainObj.subDomains.find((sub) => sub.name === subdomain.name);
+		let subdomainObj = domainObj.subDomains.find((sub: any) => sub.name === subdomain.name);
 		if (!subdomainObj) {
 			subdomainObj = {
 				id: subdomain.id,
@@ -215,13 +178,13 @@ export function transformAssessmentData(
 }
 
 type AssessmentResponseData = {
-	assessmentId: number;
-	[key: string]: string | number;
+	assessmentId: string;
+	[key: string]: string;
 };
 
 type TransformedResponse = {
-	assessmentId: number;
-	questionId: number;
+	assessmentId: string;
+	questionId: string;
 	isValidSubdomainGroup: boolean;
 	response: 0 | 1 | null;
 };
@@ -234,19 +197,20 @@ export function transformAssessmentQuestionsResponses(
 	const rawData = Object.entries(responses)
 		.filter(([key]) => key.startsWith('domainId='))
 		.map(([key, value]) => {
-			const match = key.match(/domainId=(\d+)\|subDomainId=(\d+)\|qId=(\d+)/);
+			// const match = key.match(/domainId=(\d+)\|subDomainId=(\d+)\|qId=(\d+)/); //number IDs --- IGNORE ---
+			const match = key.match(/domainId=(.*)\|subDomainId=(.*)\|qId=(.*)/); //string IDs
 			if (!match) return null; // This won't happen with valid data
 
 			const [, domainId, subDomainId, questionId] = match;
 			return {
 				assessmentId: assessmentId,
-				questionId: parseInt(questionId, 10),
-				subDomainId: parseInt(subDomainId, 10),
+				questionId: questionId,
+				subDomainId: subDomainId,
 				response: value === '' ? null : parseInt(String(value)) === 1 ? 1 : 0
 			};
 		})
 		.filter((item) => item !== null);
-	console.log('rawData  ====> ', rawData);
+
 	let currSubdomainId;
 
 	const transformedAssessmentQuestionsResponses = rawData.map((item, _, array) => {
@@ -262,81 +226,60 @@ export function transformAssessmentQuestionsResponses(
 			response: item.response
 		};
 	});
-	// console.log('transformAssessmentQuestionsResponses  ====> ', transformedAssessmentQuestionsResponses);
+	//
 	return transformedAssessmentQuestionsResponses as TransformedResponse[];
 }
 
 export function applyAssessmentResponsesToQuestionsAndGetCurrentPositions({
 	assessmentQuestions,
-	currDemgraphicsData,
 	currAssessmentData
 }: {
 	assessmentQuestions: any[];
-	currDemgraphicsData: any;
 	currAssessmentData: any[];
 }) {
-	let assessmentQuestionsCopy = JSON.parse(JSON.stringify(assessmentQuestions));
-	// console.log('questionsCopy  ====> ', assessmentQuestionsCopy);
-	// console.log('currDemgraphicsData  ====> ', currDemgraphicsData);
-	// console.log('currAssessmentData  ====> ', currAssessmentData);
+	let answeredAssessmentQuestionsData = JSON.parse(JSON.stringify(assessmentQuestions));
+	//
+	//
+	//
 
 	let lastCompletedDomainId;
 	let lastCompletedSubDomainId;
 	let domainIdsArr: any[] = [];
 	let subdomainIdsArr: any[] = [];
-	assessmentQuestionsCopy.forEach((domain: any) => {
+	answeredAssessmentQuestionsData.forEach((domain: any) => {
 		domainIdsArr.push(domain.id);
-		// console.log('domain outer ====> ', domain);
-		if (domain.type === 'demographics') {
-			// console.log('demographics', domain);
-			domain.subDomains.forEach((subdomain: any) => {
-				subdomain.fields.forEach((field: any) => {
-					if (field.fieldName) {
-						field.value = currDemgraphicsData[field.fieldName] || null;
-					}
-				});
-			});
-			return;
-		} else {
-			// console.log('not demographics  ====> ', domain);
-			domain?.subDomains?.forEach((subdomain: any, idx: number) => {
-				subdomainIdsArr.push(subdomain.id);
-				subdomain.questions.forEach((question: any) => {
-					const questionHasResponse = currAssessmentData.some(
+		domain?.subDomains?.forEach((subdomain: any, idx: number) => {
+			subdomainIdsArr.push(subdomain.id);
+			subdomain.questions.forEach((question: any) => {
+				const questionHasResponse = currAssessmentData.some(
+					(response: any) => response.questionId === question.id
+				);
+
+				if (questionHasResponse) {
+					lastCompletedSubDomainId = subdomain.id;
+					//
+					//
+					lastCompletedDomainId = domain.id;
+					//
+
+					const foundResponse = currAssessmentData.find(
 						(response: any) => response.questionId === question.id
 					);
 
-					if (questionHasResponse) {
-						lastCompletedSubDomainId = subdomain.id;
-						// console.log('lastCompletedSubDomainId  ====> ', lastCompletedSubDomainId);
-						// console.log('question  ====> ', question);
-						lastCompletedDomainId = domain.id;
-						// console.log('lastCompletedDomainId  ====> ', lastCompletedDomainId);
-
-						const foundResponse = currAssessmentData.find(
-							(response: any) => response.questionId === question.id
-						);
-
-						const questionResponse = foundResponse ? foundResponse.response : null;
-						// console.log('questionResponse  ====> ', questionResponse);
-						if (questionResponse === 1 || questionResponse === 0) {
-							question.value = questionResponse;
-						} else {
-							question.value = null;
-						}
-						question.value = questionResponse || null;
+					const questionResponse = foundResponse ? foundResponse.response : null;
+					//
+					if (questionResponse === 1 || questionResponse === 0) {
+						question.value = questionResponse;
+					} else {
+						question.value = null;
 					}
-				});
+				}
 			});
-		}
+		});
 	});
-	const nextDomainId = 0;
-	const nextSubdomainId = 0;
-	// console.log('domainIdsArr  ====> ', domainIdsArr);
-	// console.log('subdomainIdsArr  ====> ', subdomainIdsArr);
 
 	return {
-		assessmentQuestionsCopy,
+		appliedAnsweredAssessmentQuestionsData: answeredAssessmentQuestionsData,
 		lastCompletedDomainId,
 		lastCompletedSubDomainId
 	};
@@ -371,6 +314,5 @@ export function formDataToObject(formData: FormData) {
 
 export function logIfDev(message: string, ...optionalParams: any[]) {
 	if (dev) {
-		console.log(message, ...optionalParams);
 	}
 }

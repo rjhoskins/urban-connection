@@ -1,35 +1,23 @@
 <script lang="ts">
-	import { videoIdMap } from '$lib/constants';
-	import { Video } from 'lucide-svelte';
-	import { onMount, tick } from 'svelte';
 	import { getModalStateContext } from '$lib/modal-state.svelte';
-	import { logIfDev } from '$lib/utils';
 	const modal = getModalStateContext();
+
+	let currVidShown = $derived(
+		modal.ytIsManualVid ? modal.manualSetVideoId : modal.currYTModalVideoId
+	);
 
 	function handleOutSideClick(event: MouseEvent) {
 		if ((event.target as HTMLElement).classList.contains('modal')) {
-			modal.close();
-			modal.clearVideoIds();
+			modal.handleModalVideoClose();
 		}
 	}
-	function closeModal(event: MouseEvent) {
-		modal.close();
-		modal.clearVideoIds();
-	}
 
-	$effect(() => {
-		logIfDev('modal state changed', {
-			isOpen: modal.isOpen,
-			buttonTitle: modal.buttonTitle,
-			hideButton: modal.hideButton,
-			videoId: modal.videoId,
-			highestDomain: modal.highestDomain,
-			highestSubDomain: modal.highestSubDomain
-		});
-	});
+	function closeModal() {
+		modal.handleModalVideoClose();
+	}
 </script>
 
-{#if modal.isOpen}
+{#if modal.ytModalIsOpen}
 	<!-- svelte-ignore a11y_click_events_have_key_events -->
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
@@ -50,7 +38,7 @@
 					allowfullscreen
 				></iframe> -->
 
-				{@html `<iframe class="h-full w-full" src="https://www.youtube.com/embed/${modal.videoId}?rel=0&autoplay=0&controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`}
+				{@html `<iframe class="h-full w-full" src="https://www.youtube.com/embed/${currVidShown}?rel=0&autoplay=0&controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`}
 
 				<!-- <iframe
 					class="h-full w-full"
@@ -65,5 +53,3 @@
 		</div>
 	</div>
 {/if}
-<!-- class={`${initialEmbeddedId !== videoId ? 'inline-flex' : 'hidden'} bg-primary text-primary-foreground hover:bg-primary/90 text   h-10 w-fit items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-6 [&_svg]:shrink-0`} -->
-<!-- class={` bg-primary text-primary-foreground hover:bg-primary/90 text inline-flex  h-10 w-fit items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-6 [&_svg]:shrink-0`} -->

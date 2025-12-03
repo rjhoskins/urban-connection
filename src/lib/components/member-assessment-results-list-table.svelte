@@ -1,9 +1,7 @@
 <script lang="ts">
 	import * as Card from '$lib/components/ui/card';
-
 	import Button from './ui/button/button.svelte';
 	import * as Table from '$lib/components/ui/table/index.js';
-
 	import { cn } from '$lib/utils';
 	import MemberAssessmentResultsListTableRow from './member-assessment-results-list-table-row.svelte';
 	import { onMount } from 'svelte';
@@ -15,10 +13,9 @@
 	let sortDirection = $state('desc');
 
 	const tableHeaders = [
-		{ name: 'School', class: '', sortBy: 'name' },
+		{ name: 'Name', class: '', sortBy: 'name' },
 		{ name: 'Completed ', sortBy: 'completed' },
-		{ name: 'Score', sortBy: 'score' },
-		{ name: 'Action', class: '[&>div]:!block [&>div]:!text-right' }
+		{ name: 'Score', sortBy: 'score' }
 	];
 	function handleTableHeaderClick(header: string) {
 		sortBy = header;
@@ -29,7 +26,6 @@
 
 	function handleTableArrowClick() {
 		sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
-
 		// sortMembers
 	}
 	function sortMembers() {

@@ -2,8 +2,7 @@
 	import { dev } from '$app/environment';
 	import { Button } from '$lib/components/ui/button';
 	import * as Card from '$lib/components/ui/card';
-	import { createNewUserFromInviteSchema } from '$lib/schema.js';
-	import { decodeAdminUserInviteToken } from '$lib/utils';
+	import { registerExistingUserFromInviteSchema } from '$lib/schema.js';
 	/** @type {{ data: import('./$types').PageData, form: import('./$types').ActionData }} */
 	import { Field, Control, Label, FieldErrors, Description } from 'formsnap';
 	import { LoaderCircle } from 'lucide-svelte';
@@ -11,17 +10,17 @@
 	import SuperDebug from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 
-	let { data, token } = $props();
-	const { name, email, inviteId } = decodeAdminUserInviteToken(token);
+	let { data, adminInvite } = $props();
+	const { name, email, adminInviteId } = adminInvite;
 
 	const form = superForm(data.form, {
-		validators: zodClient(createNewUserFromInviteSchema)
+		validators: zodClient(registerExistingUserFromInviteSchema)
 	});
 	const { form: formData, enhance, message, delayed } = form;
 	$effect(() => {
 		$formData.name = name;
 		$formData.email = email;
-		$formData.inviteId = inviteId;
+		$formData.adminInviteId = adminInviteId;
 	});
 </script>
 
@@ -63,16 +62,16 @@
 			</Field>
 
 			<!-- username -->
-			<Field {form} name="inviteId">
+			<Field {form} name="adminInviteId">
 				<Control>
 					{#snippet children({ props }: { props: any })}
 						<input
 							{...props}
 							type="hidden"
-							name="inviteId"
+							name="adminInviteId"
 							hidden
 							class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-							bind:value={$formData.inviteId}
+							bind:value={$formData.adminInviteId}
 						/>
 					{/snippet}
 				</Control>

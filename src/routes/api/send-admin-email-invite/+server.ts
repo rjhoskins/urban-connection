@@ -1,7 +1,7 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { google } from 'googleapis';
 import nodemailer from 'nodemailer';
-import { generateInviteEmail } from '$lib/utils';
+import { generateAdminInviteEmail } from '$lib/utils';
 import { dev } from '$app/environment';
 import env from '../../../env';
 
@@ -69,7 +69,7 @@ async function sendProdEmail({
 			from: `Urban Connection Project <no-reply@theurbanconnectionproject.org>`,
 			to: ['robertjhoskins@gmail.com', 'thomas.wilkins@dreamcredible.com', `${to}`],
 			subject: 'The Urban Connection Project | School Admin Invite | ' + subject,
-			html: generateInviteEmail(htmlEmailContent, inviteLink)
+			html: generateAdminInviteEmail(htmlEmailContent, inviteLink)
 		};
 		const transporter = nodemailer.createTransport({
 			//@ts-ignore
@@ -94,11 +94,11 @@ async function sendDevEmail({
 	to,
 	subject,
 	text,
-	inviteLink = 'https://www.theurbanconnectionproject.org/inviteLink'
+	inviteLink
 }: {
-	to: string;
-	subject: string;
-	text: string;
+	to?: string;
+	subject?: string;
+	text?: string;
 	inviteLink: string;
 }) {
 	console.log(
@@ -118,10 +118,10 @@ async function sendDevEmail({
 			}
 		});
 		const info = await transporter.sendMail({
-			from: '"test👻" <test@ethereal.email>,',
-			to: `bar@example.com, baz@example.com ${to}`,
+			from: '"test👻" ',
+			to: `test ${to}`,
 			subject: `Hello ✔ ${subject}`,
-			text: 'Hello world?',
+			text: 'dev mode testing...',
 			html: `<a href="${inviteLink}">Hello ✔ School Admin Invite Link ${text}</a>` //just link
 		});
 

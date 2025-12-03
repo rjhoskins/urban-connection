@@ -3,23 +3,28 @@ import { pgTable, integer, varchar } from 'drizzle-orm/pg-core';
 import { assessmentStatusEnum, timestamps } from './db-utils';
 import schools from './schools';
 import users from './users';
+import assessmentInvites from './assessmentInvites';
+import { ulid } from 'ulid';
 
 const assessments = pgTable('assessments', {
-	id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-	participantName: varchar('participant_name', { length: 256 }).notNull(),
-	participantEmail: varchar('participant_email', { length: 256 }).notNull().unique(),
-	schoolId: integer('school_id').references(() => schools.id),
-	sentBy: varchar('sent_by', { length: 256 }).references(() => users.id),
-	// isUsed: integer('used').default(0).notNull(), not needed since has status
-	tokenCode: varchar('token_code', { length: 6 }).unique(),
-	status: assessmentStatusEnum('status').default('started'), // default now started to reflect first visit
+	id: varchar({ length: 26 })
+		.$defaultFn(() => ulid())
+		.primaryKey(),
+	schoolId: varchar({ length: 26 }).references(() => schools.id),
+	createdBy: varchar({ length: 26 }).references(() => users.id),
+	assessmentInviteId: varchar({ length: 26 }).references(() => assessmentInvites.id),
+	participantName: varchar({ length: 256 }).notNull(),
+	participantEmail: varchar({ length: 256 }).notNull().unique(),
+	status: assessmentStatusEnum().default('started').notNull(), // default now started to reflect first visit
 	...timestamps
 });
 
-export const assessmentsRelations = relations(assessments, ({ one }) => ({
-	sentBy: one(users, {
-		fields: [assessments.sentBy],
-		references: [users.id]
+export const assessmentsRelations = relations(assessments, ({ one, many }) => ({
+	school: one(schools, { fields: [assessments.schoolId], references: [schools.id] }),
+	createdByUser: one(users, { fields: [assessments.createdBy], references: [users.id] }),
+	assessmentInvite: one(assessmentInvites, {
+		fields: [assessments.assessmentInviteId],
+		references: [assessmentInvites.id]
 	})
 }));
 

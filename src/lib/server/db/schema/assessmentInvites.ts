@@ -3,18 +3,24 @@ import schools from './schools';
 import { relations } from 'drizzle-orm';
 import users from './users';
 import { timestamps } from './db-utils';
+import { ulid } from 'ulid';
+import assessments from './assessments';
 
 const assessmentInvites = pgTable('assessment_invites', {
-	id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-	schoolId: integer('school_id')
+	id: varchar()
+		.$defaultFn(() => ulid())
+		.primaryKey(),
+	schoolId: varchar({ length: 26 })
 		.notNull()
 		.references(() => schools.id),
-	email: varchar('email', { length: 256 }).notNull(),
-	createdBy: varchar('created_by', { length: 256 }).references((): AnyPgColumn => users.id),
+	expiresAt: timestamp()
+		.notNull()
+		.$default(() => new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)), // default to 7 days from creation
+	createdBy: varchar().references((): AnyPgColumn => users.id),
 	...timestamps
 });
 
-export const assessmentInvitesRelations = relations(assessmentInvites, ({ one }) => ({
+export const assessmentInvitesRelations = relations(assessmentInvites, ({ one, many }) => ({
 	school: one(schools, {
 		fields: [assessmentInvites.schoolId],
 		references: [schools.id]
@@ -22,7 +28,8 @@ export const assessmentInvitesRelations = relations(assessmentInvites, ({ one })
 	invitee: one(users, {
 		fields: [assessmentInvites.createdBy],
 		references: [users.id]
-	})
+	}),
+	assessments: many(assessments)
 }));
 
 export default assessmentInvites;

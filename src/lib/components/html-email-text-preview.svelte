@@ -1,7 +1,11 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import * as Card from '$lib/components/ui/card';
-	let { data, token = 'tbd', disableLink } = $props();
+	let {
+		data,
+		unusedAdminUserInvite,
+		disableLink
+	}: { data: any; unusedAdminUserInvite?: any; disableLink: boolean } = $props();
 </script>
 
 {#if data && browser}
@@ -23,11 +27,13 @@
 
 		<p>
 			{data.callToAction}
-			<a
-				class={[disableLink && 'pointer-events-none', 'text-blue-700 underline']}
-				href={`${window.location.origin}/auth/register?inviteToken=${token}`}
-				>{data.registrationLinkText}</a
-			>
+			{#if unusedAdminUserInvite}
+				<a
+					class={[disableLink && 'pointer-events-none', 'text-blue-700 underline']}
+					href={`${window.location.origin}/auth/register?adminInviteId=${unusedAdminUserInvite.publicId}`}
+					>{data.registrationLinkText}</a
+				>
+			{/if}
 		</p>
 	</Card.Content>
 {/if}

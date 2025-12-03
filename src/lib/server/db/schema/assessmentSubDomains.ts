@@ -3,13 +3,16 @@ import { relations } from 'drizzle-orm';
 import { timestamps } from './db-utils';
 import assessmentDomains from './assessmentDomains';
 import assessmentQuestions from './assessmentQuestions';
+import { ulid } from 'ulid';
 
 const assessmentSubDomains = pgTable('assessment_sub_domains', {
-	id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-	name: varchar('name').notNull().unique(),
-	description: varchar('description').notNull(),
+	id: varchar({ length: 26 })
+		.$defaultFn(() => ulid())
+		.primaryKey(),
+	name: varchar().notNull().unique(),
+	description: varchar().notNull(),
 	// videoData: jsonb('video_data').notNull(),
-	domainId: integer('domain_id')
+	domainId: varchar({ length: 26 })
 		.notNull()
 		.references(() => assessmentDomains.id),
 	...timestamps

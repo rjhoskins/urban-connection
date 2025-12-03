@@ -6,26 +6,29 @@ import districts from './districts';
 import schoolAdmins from './schoolAdmins';
 import assessmentInvites from './assessmentInvites';
 import users from './users';
+import { ulid } from 'ulid';
+import assessments from './assessments';
+import { admin } from 'googleapis/build/src/apis/admin';
 
 const schools = pgTable(
 	'schools',
 	{
-		id: integer('id').primaryKey().generatedAlwaysAsIdentity(),
-		name: varchar('name', { length: 256 }).notNull(),
-		districtId: integer('district_id')
+		id: varchar({ length: 26 })
+			.$defaultFn(() => ulid())
+			.primaryKey(),
+		districtId: varchar({ length: 26 })
 			.references((): AnyPgColumn => districts.id)
 			.notNull(),
-		createdBy: varchar('created_by', { length: 256 }).references((): AnyPgColumn => users.id),
-		stripePaymentId: varchar('payment_id', { length: 256 }),
-		stripeData: jsonb('stripe_data'),
+		name: varchar({ length: 256 }).notNull(),
+		createdBy: varchar({ length: 26 }).references((): AnyPgColumn => users.id),
+		stripePaymentId: varchar({ length: 256 }),
+		stripeData: jsonb(),
 		...timestamps
 	},
 	(table) => [uniqueIndex('districtSchoolNameComboUniqueIndex').on(table.districtId, table.name)]
 );
 
 export const schoolsRelations = relations(schools, ({ one, many }) => ({
-	assessmentInvites: many(assessmentInvites),
-	admins: many(schoolAdmins),
 	district: one(districts, {
 		fields: [schools.districtId],
 		references: [districts.id]
@@ -33,7 +36,10 @@ export const schoolsRelations = relations(schools, ({ one, many }) => ({
 	createdBy: one(users, {
 		fields: [schools.createdBy],
 		references: [users.id]
-	})
+	}),
+	assessmentInvites: many(assessmentInvites),
+	admins: many(schoolAdmins),
+	assessments: many(assessments)
 }));
 
 export default schools;
