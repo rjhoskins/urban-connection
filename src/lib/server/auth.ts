@@ -59,6 +59,7 @@ export async function validateSessionToken(token: string) {
 	const currentTime = new Date().toISOString();
 
 	// Check if session has expired
+	if (!session.expiresAt) throw new Error('Session expiry not set');
 	if (currentTime >= session.expiresAt) {
 		await db.delete(sessions).where(eq(sessions.id, session.id));
 		return { session: null, user: null };
@@ -66,7 +67,7 @@ export async function validateSessionToken(token: string) {
 
 	// Calculate renewal threshold (15 days before expiration)
 	const renewalThreshold = new Date(
-		Date.parse(session.expiresAt) - DAY_IN_MS * BROWSER_SESSION_DURATION_IN_DAYS
+		Date.parse(session.expiresAt!) - DAY_IN_MS * BROWSER_SESSION_DURATION_IN_DAYS
 	).toISOString();
 
 	// Check if session needs renewal

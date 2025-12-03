@@ -21,7 +21,6 @@ Other
 - [ ] fix all scores not showing up in results on school page (list view)
 - [ ] fix all inviteNewUserSchema
 - [ ] fix all decodeAdminUserInviteToken
-
 - [ ] find & fix all createAdminUserInviteToken to be adminInviteId based & decodeAdminUserInviteToken
 - [ ] fix all email templates to use adminInviteId param
 - [ ] move isUsed admin user to be post-registration action

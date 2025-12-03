@@ -1,15 +1,14 @@
 <script lang="ts">
-	/** @type {{ data: PageData }} */
 	import { page } from '$app/state';
 	import InviteUserByEmailForm from '$lib/components/forms/super-invite-user-by-email-form.svelte';
-	import type { PageData } from './$types';
-	import * as Card from '$lib/components/ui/card';
-	import Dialog from '$lib/components/dialog.svelte';
-	import HtmlEmailUserInviteForm from '$lib/components/forms/html-email-user-invite-form.svelte';
 
-	let { data } = $props();
-	const { token, canEditForm } = data;
-	const { name, email, inviteId } = { name: 'hi', email: 'hi', inviteId: 'hi' };
+	import * as Card from '$lib/components/ui/card';
+	import HtmlEmailUserInviteForm from '$lib/components/forms/html-email-user-invite-form.svelte';
+	import type { PageData } from './$types';
+
+	let { data }: { data: PageData } = $props();
+	const { unusedAdminUserInvite, canEditForm } = data;
+
 	let pageHTMLEmail = $state();
 	let pageIsEditing = $state(false);
 </script>
@@ -30,16 +29,16 @@
 			{#if canEditForm}
 				<HtmlEmailUserInviteForm
 					bind:formisEditing={pageIsEditing}
-					{token}
+					{unusedAdminUserInvite}
 					{page}
 					{data}
 					{canEditForm}
 				/>
 				{#if !pageIsEditing}
-					<InviteUserByEmailForm {data} {token} {page} {canEditForm} />
+					<InviteUserByEmailForm {data} {unusedAdminUserInvite} {page} {canEditForm} />
 				{/if}
 			{:else}
-				<InviteUserByEmailForm {data} {token} {page} {canEditForm} />
+				<InviteUserByEmailForm {data} {unusedAdminUserInvite} {page} {canEditForm} />
 			{/if}
 		</Card.Content>
 		<!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->

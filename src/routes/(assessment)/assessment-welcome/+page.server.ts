@@ -10,6 +10,7 @@ import { error, redirect, type RequestEvent } from '@sveltejs/kit';
 import { setFlash } from 'sveltekit-flash-message/server';
 import type { PgTransaction } from 'drizzle-orm/pg-core';
 import type { PostgresJsQueryResultHKT } from 'drizzle-orm/postgres-js';
+import db from '$lib/server/db';
 
 export function load({ cookies, url }) {
 	console.log('Assessment Welcome Page Load===========================================');

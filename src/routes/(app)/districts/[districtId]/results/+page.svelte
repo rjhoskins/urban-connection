@@ -22,15 +22,15 @@
 				{#each domainData as domain (domain.domainId)}
 					<ul class="space-y-4">
 						{@render domainCard({
-							id: domain.domainId ?? 0,
+							id: domain.domainId ?? '',
 							domainName: domain.domainName ?? '',
 							pointsTotal: domain.pointsTotal,
 							questionsTotal: domain.questionsTotal
 						})}
 						{#each questionsData.filter((q) => q.domainId === domain.domainId) as question (question.questionId)}
 							{@render questionCard({
-								questionId: question.questionId ?? 0,
-								domainId: question.domainId ?? 0,
+								questionId: question.questionId ?? '',
+								domainId: question.domainId ?? '',
 								pointsTotal: question.pointsTotal,
 								questionsTotal: question.questionsTotal,
 								questionText: question.questionText ?? ''
@@ -48,7 +48,7 @@
 <!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->
 
 {#snippet domainCard(domain: {
-	id: number;
+	id: string;
 	domainName: string;
 	pointsTotal: number;
 	questionsTotal: number;
@@ -75,8 +75,8 @@
 {/snippet}
 
 {#snippet questionCard(question: {
-	questionId: number;
-	domainId: number;
+	questionId: string;
+	domainId: string;
 	pointsTotal: number;
 	questionsTotal: number;
 	questionText: string;

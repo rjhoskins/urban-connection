@@ -7,7 +7,6 @@ import {
 	getSchoolForSuperAdmin,
 	getSchoolMemberAssessmentTotalsForSchoolAndDistrictAdminBySchool,
 	getSchoolMemberAssessmentTotalsForSuperUser
-	// getAssessmentData
 } from '$lib/server/queries';
 
 export const load = async (event) => {

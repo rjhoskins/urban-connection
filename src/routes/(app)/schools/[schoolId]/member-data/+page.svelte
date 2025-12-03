@@ -104,7 +104,7 @@
 		{#if isGridView}
 			<div class="grid-cols-four-fluid grid gap-4">
 				{#each data.memberData as member, idx (member.id)}
-					<MemberAssessmentResultsGridCard school={schoolWithAdmins} {idx} {member} />
+					<MemberAssessmentResultsGridCard {idx} {member} />
 				{/each}
 			</div>
 		{:else}

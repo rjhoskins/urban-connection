@@ -1,7 +1,7 @@
 <script lang="ts">
 	import '../app.css';
-	import toast, { Toaster } from 'svelte-french-toast';
-	import { initFlash } from 'sveltekit-flash-message';
+	import { Toaster } from 'svelte-french-toast';
+	import { getFlash } from 'sveltekit-flash-message';
 	import { page } from '$app/state';
 	import { afterNavigate, beforeNavigate } from '$app/navigation';
 	import { setGlobalsContext, getGlobalsContext } from '$lib/store/globals-state.svelte';
@@ -9,25 +9,16 @@
 	const globals = getGlobalsContext();
 	import { onMount } from 'svelte';
 
-	const flash = initFlash(page, {
-		clearOnNavigate: true,
-		clearAfterMs: 3000
-		//   clearArray: false,
-		//   flashCookieOptions: CookieSerializeOptions
-	});
-	$effect(() => {
-		if ($flash) {
-			toast[$flash.type]($flash.message);
-		}
-	});
-	beforeNavigate(() => {
-		console.log('beforeNavigate');
-		globals.setLoading(true);
-	});
-	afterNavigate(() => {
-		console.log('afterNavigate');
-		globals.setLoading(false);
-	});
+	const flash = getFlash(page);
+
+	// beforeNavigate(() => {
+	// 	console.log('beforeNavigate');
+	// 	globals.setLoading(true);
+	// });
+	// afterNavigate(() => {
+	// 	console.log('afterNavigate');
+	// 	globals.setLoading(false);
+	// });
 	onMount(() => {});
 
 	// const flash = getFlash(page);
@@ -44,6 +35,11 @@
 			</div>
 		</div> 
 	{:else}{/if} -->
+
+	{#if $flash}
+		{@const bg = $flash.type == 'success' ? '#3D9970' : '#FF4136'}
+		<div style:background-color={bg} class="flash">{$flash.message}</div>
+	{/if}
 	{@render children()}
 
 	<Toaster />

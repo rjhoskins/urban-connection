@@ -16,7 +16,7 @@
 
 	const { data }: { data: PageData } = $props();
 	// ensure districts has a concrete type so the snippet's parameter is not unknown
-	const { districts } = data;
+	const { districts } = data as { districts: District[] };
 
 	$effect(() => {
 		globals.setPageName('Manage Districts');
@@ -27,11 +27,11 @@
 <pre class="">{JSON.stringify(data, null, 2)}</pre>
 
 <section class=" grid-cols-four-fluid sizes grid max-w-6xl gap-4 py-8">
-	{#if districts.length === 0}
+	{#if districts?.length === 0}
 		<p class="col-span-full text-center text-lg">No districts found.</p>
 	{/if}
-	{#each districts as district (district.id)}
-		{@render districtCard(district)}
+	{#each districts as district (district?.id as District['id'])}
+		{@render districtCard(district as District)}
 	{/each}
 </section>
 
@@ -63,7 +63,8 @@
 				class="border-input bg-background ring-offset-background hover:bg-accent hover:text-accent-foreground focus-visible:ring-ring inline-flex h-10 grow items-center justify-center rounded-md border px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50"
 				href={`${page.url.pathname}/${district.id}`}>View District</a
 			>
-			{#if district.questionsTotal && district.pointsTotal}
+			<!-- TODO: FUTURE? -->
+			<!-- {#if district.questionsTotal && district.pointsTotal}
 				<div class="flex grow flex-col gap-2">
 					<div class="flex justify-between">
 						<p>Total Score:</p>
@@ -74,7 +75,7 @@
 						value={(district.pointsTotal / district.questionsTotal) * 100}
 					/>
 				</div>
-			{/if}
+			{/if} -->
 		</Card.Content>
 	</Card.Root>
 {/snippet}

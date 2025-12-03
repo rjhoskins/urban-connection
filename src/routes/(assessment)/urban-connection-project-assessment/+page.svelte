@@ -87,8 +87,10 @@
 		//start
 		if (!lastAnsweredDomainId && !lastAnsweredSubdomainId) {
 			console.log('start & setting indices....');
-			modal.currDomain = 0;
-			modal.currSubDomain = 0;
+			modal.setDomainAndSubDomain({
+				domainIdx: 0,
+				subDomainIdx: 0
+			});
 			console.log('set indices & state');
 		} else {
 			//resume
@@ -112,8 +114,6 @@
 				) {
 					//at end of assessment
 					console.log('At last index of domain and subdomain, putting to max seen');
-					modal.currDomain = currDomainIndex;
-					modal.currSubDomain = currSubDomainIndex;
 
 					modal.setDomainAndSubDomain({
 						domainIdx: currDomainIndex,
@@ -128,8 +128,6 @@
 					console.log(
 						`At ${modal.currDomain}|${modal.currSubDomain} last subdomain:${modal.currSubDomain} => next domain`
 					);
-					modal.currDomain = currDomainIndex + 1;
-					modal.currSubDomain = 0;
 
 					modal.setDomainAndSubDomain({
 						domainIdx: currDomainIndex + 1,
@@ -179,37 +177,31 @@
 	}
 
 	function next() {
-		console.log('next indices START:', {
-			currDomain: modal.currDomain,
-			currSubDomain: modal.currSubDomain
-		});
 		if (
+			//at end of assessment should already be here from applyCurrentProgress
 			isDomainAtLastIndex(modal.currDomain) &&
 			isSubdomainAtLastIndex({
 				domainIdx: modal.currDomain,
 				subDomainIdx: modal.currSubDomain
 			})
 		) {
-			//at end of assessment should already be here from applyCurrentProgress
-			return;
 		} else if (
-			(console.log('checking next indices:', {
-				currDomain: modal.currDomain,
-				currSubDomain: modal.currSubDomain
-			}),
 			isSubdomainAtLastIndex({
 				domainIdx: modal.currDomain,
 				subDomainIdx: modal.currSubDomain
-			}))
+			})
 		) {
-			console.log('checking next indices 2nd:', {
-				currDomain: modal.currDomain,
-				currSubDomain: modal.currSubDomain
-			}),
-				(modal.currDomain = modal.currDomain + 1);
-			modal.currSubDomain = 0;
+			//end of domain
+			modal.setDomainAndSubDomain({
+				domainIdx: modal.currDomain + 1,
+				subDomainIdx: 0
+			});
 		} else {
-			modal.currSubDomain += 1;
+			//middle of domain
+			modal.setDomainAndSubDomain({
+				domainIdx: modal.currDomain,
+				subDomainIdx: modal.currSubDomain + 1
+			});
 		}
 
 		modal.handlePositionChange();
@@ -272,19 +264,15 @@
 			// formData: $state.snapshot(formData),
 			currDomain: $state.snapshot(modal.currDomain),
 			currSubDomain: $state.snapshot(modal.currSubDomain),
-			currModalVideoId: $state.snapshot(modal.currModalVideoId),
-			isOpen: $state.snapshot(modal.isOpen),
 			maxSeenDomain: $state.snapshot(modal.maxSeenDomain),
-			maxSeenSubDomain: $state.snapshot(modal.maxSeenSubDomain),
-			manualIsOpen: $state.snapshot(modal.manualIsOpen)
+			maxSeenSubDomain: $state.snapshot(modal.maxSeenSubDomain)
+
 			// currModalVideoId: $state.snapshot(modal.currModalVideoId),
 			// currQuestionsProgress: $state.snapshot(currQuestionsProgress),
 			// isLastQuestion: $state.snapshot(isLastQuestion),
 			// totalQuestions: $state.snapshot(totalQuestions)
 		});
 	});
-
-	$inspect(modal.isOpen);
 </script>
 
 <!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->

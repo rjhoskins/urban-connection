@@ -1,5 +1,19 @@
 import { getContext, setContext } from 'svelte';
 
+interface AssessmentState {
+	assessmentParticipantName: string;
+	currAssessmentId: number | undefined;
+	currAssessmentData: any[];
+	currAssessmentStatus: string;
+	assessmentQuestions: any[];
+
+	setAssessmentParticipantName: (name: string) => void;
+	setAssessmentId: (assessmentId: number | undefined) => void;
+	setcurrAssessmentData: (currAssessmentData: any) => void;
+	setcurrAssessmentStatus: (currAssessmentStatus: string) => void;
+	setAssessmentQuestions: (assessmentQuestions: any[]) => void;
+}
+
 class AssessmentStateClass implements AssessmentState {
 	assessmentParticipantName = $state('');
 	currAssessmentId = $state<number | undefined>(undefined);

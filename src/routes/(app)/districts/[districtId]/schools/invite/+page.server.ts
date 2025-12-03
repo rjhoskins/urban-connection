@@ -1,7 +1,6 @@
 import { superValidate } from 'sveltekit-superforms';
 import {
-	inviteNewUserSchema,
-	newUserTokenSchema,
+	inviteNewCoAdminUserSchema,
 	schoolAdminUserInviteHTMLEmailTemplateSchema
 } from '$lib/schema';
 import { zod } from 'sveltekit-superforms/adapters';
@@ -9,93 +8,54 @@ import { message } from 'sveltekit-superforms';
 import type { PageServerLoad, Actions } from './$types.js';
 import { fail } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
-
 import { redirect } from '@sveltejs/kit';
 import { handleLogFlashReturnFormError } from '$lib/utils';
-
 import { setFlash } from 'sveltekit-flash-message/server';
 import { INITIAL_HTML_DATA } from '$lib/constants.js';
 import { htmlEmailTemplates } from '$lib/server/db/schema/index.js';
-import { getLatestHtmlTemplateDataByType } from '$lib/server/queries';
+import { getLatestHtmlTemplateDataByType, getUnusedAdminInviteById } from '$lib/server/queries';
+import { handleInviteCoAdminSubmitEvent } from '$lib/server-events.js';
+import { error } from 'console';
 
 export const load: PageServerLoad = async (event) => {
-	const token = event.url.searchParams.get('inviteToken');
-	// console.log('token => ', token);
+	if (!event.locals.user) return redirect(302, '/auth/login');
+	const user = event.locals.user;
+	if (!user) return fail(400, { message: 'User not authenticated' });
 
+	const adminInviteId = event.url.searchParams.get('adminInviteId');
+	console.log('adminInviteId => ', adminInviteId);
+	if (!adminInviteId) {
+		throw error(404, 'Invite not found or invalid');
+	}
+
+	const inviteForm = await superValidate(zod(inviteNewCoAdminUserSchema));
+	if (!inviteForm.valid) {
+		console.log('inviteForm.errors => ', inviteForm.errors);
+	}
+
+	const unusedAdminUserInvite = await getUnusedAdminInviteById({ inviteId: adminInviteId! });
+	if (!unusedAdminUserInvite) {
+		throw error(404, 'Invite not found or invalid');
+	}
+
+	console.log('unusedAdminUserInvite => ', unusedAdminUserInvite);
 	const htmlTemplate = await getLatestHtmlTemplateDataByType();
 	console.log('loaded htmlTemplate => ', htmlTemplate);
-	const inviteForm = await superValidate(zod(inviteNewUserSchema));
 	const emailForm = await superValidate(zod(schoolAdminUserInviteHTMLEmailTemplateSchema));
 	emailForm.data = htmlTemplate?.template?.keyPoints?.length
 		? htmlTemplate.template
 		: { ...INITIAL_HTML_DATA, keyPoints: [''] };
 
-	// console.log('emailForm => ', emailForm);
-
 	return {
-		token,
+		unusedAdminUserInvite,
 		inviteForm,
 		emailForm: emailForm,
+		schoolAdminHtmlTemplate: await getLatestHtmlTemplateDataByType(),
 		canEditForm: event.locals.user?.role === 'super_admin'
 	};
 };
 export const actions: Actions = {
-	invite: async (event) => {
-		if (!event.locals.user) return redirect(302, '/auth/login');
-		const form = await superValidate(event, zod(inviteNewUserSchema));
-		if (!form.valid) {
-			return handleLogFlashReturnFormError({
-				type: 'error',
-				form,
-				message: 'Invalid form',
-				status: 400,
-				event
-			});
-		}
-
-		//check if valid token/invite
-		const decodedToken = decodeAdminUserInviteToken(form.data.inviteId);
-		try {
-			const htmlTemplate = await getLatestHtmlTemplateDataByType();
-			if (!htmlTemplate) {
-				return handleLogFlashReturnFormError({
-					type: 'error',
-					form,
-					message: 'No html template found',
-					status: 404,
-					event
-				});
-			}
-			const res = await event.fetch('/api/send-admin-email-invite', {
-				method: 'POST',
-				headers: {
-					'content-type': 'application/json'
-				},
-				body: JSON.stringify({
-					to: form.data.email,
-					subject: 'You have been invited to join the platform',
-					inviteLink: `${event.url.origin}/auth/register?adminInviteId=${createAdminUserInviteToken(form.data.name, form.data.email, form.data.inviteId)}`,
-					htmlEmailContent: htmlTemplate.template
-				})
-			});
-			if (!res.ok) {
-				const errorMessage = await res.text();
-				throw new Error(`Failed to send email: ${errorMessage}`);
-			}
-		} catch (error) {
-			const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
-			return handleLogFlashReturnFormError({
-				type: 'error',
-				form,
-				message: errorMessage,
-				status: 500,
-				event
-			});
-		}
-
-		setFlash({ type: 'success', message: 'Invite sent!' }, event.cookies);
-		redirect(302, '/');
-	},
+	invite: async (event) => handleInviteCoAdminSubmitEvent(event),
 	email: async (event) => {
 		const form = await superValidate(
 			event.request,
@@ -133,7 +93,5 @@ export const actions: Actions = {
 		}
 
 		setFlash({ type: 'success', message: 'Email template data saved' }, event.cookies);
-
-		// return form;
 	}
 };

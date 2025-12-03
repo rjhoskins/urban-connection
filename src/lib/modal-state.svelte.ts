@@ -10,15 +10,27 @@ enum ModalMode {
 interface ModalsState {
 	// props
 	mode: ModalMode;
-	isOpen: boolean;
 	manualSetVideoId: string;
 	currDomain: number;
 	currSubDomain: number;
 	isResumeAssessmentOpen: boolean;
+	isResumeAssessmentResume: boolean;
+	ytModalIsOpen: boolean;
+	ytIsManualVid: boolean;
+	maxSeenDomain: number;
+	maxSeenSubDomain: number;
+	currYTModalVideoId: string | undefined;
 
 	// methods
-	open: () => void;
-	close: () => void;
+	handlePositionChange: () => void;
+	handleModalVideoClose: () => void;
+	handleManualVideoSelect: (videoId: string) => void;
+	setDomainAndSubDomain: (params: { domainIdx: number; subDomainIdx: number }) => void;
+	clearManualSetVideoId: () => void;
+	fhandleOutSideClick: (event: MouseEvent) => void;
+	setModalEmbeddedId: (videoId: string) => void;
+	returnToAutoVideoSelect: () => void;
+	setMaxSeens: () => void;
 	toggle: () => void;
 }
 
@@ -48,6 +60,12 @@ export class ModalsStateClass implements ModalsState {
 
 	get maxSeenSubDomain() {
 		return this.#maxSeenSubDomain;
+	}
+	get currDomain() {
+		return this.#currDomain;
+	}
+	get currSubDomain() {
+		return this.#currSubDomain;
 	}
 
 	currYTModalVideoId = $derived.by(() => {

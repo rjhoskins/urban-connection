@@ -5,8 +5,7 @@
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 
 	import * as Card from '$lib/components/ui/card';
-	import { inviteNewAdminUserSchema } from '$lib/schema.js';
-	// import { decodeAdminUserInviteToken } from '$lib/utils';
+	import { inviteNewCoAdminUserSchema } from '$lib/schema.js';
 	/** @type {{ data: import('./$types').PageData, form: import('./$types').ActionData }} */
 	import { Field, Control, Label, FieldErrors, Description } from 'formsnap';
 	import { superForm } from 'sveltekit-superforms';
@@ -18,17 +17,17 @@
 	import { onMount } from 'svelte';
 
 	let { page, data, unusedAdminUserInvite, canEditForm } = $props();
-	const { name, email, adminInviteId } = unusedAdminUserInvite;
+	const { name, email, phone } = unusedAdminUserInvite;
 	const form = superForm(data.inviteForm, {
 		dataType: 'json',
-		validators: zodClient(inviteNewAdminUserSchema)
+		validators: zodClient(inviteNewCoAdminUserSchema)
 	});
 	const { form: formData, enhance, message, delayed } = form;
 
 	$effect(() => {
 		$formData.name = name;
 		$formData.email = email;
-		$formData.adminInviteId = adminInviteId;
+		$formData.phone = phone;
 	});
 </script>
 
@@ -62,12 +61,13 @@
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
-	<!-- publicId -->
-	<Form.Field class="hidden space-y-0" {form} name="adminInviteId">
+
+	<!-- email -->
+	<Form.Field class="hidden space-y-0" {form} name="phone">
 		<Form.Control>
 			{#snippet children({ props })}
-				<Form.Label class="sr-only">Admin InviteId</Form.Label>
-				<Input type="hidden" {...props} bind:value={$formData.adminInviteId} />
+				<Form.Label class="sr-only">Admin Phone</Form.Label>
+				<Input type="hidden" {...props} bind:value={$formData.phone} />
 			{/snippet}
 		</Form.Control>
 		<Form.FieldErrors />

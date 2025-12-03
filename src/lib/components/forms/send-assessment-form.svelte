@@ -6,7 +6,6 @@
 
 	import * as Card from '$lib/components/ui/card';
 	import { sendAssessmentInviteSchem } from '$lib/schema.js';
-	import { decodeAdminUserInviteToken } from '$lib/utils';
 	import { superForm } from 'sveltekit-superforms';
 	import SuperDebug from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
@@ -14,7 +13,6 @@
 	import { LoaderCircle } from 'lucide-svelte';
 
 	let { inviteText = $bindable(), data } = $props();
-	// const { name, email, inviteId } = decodeAdminUserInviteToken(token);
 	const form = superForm(data.form, {
 		validators: zodClient(sendAssessmentInviteSchem)
 	});

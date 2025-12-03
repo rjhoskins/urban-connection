@@ -70,6 +70,7 @@ export const actions: Actions = {
 
 		const sessionToken = auth.generateSessionToken();
 		const session = await auth.createSession(sessionToken, existingUser.id);
+		if (!session.expiresAt) throw new Error('Session expiry not set');
 		auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
 
 		return redirect(302, '/auth/login');
@@ -97,14 +98,14 @@ export const actions: Actions = {
 				parallelism: 1
 			});
 			let newUserRes = await simpleRegisterToBeDEPRICATED({
-				id: userId,
 				passwordHash,
 				username: form.data.username
 			});
 			console.log('register newUserRes => ', newUserRes);
 
 			const sessionToken = auth.generateSessionToken();
-			const session = await auth.createSession(sessionToken, userId);
+			const session = await auth.createSession(sessionToken, newUserRes.id);
+			if (!session.expiresAt) throw new Error('Session expiry not set');
 			auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
 		} catch (e) {
 			return handleTypeSafeError(e, 'A user with this email address already exists.', form);

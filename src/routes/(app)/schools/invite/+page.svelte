@@ -1,5 +1,4 @@
 <script lang="ts">
-	/** @type {{ data: PageData }} */
 	import { page } from '$app/state';
 	import InviteUserByEmailForm from '$lib/components/forms/super-invite-user-by-email-form.svelte';
 	import type { PageData } from './$types';
@@ -10,7 +9,7 @@
 	import Dialog from '$lib/components/dialog.svelte';
 	import HtmlEmailUserInviteForm from '$lib/components/forms/html-email-user-invite-form.svelte';
 
-	let { data } = $props();
+	let { data }: { data: PageData } = $props();
 	const { unusedAdminUserInvite, canEditForm } = data;
 
 	$effect(() => {

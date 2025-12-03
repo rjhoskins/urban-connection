@@ -27,11 +27,9 @@ import district from './db/schema/districts';
 
 export async function simpleRegisterToBeDEPRICATED(
 	{
-		id,
 		passwordHash,
 		username
 	}: {
-		id: string;
 		passwordHash: string;
 		username: string; // email-based username;
 	},
@@ -39,7 +37,7 @@ export async function simpleRegisterToBeDEPRICATED(
 ) {
 	let [newUserRes] = await db
 		.insert(users)
-		.values({ id, username, isActive: true, passwordHash })
+		.values({ username, isActive: true, passwordHash })
 		.returning({ id: users.id });
 	return newUserRes || null;
 }
@@ -449,17 +447,24 @@ export async function getSchoolDataById({ id }: { id: string }): Promise<
 	if (dev) console.log('getSchoolById res => ', res);
 	return res || null;
 }
-export async function getSchoolByIdWithAdmins({ id }: { id: string }): Promise<
-	any[] | null
-	// {
-	// id: string;
-	// name: string;
-	// admins: { id: string; name: string; phone: string}[];
-	// assessments: { id: string; status: typeof assessmentStatusEnum.enumValues[number]}[];
-	//   }[]
-
-	// | null
-> {
+export async function getSchoolByIdWithAdmins({ id }: { id: string }): Promise<{
+	id: string;
+	name: string;
+	districtId: string;
+	isPaid: unknown;
+	admins: {
+		id: string;
+		user: {
+			name: string | null;
+			phone: string | null;
+			username: string;
+		};
+	}[];
+	assessments: {
+		id: string;
+		status: 'sent' | 'started' | 'completed';
+	}[];
+} | null> {
 	const res = await db.query.schools.findFirst({
 		where: eq(schools.id, id),
 		columns: { id: true, name: true, districtId: true },
@@ -472,7 +477,6 @@ export async function getSchoolByIdWithAdmins({ id }: { id: string }): Promise<
 			assessments: { columns: { id: true, status: true } }
 		}
 	});
-	if (dev) console.log('getSchoolByIdWithAdmins res => ', res);
 	return res || null;
 }
 

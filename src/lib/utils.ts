@@ -21,7 +21,7 @@ export function handleTypeSafeError(error: unknown, message: any, form: any) {
 
 interface HandleLogFlashReturnFormErrorParams {
 	type: 'error' | 'success';
-	form: SuperValidated<any> | null;
+	form: SuperValidated<any, Message, any> | null;
 	message: string | Message;
 	status: 400 | 401 | 402 | 403 | 404 | 500;
 	event: RequestEvent;
@@ -29,13 +29,13 @@ interface HandleLogFlashReturnFormErrorParams {
 
 export function handleLogFlashReturnFormError({
 	type,
-	form,
+	form = null,
 	message: messageText,
 	status: statusNum,
 	event
 }: HandleLogFlashReturnFormErrorParams) {
 	setFlash({ type, message: messageText.toString() }, event.cookies);
-	return message(form, { status: type, text: messageText.toString() });
+	return message(form!, { status: type, text: messageText.toString() });
 }
 
 export function generateAdminInviteEmail(

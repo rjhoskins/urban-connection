@@ -13,7 +13,7 @@ export const load = (async (event) => {
 	const schoolId = event.params.schoolId;
 
 	if (!event.locals.user) throw redirect(302, '/auth/login');
-	if (!event.locals.user.role === 'school_admin') {
+	if (event.locals.user.role === 'school_admin') {
 		throw error(403, 'Forbidden');
 	}
 	const schoolData = await getSchoolDetailsById(schoolId);

@@ -81,7 +81,7 @@ export const inviteNewCoAdminUserSchema = z.object({
 	email: z.string().email({ message: 'invalid email' }),
 	phone: z.string().optional()
 });
-export const registerNewAdminUserSchema = z.object({
+export const inviteNewAdminUserToRegisterSchema = z.object({
 	name: z.string(),
 	adminInviteId: z.string(),
 	email: z.string().email({ message: 'invalid email' }),
@@ -214,7 +214,7 @@ export const colors = {
 	blk: 'Black'
 } as const;
 
-export const schema = z.object({
+export const ErrorPageSchema = z.object({
 	// email: z.string().email('Please enter a valid email.'),
 	// bio: z.string().optional(),
 	// fruit: z.string().optional(),

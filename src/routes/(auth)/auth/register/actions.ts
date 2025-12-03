@@ -75,6 +75,7 @@ export const actions: Actions = {
 			// Create session and set cookie
 			const sessionToken = auth.generateSessionToken();
 			const session = await auth.createSession(sessionToken, result.id);
+			if (!session.expiresAt) throw new Error('Session expiry not set');
 			auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
 		} catch (error) {
 			const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);

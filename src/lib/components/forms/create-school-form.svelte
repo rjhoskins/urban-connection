@@ -32,7 +32,7 @@
 	const { form: formData, enhance, message, delayed, tainted, submitting } = form;
 
 	let unSavedChangesModalOpen = $state(false);
-	let navigateToUrl = $state('');
+	let navigateToUrl: URL['href'] | undefined = $state('');
 	let formHasBeenUpdated = $state(false);
 	beforeNavigate(async ({ to, cancel }) => {
 		if (submitting) return;
@@ -45,7 +45,7 @@
 	});
 	function handleLeave() {
 		unSavedChangesModalOpen = false;
-		goto(navigateToUrl);
+		goto(navigateToUrl?.toString() || '/schools');
 	}
 	formData.update(
 		($formData) => {

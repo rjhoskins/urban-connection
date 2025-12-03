@@ -10,7 +10,6 @@ import type { Actions, PageServerLoad } from '../$types';
 import { setFlash } from 'sveltekit-flash-message/server';
 import {
 	checkRegisteredUserExists,
-	getAndSetAdminInviteUsedById,
 	getUnusedAdminInviteById,
 	updateAdminInviteWithInviteeAndMarkUsed,
 	updateUserWithPassword

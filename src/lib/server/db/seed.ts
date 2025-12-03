@@ -88,7 +88,7 @@ async function createSubDomainIfNotExists({
 	description
 }: {
 	name: string;
-	domainId: number;
+	domainId: string;
 	description: string;
 }) {
 	const [subDomain] = await db
@@ -103,7 +103,7 @@ async function createQuestionIfNotExists({
 	subDomainId
 }: {
 	text: string;
-	subDomainId: number;
+	subDomainId: string;
 }) {
 	const [question] = await db
 		.insert(assessmentQuestions)

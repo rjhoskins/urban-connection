@@ -3,7 +3,7 @@
 	import SuperDebug, { superForm } from 'sveltekit-superforms';
 	import { Field, Control, Fieldset } from 'formsnap';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { schema, errorPageList } from '$lib/schema';
+	import { ErrorPageSchema, errorPageList } from '$lib/schema';
 	import * as Card from '$lib/components/ui/card';
 	import { ShieldAlertIcon } from 'lucide-svelte';
 	let { data } = $props();
@@ -17,7 +17,7 @@
 	});
 
 	const form = superForm(localFormData.form, {
-			validators: zodClient(schema)
+			validators: zodClient(ErrorPageSchema)
 		}),
 		{ form: formData, enhance } = form;
 </script>
@@ -28,7 +28,7 @@
 			<ShieldAlertIcon class="size-8 text-red-700" /><span>Oops! Murphy’s Law?</span></Card.Title
 		>
 		<Card.Description class="text-primary text-lg">
-			Well, this is unexpected. It seems like Murphy’s Law is in full effect here.</Card.Description
+			Hmmm... well, this is unexpected. It seems like Murphy’s Law is in full effect here.</Card.Description
 		>
 	</Card.Header>
 	<Card.Content>

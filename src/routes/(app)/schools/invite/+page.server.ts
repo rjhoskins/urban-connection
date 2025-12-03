@@ -1,6 +1,6 @@
 import { superValidate } from 'sveltekit-superforms';
 import {
-	inviteNewAdminUserSchema,
+	inviteNewCoAdminUserSchema,
 	schoolAdminUserInviteHTMLEmailTemplateSchema
 } from '$lib/schema';
 import { zod } from 'sveltekit-superforms/adapters';
@@ -14,6 +14,7 @@ import { setFlash } from 'sveltekit-flash-message/server';
 import { INITIAL_HTML_DATA } from '$lib/constants.js';
 import { htmlEmailTemplates } from '$lib/server/db/schema/index.js';
 import { getUnusedAdminInviteById, getLatestHtmlTemplateDataByType } from '$lib/server/queries';
+import { handleInviteCoAdminSubmitEvent } from '$lib/server-events.js';
 
 export const load: PageServerLoad = async (event) => {
 	console.log('INVITE +page.server.ts load ===================');
@@ -32,7 +33,7 @@ export const load: PageServerLoad = async (event) => {
 
 	const htmlTemplate = await getLatestHtmlTemplateDataByType();
 	console.log('loaded htmlTemplate => ', htmlTemplate);
-	const inviteForm = await superValidate(zod(inviteNewAdminUserSchema));
+	const inviteForm = await superValidate(zod(inviteNewCoAdminUserSchema));
 	const emailForm = await superValidate(zod(schoolAdminUserInviteHTMLEmailTemplateSchema));
 	emailForm.data = htmlTemplate?.template?.keyPoints?.length
 		? htmlTemplate.template
@@ -49,64 +50,7 @@ export const load: PageServerLoad = async (event) => {
 	};
 };
 export const actions: Actions = {
-	invite: async (event) => {
-		if (!event.locals.user) return redirect(302, '/auth/login');
-		const form = await superValidate(event, zod(inviteNewAdminUserSchema));
-		if (!form.valid) {
-			return handleLogFlashReturnFormError({
-				type: 'error',
-				form,
-				message: 'Invalid form',
-				status: 400,
-				event
-			});
-		}
-
-		try {
-			const htmlTemplate = await getLatestHtmlTemplateDataByType();
-			if (!htmlTemplate) {
-				return handleLogFlashReturnFormError({
-					type: 'error',
-					form,
-					message: 'No html template found',
-					status: 404,
-					event
-				});
-			}
-			console.log('htmlTemplate => ', htmlTemplate);
-			const res = await event.fetch('/api/send-admin-email-invite', {
-				method: 'POST',
-				headers: {
-					'content-type': 'application/json'
-				},
-				body: JSON.stringify({
-					to: form.data.email,
-					subject: 'You have been invited to join the platform',
-					inviteLink: `${event.url.origin}/auth/register?adminInviteId=${form.data.adminInviteId}`,
-					htmlEmailContent: htmlTemplate.template
-				})
-			});
-
-			if (!res.ok) {
-				const errorMessage = await res.text();
-				throw new Error(`Failed to send email: ${errorMessage}`);
-			}
-			// console.log('res => ', await res.text());
-			// return error(500, 'Email sending disabled for demo');
-		} catch (error) {
-			const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
-			return handleLogFlashReturnFormError({
-				type: 'error',
-				form,
-				message: errorMessage,
-				status: 500,
-				event
-			});
-		}
-
-		setFlash({ type: 'success', message: 'Invite sent!' }, event.cookies);
-		redirect(302, '/');
-	},
+	invite: async (event) => handleInviteCoAdminSubmitEvent(event),
 	email: async (event) => {
 		const form = await superValidate(
 			event.request,
@@ -144,7 +88,5 @@ export const actions: Actions = {
 		}
 
 		setFlash({ type: 'success', message: 'Email template data saved' }, event.cookies);
-
-		// return form;
 	}
 };
