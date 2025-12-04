@@ -47,7 +47,6 @@
 		"prettier-plugin-tailwindcss": "^0.6.11",
 		"svelte": "^5.22.4",
 		"svelte-check": "^4.1.4",
-		"sveltekit-flash-message": "^2.4.6",
 		"sveltekit-superforms": "^2.23.1",
 		"tailwind-merge": "^3.0.2",
 		"tailwind-variants": "^0.3.1",
@@ -92,6 +91,7 @@
 		"postgres": "^3.4.5",
 		"stripe": "^18.4.0",
 		"svelte-french-toast": "^2.0.0-alpha.0",
+		"sveltekit-flash-message": "^2.4.6",
 		"ulid": "^3.0.1"
 	}
 }

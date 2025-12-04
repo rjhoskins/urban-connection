@@ -10,7 +10,7 @@
 	const { demographicsFields, assessmentInviteId } = data;
 
 	onMount(() => {
-		modal.isResumeAssessmentOpen = true;
+		// modal.isResumeAssessmentOpen = true;
 	});
 </script>
 

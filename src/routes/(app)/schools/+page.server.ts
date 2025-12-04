@@ -70,10 +70,6 @@ export const actions = {
 		const { createdBy, schoolId } = await request.json();
 		console.log('login action called with ', { createdBy, schoolId });
 		console.log('actions LOCALS', locals);
-		// const newAssessmentInvite = await createAssessmentInvite({
-		// 	schoolId,
-		// 	createdBy
-		// });
 
 		if (locals.user?.id !== createdBy) {
 			return error(401, 'Unauthorized');

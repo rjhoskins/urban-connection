@@ -10,7 +10,7 @@ import { error, redirect, type RequestEvent } from '@sveltejs/kit';
 import { setFlash } from 'sveltekit-flash-message/server';
 import type { PgTransaction } from 'drizzle-orm/pg-core';
 import type { PostgresJsQueryResultHKT } from 'drizzle-orm/postgres-js';
-import db from '$lib/server/db';
+import { db } from '$lib/server/db';
 
 export function load({ cookies, url }) {
 	console.log('Assessment Welcome Page Load===========================================');
@@ -43,6 +43,7 @@ export const actions = {
 		const { name, email, assessmentInviteId, yearsTeaching, educationLevel } = Object.fromEntries(
 			data.entries()
 		);
+
 		if (!assessmentInviteId) {
 			console.error('Missing assessment invite ID');
 			return error(400, 'Invalid request: invalid or missing assessment invite ID');
@@ -60,50 +61,63 @@ export const actions = {
 		try {
 			const result = await db.transaction(
 				async (trx: PgTransaction<PostgresJsQueryResultHKT, any, any> | undefined) => {
-					const newAssessment = await createAssessment(
+					console.log('Creating assessment within transaction for invite:', {
+						assessmentId: assessmentInviteId,
+						name,
+						email,
+						schoolId: currAssessmentInvite.schoolId,
+						createdBy: currAssessmentInvite.createdBy
+					});
+					const assessRes = await createAssessment(
 						{
 							participantName: name as string,
 							participantEmail: email as string,
 							schoolId: currAssessmentInvite.schoolId,
-							createdBy: currAssessmentInvite.createdBy ? currAssessmentInvite.createdBy : '',
+							createdBy: currAssessmentInvite.createdBy!,
 							assessmentInviteId: assessmentInviteId as string //cool bc if we get here we know it's valid
 						},
 						trx
 					);
+					console.log('Assessment creation result:', assessRes);
 
-					if (!newAssessment) {
+					if (!assessRes) {
 						console.error('Failed to create assessment for:', email);
 						return error(500, 'Failed to create assessment. Please try again later.');
 					}
 
-					const newDemographics = await createDemographicsData(
+					const newDemRes = await createDemographicsData(
 						{
-							assessmentId: newAssessment.id,
+							assessmentId: assessRes.id,
 							schoolId: currAssessmentInvite.schoolId,
 							yearsTeaching: parseInt(yearsTeaching as string, 10),
 							educationLevel: educationLevel as string
 						},
 						trx
 					);
+					if (!newDemRes) {
+						console.error('Failed to create demographics for assessment:', assessRes.id);
+						return error(500, 'Failed to create demographics. Please try again later.');
+					}
 
-					return { newAssessment, newDemographics };
+					return { assessRes, newDemRes };
 				}
 			);
 
 			logIfDev('New assessment & demographics created:', newAssessment, newDemographics);
-			newAssessment = result.newAssessment;
-			newDemographics = result.newDemographics;
+			newAssessment = result.assessRes;
+			newDemographics = result.newDemRes;
 		} catch (error) {
 			const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
 			const UnexpectedErrorMsg = 'Unexpected error: ' + errorMessage;
-			return handleLogFlashReturnFormError({
-				type: 'error',
-				form: null,
-				message: UnexpectedErrorMsg,
-				status: 500,
-				event
-			});
 		}
+		if (!newAssessment) {
+			setFlash(
+				{ type: 'error', message: 'Could not create assessment. Please try again later.' },
+				event.cookies
+			);
+			return error(404, 'Could not create assessment. Please try again later.');
+		}
+		redirect(303, `/urban-connection-project-assessment?assessmentId=${newAssessment.id}`);
 	},
 
 	resume: async (event) => {

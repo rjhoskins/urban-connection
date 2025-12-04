@@ -1083,16 +1083,19 @@ export async function createAssessment(
 	},
 	trx?: PgTransaction<PostgresJsQueryResultHKT, any, any>
 ): Promise<{ id: string } | null> {
+	logIfDev('START createAssessment newAssessment => ');
 	const queryBuilder = trx ? trx.insert(assessments) : db.insert(assessments);
-	const [newAssessment] = await queryBuilder.values({
-		participantName,
-		participantEmail,
-		schoolId,
-		createdBy,
-		assessmentInviteId
-		// status: 'started' is default
-	});
-
+	const [newAssessment] = await queryBuilder
+		.values({
+			participantName,
+			participantEmail,
+			schoolId,
+			createdBy,
+			assessmentInviteId
+			// status: 'started' is default
+		})
+		.returning({ id: assessments.id });
+	logIfDev('createAssessment newAssessment => ', newAssessment);
 	return newAssessment || null;
 }
 
@@ -1278,20 +1281,6 @@ export async function getSchoolDetailsById(
 
 	return results || null;
 }
-// export const getSchoolAssessmentIDByTokenCode = async ({
-// 	schoolId,
-// 	code
-// }: {
-// 	schoolId: string;
-// 	code: string;
-// }) => {
-// 	const [res] = await db
-// 		.select({ id: assessments.id, status: assessments.status })
-// 		.from(assessments)
-// 		.where(and(eq(assessments.tokenCode, code), eq(assessments.schoolId, schoolId)));
-// 	if (dev) console.log('getSchoolAssessmentIDByTokenCode => ', res);
-// 	return res || null;
-// };
 
 export const getAssessmentById = async ({ id }: { id: string }) => {
 	const [res] = await db

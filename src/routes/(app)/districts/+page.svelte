@@ -24,9 +24,9 @@
 </script>
 
 <h1 class="sr-only">Manage All Districts</h1>
-<pre class="">{JSON.stringify(data, null, 2)}</pre>
+<!-- <pre class="">{JSON.stringify(data, null, 2)}</pre> -->
 
-<section class=" grid-cols-four-fluid sizes grid max-w-6xl gap-4 py-8">
+<section class=" grid-cols-four-fluid grid max-w-6xl gap-4 py-8">
 	{#if districts?.length === 0}
 		<p class="col-span-full text-center text-lg">No districts found.</p>
 	{/if}

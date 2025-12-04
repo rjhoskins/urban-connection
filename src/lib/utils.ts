@@ -29,13 +29,13 @@ interface HandleLogFlashReturnFormErrorParams {
 
 export function handleLogFlashReturnFormError({
 	type,
-	form = null,
+	form,
 	message: messageText,
 	status: statusNum,
 	event
 }: HandleLogFlashReturnFormErrorParams) {
 	setFlash({ type, message: messageText.toString() }, event.cookies);
-	return message(form!, { status: type, text: messageText.toString() });
+	return message(form, { status: type, text: messageText.toString() });
 }
 
 export function generateAdminInviteEmail(
