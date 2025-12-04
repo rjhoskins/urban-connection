@@ -6,6 +6,10 @@
 	const globals = getGlobalsContext();
 	import { onMount } from 'svelte';
 
+	import { Grid2X2, List } from 'lucide-svelte';
+	import { Button } from '$lib/components/ui/button';
+	let isSummaryView = $state(true);
+
 	let { data }: { data: PageData } = $props();
 	const { domainData, questionsData } = data;
 	onMount(() => {
@@ -14,9 +18,22 @@
 </script>
 
 <section class="mx-auto grid max-w-7xl gap-4 p-2 lg:p-8">
+	<Card.Root class="my-4 flex justify-end gap-4 p-4">
+		<Button
+			class="flex items-center justify-center"
+			variant={`${!isSummaryView ? 'default' : 'secondary'}`}
+			onclick={() => (isSummaryView = false)}><List /><span>Detail</span></Button
+		>
+		<Button
+			variant={`${isSummaryView ? 'default' : 'secondary'}`}
+			class="flex items-center justify-center"
+			onclick={() => (isSummaryView = true)}><Grid2X2 /><span>Summary</span></Button
+		>
+	</Card.Root>
 	<h1 class="sr-only">All Time Totals</h1>
-	<div class=" p-4">
-		<div class="grid grid-cols-2 gap-4">
+
+	<div class="grid grid-cols-2 gap-4">
+		{#if domainData.length !== 0}
 			{#each domainData as domain (domain.domainId)}
 				<ul class="space-y-4">
 					{@render domainCard({
@@ -25,18 +42,22 @@
 						pointsTotal: domain.pointsTotal,
 						questionsTotal: domain.questionsTotal
 					})}
-					{#each questionsData.filter((q) => q.domainId === domain.domainId) as question (question.questionId)}
-						{@render questionCard({
-							questionId: question.questionId ?? '',
-							domainId: question.domainId ?? '',
-							pointsTotal: question.pointsTotal,
-							questionsTotal: question.questionsTotal,
-							questionText: question.questionText ?? ''
-						})}
-					{/each}
+					{#if !isSummaryView}
+						{#each questionsData.filter((q) => q.domainId === domain.domainId) as question (question.questionId)}
+							{@render questionCard({
+								questionId: question.questionId ?? '',
+								domainId: question.domainId ?? '',
+								pointsTotal: question.pointsTotal,
+								questionsTotal: question.questionsTotal,
+								questionText: question.questionText ?? ''
+							})}
+						{/each}
+					{/if}
 				</ul>
 			{/each}
-		</div>
+		{:else}
+			<p>No data available</p>
+		{/if}
 	</div>
 </section>
 
