@@ -31,7 +31,7 @@
 	let isGridView = $state(true);
 
 	onMount(() => {
-		globals.setPageName('Manage Districtz | ' + disctrictWithSchools.name);
+		globals.setPageName('Manage Districts | ' + disctrictWithSchools.name);
 		console.log('District Page Data:', data);
 	});
 </script>
