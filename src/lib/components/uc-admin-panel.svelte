@@ -16,13 +16,13 @@
 			imgUrl: '/img/districts.png',
 			imgStyleDimensions: 'height: 60px; width: 60px;'
 		},
-		{
-			title: 'Manage Schools',
-			linkurl: '/schools',
-			description: 'Add an admin or access your assessment invite link.',
-			imgUrl: '/img/schools.png',
-			imgStyleDimensions: 'height: 60px; width: 60px;'
-		},
+		// {
+		// 	title: 'Manage Schools',
+		// 	linkurl: '/schools',
+		// 	description: 'Add an admin or access your assessment invite link.',
+		// 	imgUrl: '/img/schools.png',
+		// 	imgStyleDimensions: 'height: 60px; width: 60px;'
+		// },
 		{
 			title: 'View Results Dashboard',
 			linkurl: '/results',
