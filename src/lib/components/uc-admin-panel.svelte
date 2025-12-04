@@ -23,13 +23,13 @@
 		// 	imgUrl: '/img/schools.png',
 		// 	imgStyleDimensions: 'height: 60px; width: 60px;'
 		// },
-		// {
-		// 	title: 'View Results Dashboard',
-		// 	linkurl: '/results',
-		// 	description: 'View completed assessment results for all schools',
-		// 	imgUrl: '/img/results.png',
-		// 	imgStyleDimensions: 'height: 60px; width: 60px;'
-		// },
+		{
+			title: 'View Results Dashboard',
+			linkurl: '/results',
+			description: 'View completed assessment results for all schools',
+			imgUrl: '/img/results.png',
+			imgStyleDimensions: 'height: 60px; width: 60px;'
+		},
 		{
 			title: 'Edit HTML Email Template text',
 			linkurl: '/templates',

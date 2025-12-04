@@ -1,34 +1,34 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	// import * as Card from '$lib/components/ui/card';
-	// import { Progress } from '$lib/components/ui/progress';
-	// import { getGlobalsContext } from '$lib/store/globals-state.svelte';
-	// const globals = getGlobalsContext();
+	import * as Card from '$lib/components/ui/card';
+	import { Progress } from '$lib/components/ui/progress';
+	import { getGlobalsContext } from '$lib/store/globals-state.svelte';
+	const globals = getGlobalsContext();
 	import { onMount } from 'svelte';
 
 	let { data }: { data: PageData } = $props();
-	// const { domainData, questionsData } = data;
-	// onMount(() => {
-	// 	globals.setPageName('Assessment Results | All Time Totals');
-	// });
+	const { domainData, questionsData } = data;
+	onMount(() => {
+		globals.setPageName('Assessment Results | All Time Totals');
+	});
 </script>
 
-<!-- <section class="mx-auto grid max-w-7xl gap-4 p-2 lg:p-8">
+<section class="mx-auto grid max-w-7xl gap-4 p-2 lg:p-8">
 	<h1 class="sr-only">All Time Totals</h1>
 	<div class=" p-4">
 		<div class="grid grid-cols-2 gap-4">
 			{#each domainData as domain (domain.domainId)}
 				<ul class="space-y-4">
 					{@render domainCard({
-						id: domain.domainId ?? 0,
+						id: domain.domainId ?? '',
 						domainName: domain.domainName ?? '',
 						pointsTotal: domain.pointsTotal,
 						questionsTotal: domain.questionsTotal
 					})}
 					{#each questionsData.filter((q) => q.domainId === domain.domainId) as question (question.questionId)}
 						{@render questionCard({
-							questionId: question.questionId ?? 0,
-							domainId: question.domainId ?? 0,
+							questionId: question.questionId ?? '',
+							domainId: question.domainId ?? '',
 							pointsTotal: question.pointsTotal,
 							questionsTotal: question.questionsTotal,
 							questionText: question.questionText ?? ''
@@ -38,12 +38,12 @@
 			{/each}
 		</div>
 	</div>
-</section> -->
+</section>
 
 <!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->
 
-<!-- {#snippet domainCard(domain: {
-	id: number;
+{#snippet domainCard(domain: {
+	id: string;
 	domainName: string;
 	pointsTotal: number;
 	questionsTotal: number;
@@ -70,8 +70,8 @@
 {/snippet}
 
 {#snippet questionCard(question: {
-	questionId: number;
-	domainId: number;
+	questionId: string;
+	domainId: string;
 	pointsTotal: number;
 	questionsTotal: number;
 	questionText: string;
@@ -97,4 +97,4 @@
 			{/if}
 		</Card.Content>
 	</Card.Root>
-{/snippet} -->
+{/snippet}
