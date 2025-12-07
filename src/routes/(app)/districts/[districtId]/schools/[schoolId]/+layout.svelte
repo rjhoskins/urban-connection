@@ -134,35 +134,34 @@
 <section class=" grid max-w-7xl auto-rows-[1fr_auto] grid-cols-2 gap-5">
 	<div class="top mb-11 flex justify-between">
 		<div class="left space-y-3">
-			<div class="flex items-center justify-between gap-4 font-bold text-[#525252]">
+			<div class="grid-rows-auto grid grid-cols-2 gap-8 font-bold text-[#525252]">
 				{#each schoolWithAdmins.admins as admin (admin.id)}
 					<AdminContactDetailsCard {admin} />
 				{/each}
 			</div>
 
-			<div class="btns flex gap-5">
-				<Button
-					href={`${page.url.origin}/districts/${schoolWithAdmins.districtId}/schools/${schoolWithAdmins.id}/invite-coadmin`}
-					class="">Add School Admin</Button
-				>
-				{#if schoolWithAdmins.paid}
-					<Button onclick={copyAsssessmentLink}>Copy Assessment Link</Button>
-				{:else}
-					{#each products as { default_price, name }}
-						<Button
-							onclick={() =>
-								handlePurchase({
-									priceId: default_price,
-									userId: data.user?.id,
-									schoolId: schoolWithAdmins.id
-								})}>Purchase {name}</Button
-						>
-					{/each}
-				{/if}
-				<!-- <Button href={`${window.location.origin}/schools/${school.id}/send-assessment`} class=""
-						>Mass Send Assessment</Button
-					> -->
-			</div>
+			{#if browser}
+				<div class="btns flex flex-wrap gap-5">
+					<Button
+						href={`${window.location.origin}/schools/${schoolWithAdmins.id}/invite-coadmin`}
+						class="">Add School Admin</Button
+					>
+					{#if schoolWithAdmins.isPaid}
+						<Button onclick={copyAsssessmentLink}>Copy Assessment Invite Link</Button>
+					{:else}
+						{#each products as { default_price, name }}
+							<Button
+								onclick={() =>
+									handlePurchase({
+										priceId: default_price,
+										userId: data.user?.id,
+										schoolId: schoolWithAdmins.id
+									})}>Purchase {name}</Button
+							>
+						{/each}
+					{/if}
+				</div>
+			{/if}
 		</div>
 	</div>
 
