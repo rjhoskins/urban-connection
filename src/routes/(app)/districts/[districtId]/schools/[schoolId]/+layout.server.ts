@@ -47,7 +47,7 @@ export const load = async (event) => {
 	}
 	if (event.locals.user.role === 'super_admin') {
 		console.log('super admin!!!!!!!!!!!!!!!!!!!!!!!!!!====================');
-		schoolWithAdminsDataFunc = async () => getSchoolForSuperAdmin(schoolId);
+		schoolWithAdminsDataFunc = async () => getSchoolByIdWithAdmins({ id: schoolId });
 		memberDataFunc = async () => getSchoolMemberAssessmentTotalsForSchoolBySchoolId(schoolId);
 	}
 
