@@ -37,9 +37,39 @@
 		globals.setPageName(pageTitle);
 	});
 
-	function copyAsssessmentLink() {
-		// todo: move to server
-		console.log('copyAsssessmentLink');
+	async function copyAsssessmentLink() {
+		let resData;
+		const res = await fetch('/api/create-assessment-invite', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				schoolId: data.schoolWithAdmins.id,
+				createdBy: data.user?.id
+			})
+		});
+		resData = await res.json();
+
+		console.log('Assessment invite created: ', resData);
+		if (!resData.success) {
+			toast.error(
+				`Error creating assessment link: ${resData.message}, try again later or contact your administrator.`
+			);
+			return;
+		}
+		const assessmentLink = `${page.url.origin}/assessment-welcome?assessmentInviteId=${resData.data.id}`;
+
+		if (browser) {
+			navigator.clipboard.writeText(assessmentLink).then(
+				() => {
+					toast.success('Assessment Invite link copied to clipboard!');
+				},
+				(err) => {
+					toast.error('Could not copy text: ', err);
+				}
+			);
+		}
 	}
 
 	const totalAssessments = memberData.length;
