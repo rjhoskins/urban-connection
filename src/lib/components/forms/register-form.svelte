@@ -11,7 +11,7 @@
 	import { zodClient } from 'sveltekit-superforms/adapters';
 
 	let { data, adminInvite } = $props();
-	const { name, email, adminInviteId } = adminInvite;
+	const { name = '', email = '', adminInviteId = '' } = adminInvite;
 
 	const form = superForm(data.form, {
 		validators: zodClient(registerExistingUserFromInviteSchema)
