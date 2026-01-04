@@ -78,7 +78,7 @@
 			<LoaderCircle class="animate-spin" />
 			Sending...
 		{:else}
-			Send Invitez
+			Send Invite
 		{/if}</Form.Button
 	>
 
