@@ -58,27 +58,22 @@
 	let currOnPageVideoId = $derived.by(() => {
 		switch (modal.currDomain) {
 			case 0:
-				if (modal.currSubDomain === 0) return videoIdMap.get('onPage-domain-awareness') ?? '';
-				break;
+				if (modal.currSubDomain === 0) return videoIdMap.get('onPage-subDomain-awarenessIntro');
+				return '';
 			case 1:
-				if (modal.currSubDomain !== 0) return;
-				return videoIdMap.get('onPage-domain-societalAwareness') ?? '';
-				break;
+				if (modal.currSubDomain !== 0) return '';
+				return videoIdMap.get('onPage-domain-societalAwareness');
 			case 2:
-				if (modal.currSubDomain !== 0) return;
-				return videoIdMap.get('onPage-domain-systems') ?? '';
-				break;
+				if (modal.currSubDomain !== 0) return '';
+				return videoIdMap.get('onPage-domain-systems');
 			case 3:
-				if (modal.currSubDomain !== 0) return;
-				return videoIdMap.get('onPage-domain-buildingRelationships') ?? '';
-				break;
+				if (modal.currSubDomain !== 0) return '';
+				return videoIdMap.get('onPage-domain-buildingRelationships');
 			case 4:
-				if (modal.currSubDomain !== 0) return;
-				videoIdMap.get('onPage-domain-rigorousAndAccessibleContent') ?? '';
-				break;
+				if (modal.currSubDomain !== 0) return '';
+				return videoIdMap.get('onPage-domain-rigorousAndAccessibleContent');
 			default:
 				return '';
-				break;
 		}
 	});
 
@@ -242,14 +237,14 @@
 			assessmentQuestions
 		});
 
-		logIfDev(' REACTIVE STATE:', {
+		console.log('REACTIVE STATE:', {
 			// formData: $state.snapshot(formData),
-			// currDomain: $state.snapshot(modal.currDomain),
-			// currSubDomain: $state.snapshot(modal.currSubDomain),
+			currDomain: $state.snapshot(modal.currDomain),
+			currSubDomain: $state.snapshot(modal.currSubDomain),
 			currYTModalVideoId: $state.snapshot(modal.currYTModalVideoId),
 			ytModalIsOpen: $state.snapshot(modal.ytModalIsOpen),
 			ytIsManualVid: $state.snapshot(modal.ytIsManualVid),
-			// currModalVideoId: $state.snapshot(modal.currModalVideoId),
+			currOnPageVideoId: currOnPageVideoId,
 			maxSeenDomain: $state.snapshot(modal.maxSeenDomain),
 			maxSeenSubDomain: $state.snapshot(modal.maxSeenSubDomain)
 			// currQuestionsProgress: $state.snapshot(currQuestionsProgress),
@@ -297,7 +292,7 @@
 			</div>
 			<div class=" grid grid-cols-2 gap-6">
 				<div class="left col-span-1 flex flex-col gap-4 space-y-3">
-					{#if modal.currSubDomain === 0}
+					{#if modal.currSubDomain === 0 && currOnPageVideoId}
 						<div class="aspect-w-16 aspect-h-9 1st overflow-hidden rounded-3xl">
 							{@html `<iframe class="h-[315px] w-full" src="https://www.youtube.com/embed/${currOnPageVideoId}?rel=0&autoplay=&controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`}
 						</div>
@@ -313,7 +308,7 @@
 						</div>
 						{#if modal.currDomain === 0 && modal.currSubDomain === 0}
 							<div class="aspect-w-16 aspect-h-9 2nd overflow-hidden rounded-3xl">
-								{@html `<iframe class="h-[315px] w-full" src="https://www.youtube.com/embed/${videoIdMap.get('onPage-subDomain-awarenessIntro')}?rel=0&autoplay=0&controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`}
+								{@html `<iframe class="h-[315px] w-full" src="https://www.youtube.com/embed/${videoIdMap.get('onPage-domain-societalAwareness')}?rel=0&autoplay=0&controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`}
 							</div>
 						{/if}
 					{/if}
