@@ -58,8 +58,7 @@
 	let currOnPageVideoId = $derived.by(() => {
 		switch (modal.currDomain) {
 			case 0:
-				if (modal.currSubDomain !== 0) return;
-				return videoIdMap.get('onPage-domain-awareness') ?? '';
+				if (modal.currSubDomain === 0) return videoIdMap.get('onPage-domain-awareness') ?? '';
 				break;
 			case 1:
 				if (modal.currSubDomain !== 0) return;
@@ -299,7 +298,7 @@
 			<div class=" grid grid-cols-2 gap-6">
 				<div class="left col-span-1 flex flex-col gap-4 space-y-3">
 					{#if modal.currSubDomain === 0}
-						<div class="aspect-w-16 aspect-h-9 overflow-hidden rounded-3xl">
+						<div class="aspect-w-16 aspect-h-9 1st overflow-hidden rounded-3xl">
 							{@html `<iframe class="h-[315px] w-full" src="https://www.youtube.com/embed/${currOnPageVideoId}?rel=0&autoplay=&controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`}
 						</div>
 					{/if}
@@ -313,7 +312,7 @@
 							</p>
 						</div>
 						{#if modal.currDomain === 0 && modal.currSubDomain === 0}
-							<div class="aspect-w-16 aspect-h-9 overflow-hidden rounded-3xl">
+							<div class="aspect-w-16 aspect-h-9 2nd overflow-hidden rounded-3xl">
 								{@html `<iframe class="h-[315px] w-full" src="https://www.youtube.com/embed/${videoIdMap.get('onPage-subDomain-awarenessIntro')}?rel=0&autoplay=0&controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`}
 							</div>
 						{/if}

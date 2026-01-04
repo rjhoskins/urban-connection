@@ -14,7 +14,7 @@
 
 <!-- <pre>{JSON.stringify(page, null, 2)}</pre> -->
 <Card.Root
-	class="flex max-w-1/2 flex-col gap-6 px-4 py-2.5 transition-shadow duration-300 ease-in-out hover:shadow-lg"
+	class="flex flex-col gap-6 px-4 py-2.5 transition-shadow duration-300 ease-in-out hover:shadow-lg"
 >
 	<div class="top flex justify-between">
 		<div class="left flex flex-col justify-between">
