@@ -8,7 +8,7 @@
 	const modal = getModalStateContext();
 
 	onMount(() => {
-		modal.handleManualVideoSelect('modal-closing');
+		modal.handleManualVideoSelect(videoIdMap.get('modal-closing')!);
 	});
 </script>
 
