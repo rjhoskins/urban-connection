@@ -104,7 +104,7 @@
 </script>
 
 <!-- <pre>{JSON.stringify(assessmentformData[currDomain].subDomains[currSubDomain], null, 2)}</pre> -->
-<div class="sizes herz col-span-2">
+<div class="herz col-span-2">
 	<form method="POST" id="assessmentForm" class="col-span-2 grid grid-cols-2 gap-2">
 		<div class="col-span-2 grid grid-cols-2 gap-2">
 			{#if isLastQuestion}
@@ -172,7 +172,7 @@
 			{/each}
 		</div>
 
-		<div class="sizes col-span-2 flex justify-end gap-4 pt-2">
+		<div class="col-span-2 flex justify-end gap-4 pt-2">
 			{#if !isFirstQuestion}
 				<Button type="button" onclick={(e) => handlePrev(e)} variant="outline" class="w-fit"
 					>Previous</Button
