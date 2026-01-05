@@ -104,72 +104,75 @@
 </script>
 
 <!-- <pre>{JSON.stringify(assessmentformData[currDomain].subDomains[currSubDomain], null, 2)}</pre> -->
-<div class="">
-	<form method="POST" id="assessmentForm" class=" flex flex-col gap-2">
-		{#if isLastQuestion}
-			<input type="hidden" name="isLastQuestion" value={true} />
-		{/if}
-		<input type="hidden" name="assessmentId" value={assessmentId} />
-		<!-- assessment inputs -->
-		{#each assessmentformData?.[currDomain]?.subDomains?.[currSubDomain]?.questions, questionIdx (questionIdx)}
-			{@const inputName = `domainId=${assessmentformData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}|subDomainId=${assessmentformData[currDomain].subDomains[currSubDomain].id}|qId=${assessmentformData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}`}
-			<Card class="question flex max-w-prose gap-4  p-8">
-				<div class="flex flex-col gap-1.5">
-					<p class="text-lg font-normal text-black/70">
-						<span class="font-bold text-[#1E293B]"
-							>{ZERO_BASED_ALPHABET_NUMBERING[
-								questionIdx as keyof typeof ZERO_BASED_ALPHABET_NUMBERING
-							]}{')'}</span
-						>
-						{assessmentformData[currDomain].subDomains[currSubDomain].questions[questionIdx].text}
-					</p>
-					<div class="inputs flex gap-8">
-						<label class="align-middlex flex cursor-pointer items-center space-x-2">
-							<input
-								type="radio"
-								name={inputName}
-								bind:group={
-									assessmentformData[currDomain].subDomains[currSubDomain].questions[questionIdx]
-										.value
-								}
-								value={1}
-								class="h-4 w-4 border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
-							/>
-							<input
-								type="hidden"
-								name={inputName}
-								bind:group={
-									assessmentformData[currDomain].subDomains[currSubDomain].questions[questionIdx]
-										.value
-								}
-								value={assessmentformData[currDomain].subDomains[currSubDomain].questions[
-									questionIdx
-								].value
-									? assessmentformData[currDomain].subDomains[currSubDomain].questions[questionIdx]
+<div class="sizes herz col-span-2">
+	<form method="POST" id="assessmentForm" class="col-span-2 grid grid-cols-2 gap-2">
+		<div class="col-span-2 grid grid-cols-2 gap-2">
+			{#if isLastQuestion}
+				<input type="hidden" name="isLastQuestion" value={true} />
+			{/if}
+			<input type="hidden" name="assessmentId" value={assessmentId} />
+			<!-- assessment inputs -->
+			{#each assessmentformData?.[currDomain]?.subDomains?.[currSubDomain]?.questions, questionIdx (questionIdx)}
+				{@const inputName = `domainId=${assessmentformData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}|subDomainId=${assessmentformData[currDomain].subDomains[currSubDomain].id}|qId=${assessmentformData[currDomain].subDomains[currSubDomain].questions[questionIdx].id}`}
+				<Card class="question flex max-w-prose gap-4  p-8">
+					<div class="flex flex-col gap-1.5">
+						<p class="text-lg font-normal text-black/70">
+							<span class="font-bold text-[#1E293B]"
+								>{ZERO_BASED_ALPHABET_NUMBERING[
+									questionIdx as keyof typeof ZERO_BASED_ALPHABET_NUMBERING
+								]}{')'}</span
+							>
+							{assessmentformData[currDomain].subDomains[currSubDomain].questions[questionIdx].text}
+						</p>
+						<div class="inputs flex gap-8">
+							<label class="align-middlex flex cursor-pointer items-center space-x-2">
+								<input
+									type="radio"
+									name={inputName}
+									bind:group={
+										assessmentformData[currDomain].subDomains[currSubDomain].questions[questionIdx]
 											.value
-									: null}
-							/>
-							<span class="text-gray-700">Yes</span>
-						</label>
-						<label class="flex cursor-pointer items-center space-x-2">
-							<input
-								type="radio"
-								name={inputName}
-								bind:group={
-									assessmentformData[currDomain].subDomains[currSubDomain].questions[questionIdx]
-										.value
-								}
-								value={0}
-								class="h-4 w-4 border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
-							/>
-							<span class="text-gray-700">No</span>
-						</label>
+									}
+									value={1}
+									class="h-4 w-4 border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
+								/>
+								<input
+									type="hidden"
+									name={inputName}
+									bind:group={
+										assessmentformData[currDomain].subDomains[currSubDomain].questions[questionIdx]
+											.value
+									}
+									value={assessmentformData[currDomain].subDomains[currSubDomain].questions[
+										questionIdx
+									].value
+										? assessmentformData[currDomain].subDomains[currSubDomain].questions[
+												questionIdx
+											].value
+										: null}
+								/>
+								<span class="text-gray-700">Yes</span>
+							</label>
+							<label class="flex cursor-pointer items-center space-x-2">
+								<input
+									type="radio"
+									name={inputName}
+									bind:group={
+										assessmentformData[currDomain].subDomains[currSubDomain].questions[questionIdx]
+											.value
+									}
+									value={0}
+									class="h-4 w-4 border-gray-300 bg-gray-100 text-blue-600 focus:ring-blue-500"
+								/>
+								<span class="text-gray-700">No</span>
+							</label>
+						</div>
 					</div>
-				</div>
-			</Card>
-		{/each}
+				</Card>
+			{/each}
+		</div>
 
-		<div class="flex justify-end gap-4 pt-2">
+		<div class="sizes col-span-2 flex justify-end gap-4 pt-2">
 			{#if !isFirstQuestion}
 				<Button type="button" onclick={(e) => handlePrev(e)} variant="outline" class="w-fit"
 					>Previous</Button
