@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import { page } from '$app/state';
 	import AssessmentDomainProgressCard from '$lib/components/assessment-domain-progress-card.svelte';
 	import AssessmentQuestionsForm from '$lib/components/forms/assessment-questions-form.svelte';
@@ -140,6 +141,10 @@
 		isLoading = false;
 		modal.handlePositionChange();
 	}
+	function scrollToTop() {
+		if (!browser) return;
+		window.scrollTo({ top: 0, behavior: 'smooth' });
+	}
 
 	function isDomainAtLastIndex(domainIdx: number): boolean {
 		// console.log('isDomainAtLastIndex:', {
@@ -199,6 +204,7 @@
 		}
 
 		modal.handlePositionChange();
+		scrollToTop();
 	}
 
 	function previous() {
@@ -223,6 +229,7 @@
 			});
 		}
 		modal.handlePositionChange();
+		scrollToTop();
 	}
 
 	function openInstructionsModal() {
