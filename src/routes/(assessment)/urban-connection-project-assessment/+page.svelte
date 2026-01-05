@@ -58,21 +58,20 @@
 
 	let currOnPageVideoId = $derived.by(() => {
 		switch (modal.currDomain) {
+			//four domains
 			case 0:
 				if (modal.currSubDomain === 0) return videoIdMap.get('onPage-subDomain-awarenessIntro');
 				return '';
 			case 1:
 				if (modal.currSubDomain !== 0) return '';
-				return videoIdMap.get('onPage-domain-societalAwareness');
+				return videoIdMap.get('onPage-domain-systems');
 			case 2:
 				if (modal.currSubDomain !== 0) return '';
-				return videoIdMap.get('onPage-domain-systems');
+				return videoIdMap.get('onPage-domain-buildingRelationships');
 			case 3:
 				if (modal.currSubDomain !== 0) return '';
-				return videoIdMap.get('onPage-domain-buildingRelationships');
-			case 4:
-				if (modal.currSubDomain !== 0) return '';
 				return videoIdMap.get('onPage-domain-rigorousAndAccessibleContent');
+
 			default:
 				return '';
 		}
