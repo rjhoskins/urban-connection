@@ -313,10 +313,10 @@
 						{/if}
 					{/if}
 					<div class="rounded-md bg-[#EFF2FE]/50 p-4">
-						<p class=" mb-4 text-lg font-bold">Read the indicator summary below.</p>
+						<p class=" mb-4 text-xl font-bold">Read the indicator summary below.</p>
 						<div class="text-basetext-[#334155]">
 							{#if formData?.[modal.currDomain]?.subDomains?.[modal.currSubDomain] && formData?.[modal.currDomain]?.subDomains?.[modal.currSubDomain]?.description}
-								<p class="">
+								<p class="text-lg">
 									{formData?.[modal.currDomain]?.subDomains?.[modal.currSubDomain]?.description!}
 								</p>
 							{/if}
