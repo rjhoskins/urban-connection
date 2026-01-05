@@ -229,7 +229,6 @@
 			});
 		}
 		modal.handlePositionChange();
-		scrollToTop();
 	}
 
 	function openInstructionsModal() {
