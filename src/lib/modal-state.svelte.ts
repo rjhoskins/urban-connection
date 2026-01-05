@@ -105,9 +105,11 @@ export class ModalsStateClass implements ModalsState {
 	handleModalVideoClose() {
 		this.ytModalIsOpen = false;
 		this.manualSetVideoId = '';
+		this.ytIsManualVid = false; // reset to auto mode
 	}
 
 	handlePositionChange() {
+		this.setMaxSeens();
 		if (this.currYTModalVideoId != '') {
 			this.ytModalIsOpen = true;
 		} else {
