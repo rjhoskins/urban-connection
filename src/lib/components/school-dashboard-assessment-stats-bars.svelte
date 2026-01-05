@@ -5,7 +5,7 @@
 	import { Button } from 'bits-ui';
 	import Progress from '$lib/components/ui/progress/progress.svelte';
 
-	const { chartData, totalPointsPercentage, totalAssessments } = $props();
+	const { chartData, totalPointsPercentage, totalAssessments, showTotal = false } = $props();
 </script>
 
 <div class="buttons flex items-center justify-between gap-2"></div>
@@ -18,17 +18,18 @@
 {#each chartData as progress (progress.category)}
 	{@render ProgressIndicator(progress)}
 {/each}
+{#if showTotal}
+	<div class="">
+		<div class="flex items-center justify-between">
+			<p class="text-2xl text-black/70">Total Score</p>
+			<p class={`rounded-md ${getScoreBackgroundColor(totalPointsPercentage)} px-1 py-0.5 text-xs`}>
+				{Math.round(totalPointsPercentage)}%
+			</p>
+		</div>
 
-<div class="">
-	<div class="flex items-center justify-between">
-		<p class="text-2xl text-black/70">Total Score</p>
-		<p class={`rounded-md ${getScoreBackgroundColor(totalPointsPercentage)} px-1 py-0.5 text-xs`}>
-			{Math.round(totalPointsPercentage)}%
-		</p>
+		<Progress class="h-[7px]" value={totalPointsPercentage} />
 	</div>
-
-	<Progress class="h-[7px]" value={totalPointsPercentage} />
-</div>
+{/if}
 
 {#snippet ProgressIndicator(data: { category: any; value: any; chartColor: any; labelColor: any })}
 	<div class="">

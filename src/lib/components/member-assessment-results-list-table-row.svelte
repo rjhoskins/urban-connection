@@ -5,7 +5,6 @@
 	import { getScoreBackgroundColor } from '$lib/utils';
 	import { onMount } from 'svelte';
 	let { member, idx, page } = $props();
-	let isNested = page.url.pathname.includes('districts');
 	const { id, name, status, completedAt, pointsTotal, questionsTotal } = member;
 	const progress = $derived.by(() => {
 		if (pointsTotal && questionsTotal) {
@@ -26,7 +25,7 @@
 
 <Table.Row class="text-sm">
 	<Table.Cell>
-		<p class="text-sm">{isNested ? name : `Teacher ${idx + 1}`}</p>
+		<p class="text-sm">{name}</p>
 	</Table.Cell>
 	<Table.Cell>
 		{#if status !== 'completed'}
@@ -35,13 +34,13 @@
 			{formattedDate}
 		{/if}
 	</Table.Cell>
-	<Table.Cell class="text-right">
-		<div class={`w-fit text-right ${getScoreBackgroundColor(progress)}`}>
+	<!-- 	<Table.Cell class="text-right">
+	<div class={`w-fit text-right ${getScoreBackgroundColor(progress)}`}>
 			{#if progress}
 				{Math.round(progress)}%
 			{:else}
 				-
 			{/if}
 		</div>
-	</Table.Cell>
+	</Table.Cell> -->
 </Table.Row>

@@ -7,7 +7,7 @@
 	import { getScoreBackgroundColor } from '$lib/utils';
 
 	const isNested = page.url.pathname.includes('districts');
-	let { member, idx } = $props();
+	let { member, idx, showScore = false } = $props();
 	const { id, name, status, completedAt, pointsTotal, questionsTotal } = member;
 	const progress = $derived.by(() => {
 		if (pointsTotal && questionsTotal) {
@@ -29,16 +29,15 @@
 >
 	<div class="top flex justify-between">
 		<div class="flex flex-col gap-1">
-			<p class="text-sm">{isNested ? name : `Teacher ${idx + 1}`}</p>
+			<p class="text-sm">{name}</p>
 		</div>
-		<!-- {#if isNested}
-			<Button href={`${page.url.pathname}/schools/${id}`}>View Schoolz</Button>
-		{/if} -->
 	</div>
 	<div class="bottom flex justify-between text-xs text-black/70">
 		<div class="flex flex-col gap-2">
 			<p>Completed:</p>
-			<p>Score:</p>
+			{#if showScore}
+				<p>Score:</p>
+			{/if}
 		</div>
 		<div class="flex flex-col gap-2">
 			<p>
@@ -48,15 +47,17 @@
 					{formattedDate}
 				{/if}
 			</p>
-			<p
-				class={`md grid w-fit place-content-center rounded-md p-1 font-bold ${getScoreBackgroundColor(progress)}`}
-			>
-				{#if progress > 0}
-					{Math.round(progress)}%
-				{:else}
-					NA
-				{/if}
-			</p>
+			{#if showScore}
+				<p
+					class={`md grid w-fit place-content-center rounded-md p-1 font-bold ${getScoreBackgroundColor(progress)}`}
+				>
+					{#if progress > 0}
+						{Math.round(progress)}%
+					{:else}
+						NA
+					{/if}
+				</p>
+			{/if}
 		</div>
 	</div>
 </Card.Root>
