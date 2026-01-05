@@ -60,7 +60,7 @@
 		switch (modal.currDomain) {
 			//four domains
 			case 0:
-				if (modal.currSubDomain === 0) return videoIdMap.get('onPage-subDomain-awarenessIntro');
+				if (modal.currSubDomain === 0) return videoIdMap.get('onPage-domain-societalAwareness');
 				return '';
 			case 1:
 				if (modal.currSubDomain !== 0) return '';
@@ -231,7 +231,7 @@
 	}
 
 	function openInstructionsModal() {
-		modal.handleManualVideoSelect('modal-instructions-btn');
+		modal.handleManualVideoSelect(videoIdMap.get('modal-instructions-btn'));
 	}
 
 	onMount(async () => {
@@ -274,6 +274,8 @@
 	});
 </script>
 
+<!-- http://localhost:5173/urban-connection-project-assessment?assessmentId=01KE5WG0WZZVZBDCD4ZBX5ES6E -->
+
 <!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->
 
 <section class="">
@@ -283,7 +285,7 @@
 				class="border-primary h-16 w-16 animate-spin rounded-full border-4 border-t-transparent"
 			></div>
 		</div>
-	{:else}
+	{:else}Read the indicator summary below.
 		<div class="mx-auto max-w-7xl space-y-5 p-2 lg:p-8">
 			<div class="grid grid-cols-4 gap-4 py-4">
 				{#each domains as domain, index (index)}
@@ -295,13 +297,15 @@
 					/>
 				{/each}
 			</div>
+			{#if modal.currDomain === 0 && modal.currSubDomain === 0}
+				<div
+					class="aspect-w-16 aspect-h-9 domain sizes mx-auto grid place-content-center rounded-3xl"
+				>
+					{@html `<iframe class="h-[400px] rounded-3xl aspect-video" src="https://www.youtube.com/embed/${videoIdMap.get('onPage-subDomain-awarenessIntro')}?rel=0&autoplay=0&controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`}
+				</div>
+			{/if}
 			<div class=" grid grid-cols-2 gap-6">
-				<div class="left col-span-1 flex flex-col gap-4 space-y-3">
-					{#if modal.currSubDomain === 0 && currOnPageVideoId}
-						<div class="aspect-w-16 aspect-h-9 1st overflow-hidden rounded-3xl">
-							{@html `<iframe class="h-[315px] w-full" src="https://www.youtube.com/embed/${currOnPageVideoId}?rel=0&autoplay=&controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`}
-						</div>
-					{/if}
+				<div class="subdomain sizes col-span-1 flex flex-col gap-4 space-y-3">
 					{#if formData?.[modal.currDomain]?.subDomains?.[modal.currSubDomain]?.name}
 						<div class="flex items-center gap-4">
 							<p class="text-2xl font-bold">
@@ -311,11 +315,6 @@
 								{formData[modal.currDomain].subDomains[modal.currSubDomain].questions?.length} descriptors
 							</p>
 						</div>
-						{#if modal.currDomain === 0 && modal.currSubDomain === 0}
-							<div class="aspect-w-16 aspect-h-9 2nd overflow-hidden rounded-3xl">
-								{@html `<iframe class="h-[315px] w-full" src="https://www.youtube.com/embed/${videoIdMap.get('onPage-domain-societalAwareness')}?rel=0&autoplay=0&controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`}
-							</div>
-						{/if}
 					{/if}
 					<div class="rounded-md bg-[#EFF2FE]/50 p-4">
 						<p class=" mb-4 text-xl font-bold">Read the indicator summary below.</p>
@@ -328,7 +327,13 @@
 						</div>
 					</div>
 				</div>
-				<div class="">
+
+				{#if modal.currSubDomain === 0 && currOnPageVideoId}
+					<div class="aspect-w-16 aspect-h-9 1st overflow-hidden rounded-3xl">
+						{@html `<iframe class="h-[315px] w-full" src="https://www.youtube.com/embed/${currOnPageVideoId}?rel=0&autoplay=&controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`}
+					</div>
+				{/if}
+				<div class="sizes col-span-2">
 					<div class="prose space-y-3 p-4">
 						<div class="mb-4 flex items-center gap-4">
 							<p class="text-lg font-bold">Instructions</p>
@@ -355,6 +360,8 @@
 						</p>
 						<p>Select <span class="font-bold">Next</span> after answering each descriptor.</p>
 					</div>
+				</div>
+				<div class="her sizes col-span-2 grid grid-cols-2">
 					<AssessmentQuestionsForm
 						bind:assessmentformData={formData}
 						currDomain={modal.currDomain}
