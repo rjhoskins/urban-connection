@@ -22,7 +22,7 @@
 	let isGridView = $state(true);
 
 	let pageTitle = $state(`${schoolWithAdmins.name} | Dashboard`);
-	onMount(() => {
+	$effect(() => {
 		globals.setPageName(pageTitle);
 	});
 
@@ -75,7 +75,6 @@
 
 <!-- <svelte:head>
 	<title>{pageTitle}</title>
-	<meta name="description" content={`Manage ${school.name} School`} />
 	<meta property="og:title" content={pageTitle} />
 	<meta property="og:description" content={`Manage ${school.name} School`} />
 	<meta property="og:image" content="/img/urban-connection-logo.png" />

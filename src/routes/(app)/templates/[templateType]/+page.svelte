@@ -12,15 +12,15 @@
 
 	let formisEditing = $state(true);
 	const templatTitle = TEMPLATE_TITLES[data.type!] || 'Template';
+	let pageTitle = $state(`HTML Email Templates | ${templatTitle}`);
 
 	onMount(() => {
-		globals.setPageName(`HTML Email Templates | ${templatTitle}`);
+		globals.setPageName(pageTitle);
 	});
 </script>
 
 <svelte:head>
-	<title>Hello world!</title>
-	<!-- <meta name="description" content="This is where the description goes for SEO" /> -->
+	<title>{pageTitle}</title>
 </svelte:head>
 
 <!-- <pre>{JSON.stringify(data.htmlTemplateData.template, null, 2)}</pre> -->

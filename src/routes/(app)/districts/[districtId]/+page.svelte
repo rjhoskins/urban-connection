@@ -6,7 +6,6 @@
 	import Card from '$lib/components/ui/card/card.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { Grid2X2, List } from 'lucide-svelte';
-	import { onMount } from 'svelte';
 	import { getGlobalsContext } from '$lib/store/globals-state.svelte';
 	const globals = getGlobalsContext();
 	import MemberAssessmentResultsListTable from '$lib/components/member-assessment-results-list-table.svelte';
@@ -29,12 +28,16 @@
 		memberAssessmentData: Array<{ id: string; [key: string]: any }>;
 	};
 	let isGridView = $state(true);
+	let pageTitle = $state('Manage Districts | ' + disctrictWithSchools.name);
 
-	onMount(() => {
-		globals.setPageName('Manage Districts | ' + disctrictWithSchools.name);
-		console.log('District Page Data:', data);
+	$effect(() => {
+		globals.setPageName(pageTitle);
 	});
 </script>
+
+<svelte:head>
+	<title>{pageTitle}</title>
+</svelte:head>
 
 <!-- <pre class="">{JSON.stringify(data, null, 2)}</pre> -->
 

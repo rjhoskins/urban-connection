@@ -27,7 +27,7 @@
 			<img
 				class="aspect-square h-12 rounded-md bg-white p-1"
 				src="/img/urban-connection-logo.png"
-				alt="The Urban Connection Project"
+				alt="Climate Effectiveness Progress Monitoring Assessment"
 			/>
 			<p
 				class="ml-3 text-base leading-4 text-white transition-opacity duration-200 {expanded

@@ -12,6 +12,11 @@
 	});
 </script>
 
+<svelte:head>
+	<title>Thank You</title>
+</svelte:head>
+</script>
+
 <section class="grid place-items-center">
 	<div class="mx-auto max-w-2xl">
 		<h1 class="py py-8 text-center text-5xl font-bold">Thank You!</h1>

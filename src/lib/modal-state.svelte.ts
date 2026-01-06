@@ -20,6 +20,7 @@ interface ModalsState {
 	maxSeenDomain: number;
 	maxSeenSubDomain: number;
 	currYTModalVideoId: string | undefined;
+	assessmentParticipantEmail?: string;
 
 	// methods
 	handlePositionChange: () => void;
@@ -46,6 +47,7 @@ export class ModalsStateClass implements ModalsState {
 	ytModalIsOpen = $state(false);
 	ytIsManualVid = $state(false);
 	manualSetVideoId = $state('');
+	assessmentParticipantEmail = $state<string | undefined>(undefined);
 
 	constructor(context?: Partial<ModalsState>) {}
 

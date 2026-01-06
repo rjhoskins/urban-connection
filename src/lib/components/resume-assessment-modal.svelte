@@ -51,6 +51,7 @@
 							logIfDev('Resume assessment success', result);
 							closeModal();
 							toast.success('Success, picking up where you left off');
+							modal.assessmentParticipantEmail = formData.get('email') as string;
 							goto(result.location);
 						} else {
 							logIfDev('Resume assessment failed', result);

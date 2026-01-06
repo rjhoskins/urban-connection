@@ -1,3 +1,4 @@
+import { hash } from '@node-rs/argon2';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import * as dotenv from 'dotenv';
@@ -8,18 +9,32 @@ export const db = drizzle(client, {
 	casing: 'snake_case'
 });
 
-import { TEST_RUBRIC_DATA2, RUBRIC_DATA, TEST_RUBRIC_DATA } from '$lib/constants';
-import { assessmentDomains, assessmentQuestions, assessmentSubDomains } from './schema';
-
-const data = RUBRIC_DATA;
+import { RUBRIC_DATA, INITIAL_DISTRICTS, INITIAL_HTML_DATA } from '$lib/constants';
+import {
+	assessmentDomains,
+	assessmentQuestions,
+	assessmentSubDomains,
+	districts,
+	htmlEmailTemplates,
+	users
+} from './schema';
+import { simpleRegisterToBeDEPRICATED } from '../queries';
 
 async function seed() {
-	console.log('🌱 Starting seed...');
 	// Clear existing data
+	await db.delete(users);
+	await db.delete(districts);
+	await db.delete(htmlEmailTemplates);
 	await db.delete(assessmentQuestions);
 	await db.delete(assessmentSubDomains);
 	await db.delete(assessmentDomains);
 
+	console.log('🌱 Starting seed...');
+	await createUCSuperUser();
+	await createInitialDistrict();
+	await createInitialHTMLTemplate();
+
+	const data = RUBRIC_DATA;
 	let currDomain;
 	let currSubDomain;
 	let currDescriptor;
@@ -111,4 +126,29 @@ async function createQuestionIfNotExists({
 		.onConflictDoNothing({ target: assessmentQuestions.text })
 		.returning({ id: assessmentQuestions.id });
 	return question;
+}
+async function createUCSuperUser() {
+	const passwordHash = await hash('123456', {
+		memoryCost: 19456,
+		timeCost: 2,
+		outputLen: 32,
+		parallelism: 1
+	});
+	await simpleRegisterToBeDEPRICATED({
+		username: 'uc-super-user',
+		passwordHash
+	});
+}
+async function createInitialDistrict() {
+	for (const districtName of INITIAL_DISTRICTS) {
+		await db.insert(districts).values({
+			name: districtName
+		});
+	}
+}
+async function createInitialHTMLTemplate() {
+	await db.insert(htmlEmailTemplates).values({
+		type: 'admin_invite',
+		template: INITIAL_HTML_DATA
+	});
 }

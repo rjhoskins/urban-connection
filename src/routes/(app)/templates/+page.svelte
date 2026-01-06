@@ -28,11 +28,16 @@
 			...templateType
 		};
 	});
+	let pageTitle = $state('HTML Email Templates');
 
-	onMount(() => {
-		globals.setPageName('HTML Email Templates');
+	$effect(() => {
+		globals.setPageName(pageTitle);
 	});
 </script>
+
+<svelte:head>
+	<title>{pageTitle}</title>
+</svelte:head>
 
 <section class="">
 	<h1 class="my-6 text-center text-4xl">HTML Email Templates</h1>

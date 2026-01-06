@@ -4,6 +4,11 @@
 	let { data } = $props();
 </script>
 
+<svelte:head>
+	<title>Register Dev From Dev</title>
+</svelte:head>
+</script>
+
 <h1 class="my-6 text-center text-3xl capitalize">Register to create an account</h1>
 
 <div class=" grid h-full place-content-center">

@@ -9,8 +9,7 @@
 </script>
 
 <svelte:head>
-	<title>The Urban Connection Project</title>
-	<meta name="description" content="This is where the description goes for SEO" />
+	<title>Climate Effectiveness Progress Monitoring Assessment</title>
 </svelte:head>
 
 <section class="grid h-full place-items-center">

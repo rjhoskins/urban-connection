@@ -18,12 +18,18 @@
 	// ensure districts has a concrete type so the snippet's parameter is not unknown
 	const { districts } = data as { districts: District[] };
 
+	let pageTitle = $state('Manage Districts');
+
 	$effect(() => {
-		globals.setPageName('Manage Districts');
+		globals.setPageName(pageTitle);
 	});
 </script>
 
-<h1 class="sr-only">Manage All Districts</h1>
+<svelte:head>
+	<title>{pageTitle}</title>
+</svelte:head>
+
+<h1 class="sr-only">{pageTitle}</h1>
 <!-- <pre class="">{JSON.stringify(data, null, 2)}</pre> -->
 
 <section class=" grid-cols-four-fluid grid max-w-6xl gap-4 py-8">

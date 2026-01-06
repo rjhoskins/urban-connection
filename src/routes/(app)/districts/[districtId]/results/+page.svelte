@@ -8,11 +8,16 @@
 
 	let { data }: { data: PageData } = $props();
 	const { districtData, domainData, questionsData } = data;
+	let pageTitle = $state('Assessment Results | ' + districtData.name);
 
-	onMount(() => {
-		globals.setPageName('Assessment Results | ' + districtData.name);
+	$effect(() => {
+		globals.setPageName(pageTitle);
 	});
 </script>
+
+<svelte:head>
+	<title>{pageTitle}</title>
+</svelte:head>
 
 <section class=" mx-auto grid max-w-7xl gap-4 p-2 lg:p-8">
 	<h1 class="sr-only">{districtData.name} All Time Assessment Results Totals</h1>

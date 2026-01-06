@@ -4,6 +4,11 @@
 	let { data }: PageProps = $props();
 </script>
 
+<svelte:head>
+	<title>Payment Cancelled</title>
+</svelte:head>
+</script>
+
 <h1>Hello Cancel</h1>
 <p>Your order has been cancelled.</p>
 <p>If you have any questions, please contact support.</p>

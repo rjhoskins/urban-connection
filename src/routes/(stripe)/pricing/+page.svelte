@@ -4,9 +4,7 @@
 
 	let { data }: PageProps = $props();
 
-	async function handleCheckout(
-		event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }
-	) {
+	async function handleCheckout(event: MouseEvent) {
 		const currUrl = window.location.href;
 		console.log('Checkout button clicked');
 		event.preventDefault();
@@ -21,6 +19,10 @@
 		window.location.href = url;
 	}
 </script>
+
+<svelte:head>
+	<title>Pricing</title>
+</svelte:head>
 
 <h1>Hello Buy, cool stuff</h1>
 <form action="/api/create-checkout-session" method="POST">

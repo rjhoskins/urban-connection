@@ -6,16 +6,14 @@
 	let { data } = $props();
 	import { getGlobalsContext } from '$lib/store/globals-state.svelte';
 	const globals = getGlobalsContext();
+	let pageTitle = $state('Create School');
 	$effect(() => {
-		console.log('effect page');
-		console.log('data', data);
-		globals.pageName = 'Create School';
+		globals.pageName = pageTitle;
 	});
 </script>
 
 <svelte:head>
-	<title>The Urban Connection Project</title>
-	<meta name="description" content="This is where the description goes for SEO" />
+	<title>{pageTitle}</title>
 </svelte:head>
 
 <div class=" h-full max-w-7xl">

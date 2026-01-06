@@ -4,14 +4,19 @@
 	import InviteCoAdminForm from '$lib/components/forms/invite-co-admin-form.svelte';
 	import HtmlEmailTextPreview from '$lib/components/html-email-text-preview.svelte';
 	import Card from '$lib/components/ui/card/card.svelte';
+	import { getGlobalsContext } from '$lib/store/globals-state.svelte';
+	const globals = getGlobalsContext();
+	let pageTitle = $state('Climate Effectiveness Progress Monitoring Assessment Invite Co-Admin');
 
 	let { data } = $props();
-	const unusedAdminUserInvite = {};
+
+	$effect(() => {
+		globals.setPageName(pageTitle);
+	});
 </script>
 
 <svelte:head>
-	<title>The Urban Connection Project</title>
-	<meta name="description" content="This is where the description goes for SEO" />
+	<title>{pageTitle}</title>
 </svelte:head>
 
 <section class="grid h-full place-items-center">

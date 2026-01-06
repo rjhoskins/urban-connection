@@ -47,7 +47,6 @@
 		assessmentQuestions?.[modal.currDomain]?.subDomains?.[modal.currSubDomain]?.questions?.length ||
 			0
 	);
-
 	let isLastQuestion = $derived.by(() => {
 		const lastDomainIdx = formData.length - 1;
 		if (modal.currDomain < lastDomainIdx) return false;
@@ -273,6 +272,10 @@
 		});
 	});
 </script>
+
+<svelte:head>
+	<title>Climate Effectiveness Progress Monitoring Assessment</title>
+</svelte:head>
 
 <!-- http://localhost:5173/urban-connection-project-assessment?assessmentId=01KE5WG0WZZVZBDCD4ZBX5ES6E -->
 

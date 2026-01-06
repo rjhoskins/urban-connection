@@ -12,10 +12,16 @@
 
 	let { data }: { data: PageData } = $props();
 	const { domainData, questionsData } = data;
-	onMount(() => {
-		globals.setPageName('Assessment Results | All Time Totals');
+	let pageTitle = $state('Assessment Results | All Time Totals');
+
+	$effect(() => {
+		globals.setPageName(pageTitle);
 	});
 </script>
+
+<svelte:head>
+	<title>{pageTitle}</title>
+</svelte:head>
 
 <section class="mx-auto grid max-w-7xl gap-4 p-2 lg:p-8">
 	<Card.Root class="my-4 flex justify-end gap-4 p-4">

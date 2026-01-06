@@ -5,11 +5,24 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Grid2X2, List } from 'lucide-svelte';
 	import { onMount } from 'svelte';
+	import { getGlobalsContext } from '$lib/store/globals-state.svelte';
+	const globals = getGlobalsContext();
 
 	let { data }: { data: PageData } = $props();
 	const { schoolData, domainData, questionsData } = data;
+
 	let isSummaryView = $state(true);
+	let pageTitle = $state('School Assessment Results');
+
+	$effect(() => {
+		// Set the page name in globals store
+		globals.setPageName(pageTitle);
+	});
 </script>
+
+<svelte:head>
+	<title>{pageTitle}</title>
+</svelte:head>
 
 <Card.Root class="my-4 flex justify-end gap-4 p-4">
 	<Button

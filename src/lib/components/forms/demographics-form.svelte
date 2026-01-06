@@ -7,6 +7,7 @@
 	import type { ActionResult } from '@sveltejs/kit';
 	import toast from 'svelte-french-toast';
 	import { getModalStateContext } from '$lib/modal-state.svelte';
+	const modals = getModalStateContext();
 	import { onMount } from 'svelte';
 	const modal = getModalStateContext();
 
@@ -29,6 +30,11 @@
 		const isDemographics = data.get('isDemographics');
 
 		const name = data.get('name');
+
+		//per fields to set assessment participant email
+		const email = data.get('email');
+		modals.assessmentParticipantEmail = (email as string) || '';
+		logIfDev('assessmentParticipantEmail', modals.assessmentParticipantEmail);
 
 		const decodedeAssessmentToken = '(assessmentToken as string);';
 

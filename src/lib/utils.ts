@@ -47,7 +47,7 @@ export function generateAdminInviteEmail(
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Urban Connection Project</title>
+    <title>Climate Effectiveness Progress Monitoring Assessment</title>
     <style type="text/css">
         /* Client-specific styles */
         body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }

@@ -22,8 +22,6 @@ import type { PgEnum, PgTransaction } from 'drizzle-orm/pg-core';
 import db from './db';
 import type { AdminInvite, CreateUser, UserInviteHTMLEmailTemplateType } from '$lib/schema';
 import { logIfDev, transformAssessmentData } from '$lib/utils';
-import { admin } from 'googleapis/build/src/apis/admin';
-import district from './db/schema/districts';
 
 export async function simpleRegisterToBeDEPRICATED(
 	{
@@ -72,22 +70,6 @@ export async function findIfUserExistsById({
 		.from(users)
 		.where(eq(users.username, username));
 	return user || null;
-}
-
-export async function findUnusedInviteByInviteId({ inviteId }: { inviteId: string }) {
-	const [existingUnusedInvite] = await db
-		.select()
-		.from(adminUserInvites)
-		.where(and(eq(adminUserInvites.id, inviteId), eq(adminUserInvites.isUsed, false)));
-	return existingUnusedInvite || null;
-}
-
-export async function findUnusedInviteByEmail({ userEmail }: { userEmail: string }) {
-	const [existingUnusedInvite] = await db
-		.select()
-		.from(adminUserInvites)
-		.where(and(eq(adminUserInvites.email, userEmail), eq(adminUserInvites.isUsed, false)));
-	return existingUnusedInvite || null;
 }
 
 export async function checkRegisteredUserExists({
@@ -218,23 +200,6 @@ export const getUnusedAdminInviteById = async ({ inviteId }: { inviteId: string 
 	logIfDev('getUnusedAdminInviteById res => ', res);
 	return res || null;
 };
-// export async function updateSchoolAdminWithToken(
-// 	{
-// 		userId,
-// 		token
-// 	}: {
-// 		userId: string;
-// 		token: string;
-// 	},
-// 	trx?: PgTransaction<PostgresJsQueryResultHKT, any, any>
-// ) {
-// 	const queryBuilder = trx ? trx.update(schoolAdmins) : db.update(schoolAdmins);
-// 	const [result] = await queryBuilder
-// 		.set({ assessmentToken: token })
-// 		.where(eq(schoolAdmins.userId, userId))
-// 		.returning({ id: schoolAdmins.id });
-// 	return result || null;
-// }
 
 export async function createSchool(
 	{

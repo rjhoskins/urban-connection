@@ -18,10 +18,9 @@
 	let numMembersShown = $state(data.memberData.length);
 	let isGridView = $state(true);
 
-	let pageTitle = $state(`${schoolWithAdmins.name} | Dashboard`);
-	onMount(() => {
+	let pageTitle = $state(`${schoolWithAdmins.name} | Dashboard | Member Data`);
+	$effect(() => {
 		globals.setPageName(pageTitle);
-		console.log('Mounted member-data page for school:', data);
 	});
 
 	const totalAssessments = memberData.length;
@@ -73,12 +72,6 @@
 
 <svelte:head>
 	<title>{pageTitle}</title>
-	<meta name="description" content={`Manage ${schoolWithAdmins.name} School`} />
-	<meta property="og:title" content={pageTitle} />
-	<meta property="og:description" content={`Manage ${schoolWithAdmins.name} School`} />
-	<meta property="og:image" content="/img/urban-connection-logo.png" />
-	<meta property="og:url" content={page.url.href} />
-	<link rel="icon" href="/img/urban-connection-logo.png" type="image/png" />
 </svelte:head>
 
 <h1 class="sr-only">Manage {schoolWithAdmins.name} School</h1>

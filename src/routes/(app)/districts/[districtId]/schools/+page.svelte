@@ -13,16 +13,21 @@
 	import { Card } from '$lib/components/ui/card';
 	import { Button } from '$lib/components/ui/button';
 	import { browser } from '$app/environment';
+	let pageTitle = $state('Manage District Schools');
 
-	onMount(() => {
+	$effect(() => {
 		// console.log('mounted');
 		// console.log('data', data);
-		globals.pageName = data.pageTitle;
+		globals.pageName = pageTitle;
 	});
 	function toggleView() {
 		isGridView = !isGridView;
 	}
 </script>
+
+<svelte:head>
+	<title>{pageTitle}</title>
+</svelte:head>
 
 <section class="flex h-full max-w-7xl flex-col">
 	<h1 class="p4 sr-only my-6 text-center text-3xl">Manage All Schools</h1>

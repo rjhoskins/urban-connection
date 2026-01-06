@@ -5,22 +5,27 @@
 	import * as Card from '$lib/components/ui/card';
 	import HtmlEmailUserInviteForm from '$lib/components/forms/html-email-user-invite-form.svelte';
 	import type { PageData } from './$types';
+	import { getGlobalsContext } from '$lib/store/globals-state.svelte';
+	const globals = getGlobalsContext();
 
 	let { data }: { data: PageData } = $props();
 	const { unusedAdminUserInvite, canEditForm } = data;
 
 	let pageHTMLEmail = $state();
 	let pageIsEditing = $state(false);
+	let pageTitle = $state(`Invite Administrator`);
+	$effect(() => {
+		globals.setPageName(pageTitle);
+	});
 </script>
 
 <svelte:head>
-	<title>Hello world!</title>
-	<!-- <meta name="description" content="This is where the description goes for SEO" /> -->
+	<title>{pageTitle}</title>
 </svelte:head>
 
 <!-- <pre>{JSON.stringify(data.htmlTemplateData.template, null, 2)}</pre> -->
 
-<h1 class="sr-only">Invite Administrator</h1>
+<h1 class="sr-only">{pageTitle}</h1>
 
 <div class="grid h-full place-content-center">
 	<!-- <pre class="">{JSON.stringify(pageIsEditing, null, 2)}</pre> -->

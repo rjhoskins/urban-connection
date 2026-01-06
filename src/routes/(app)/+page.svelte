@@ -7,16 +7,20 @@
 	import UCAdminPanel from '$lib/components/uc-admin-panel.svelte';
 	import DistrictAdminPanel from '$lib/components/district-admin-panel.svelte';
 	import SchooladminAdminPanel from '$lib/components/schooladmin-admin-panel.svelte';
-	import { onMount } from 'svelte';
+	let pageTitle = $state('Dashboard');
+	$effect(() => {
+		let roleTitle = '';
+		if (data.user?.role === 'super_admin') roleTitle = 'Super Admin';
+		else if (data.user?.role === 'district_admin') roleTitle = 'District Admin';
+		else if (data.user?.role === 'school_admin') roleTitle = 'School Admin';
 
-	onMount(() => {
-		globals.setPageName('Main Menu');
+		pageTitle = `${roleTitle} Dashboard`;
+		globals.setPageName(pageTitle);
 	});
 </script>
 
 <svelte:head>
-	<title>The Urban Connection Project</title>
-	<meta name="description" content="This is where the description goes for SEO" />
+	<title>{pageTitle}</title>
 </svelte:head>
 <h1 class="sr-only">Main Menu</h1>
 <div class=" grid h-full place-content-center">

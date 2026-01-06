@@ -16,7 +16,7 @@ export const ASSESSMENT_PROGRESS_IMG_MAP = new Map([
 export const INITIAL_HTML_DATA = {
 	greeting: 'Dear Administrator,',
 	definition:
-		'The Urban Connection Project defines Cultural Responsiveness as the bridge between people built by the infusion of cultural experiences necessary to:',
+		'Climate Effectiveness Progress Monitoring Assessment defines Cultural Responsiveness as the bridge between people built by the infusion of cultural experiences necessary to:',
 	keyPoints: [
 		'implement systems of accountability',
 		'cultivate necessary relationships',
@@ -102,7 +102,7 @@ export const demographicsQuestionsData = {
 		}
 	]
 };
-const rubricData = [
+export const RUBRIC_DATA = [
 	{
 		name: 'Cultural Awareness',
 		totalPoints: 24,
@@ -786,146 +786,6 @@ const rubricData = [
 	}
 ];
 
-export const RUBRIC_DATA = rubricData;
-
-const testRubricData = [
-	{
-		name: 'Cultural Awareness',
-		totalPoints: 24,
-		subDomains: [
-			{
-				name: 'Cultural Awareness',
-				points: 5,
-				description:
-					'The school demonstrates intentionality in an effort to become/remain culturally aware, and use that understanding to guide decisions, foster relationships, and create an inclusive environment.',
-				descriptors: [
-					'Training is provided regularly for cultural awareness.',
-					'Families from all backgrounds feel welcomed and respected.',
-					'The school celebrates cultural diversity through events.'
-				]
-			},
-			{
-				name: 'Mentorship',
-				points: 5,
-				description:
-					'There is prioritization in student mentorship, focusing on building meaningful relationships with students, families, and the community.',
-				descriptors: [
-					'Connecting with students in a mentoring role is promoted.',
-					'Students have access to resources like counseling.',
-					'Staff receives training to build meaningful relationships.'
-				]
-			}
-		]
-	},
-	{
-		name: 'Systems',
-		totalPoints: 26,
-		subDomains: [
-			{
-				name: 'Systemic Expectations',
-				points: 6,
-				description:
-					"The school's system establishes inclusive language and clear expectations involving all stakeholders.",
-				descriptors: [
-					'Consistent use of established common language.',
-					'Visual reminders of expectations in common areas.',
-					'Expectations are expressed daily.'
-				]
-			}
-		]
-	}
-];
-
-export const TEST_RUBRIC_DATA = testRubricData;
-
-const testRubricData2 = [
-	{
-		name: 'Cultural Awareness',
-		totalPoints: 24,
-		type: 'domain',
-		subDomains: [
-			{
-				name: 'Cultural Awareness',
-				type: 'subdomain',
-				description:
-					'The school demonstrates intentionality in an effort to become/remain culturally aware, and use that understanding to guide decisions, foster relationships, and create an inclusive environment.',
-				descriptors: [
-					{
-						id: 'cultural-awareness-1',
-						value: null, // This will be set dynamically (true/false)
-						text: 'Training is provided regularly for cultural awareness.'
-					},
-					{
-						id: 'cultural-awareness-2',
-						value: null,
-						text: 'Families from all backgrounds feel welcomed and respected.'
-					},
-					{
-						id: 'cultural-awareness-3',
-						value: null,
-						text: 'The school celebrates cultural diversity through events.'
-					}
-				]
-			},
-			{
-				name: 'Mentorship',
-				type: 'subdomain',
-				description:
-					'There is prioritization in student mentorship, focusing on building meaningful relationships with students, families, and the community.',
-				descriptors: [
-					{
-						id: 'mentorship-1',
-						value: null,
-						text: 'Connecting with students in a mentoring role is promoted.'
-					},
-					{
-						id: 'mentorship-2',
-						value: null,
-						text: 'Students have access to resources like counseling.'
-					},
-					{
-						id: 'mentorship-3',
-						value: null,
-						text: 'Staff receives training to build meaningful relationships.'
-					}
-				]
-			}
-		]
-	},
-	{
-		name: 'Systems',
-		totalPoints: 26,
-		subDomains: [
-			{
-				name: 'Systemic Expectations',
-				type: 'sub',
-				description:
-					"The school's system establishes inclusive language and clear expectations involving all stakeholders.",
-				descriptors: [
-					{
-						id: 'systemic-expectations-1',
-						value: null,
-						text: 'Consistent use of established common language.'
-					},
-					{
-						id: 'systemic-expectations-2',
-						value: null,
-						text: 'Visual reminders of expectations in common areas.'
-					},
-					{
-						id: 'systemic-expectations-3',
-						value: null,
-						text: 'Expectations are expressed daily.'
-					}
-				]
-			}
-		]
-	}
-];
-
-export const TEST_RUBRIC_DATA2 = testRubricData2;
-export const TEST_COMBINED_WITH_DEMOGRAPHICS = [demographicsQuestionsData, ...testRubricData2];
-
 export const ZERO_BASED_ALPHABET_NUMBERING = {
 	0: 'A',
 	1: 'B',
@@ -990,13 +850,5 @@ export const videoIdMap = new Map<string, string>([
 	['modal-domain-summaryInstructions', 'P4Zuc2uqxdg'],
 	['modal-closing', 'YCcGbZoqUXg']
 ]);
-// console work
-// `<iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ?si=abc123def456ghi7" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`.match(/src="(https:\/\/www\.youtube\.com\/embed\/[^"]+)"/)[1].split('embed/')[1]
 
-// const html = `<iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ?si=abc123def456ghi7" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`;
-
-// const match = html.match(/src="(https:\/\/www\.youtube\.com\/embed\/[^"]+)"/);
-// const embedUrl = match ? match[1] : null;
-
-// console.log(embedUrl);
-// Output: https://www.youtube.com/embed/dQw4w9WgXcQ?si=abc123def456ghi7
+export const INITIAL_DISTRICTS = ['District One'];
