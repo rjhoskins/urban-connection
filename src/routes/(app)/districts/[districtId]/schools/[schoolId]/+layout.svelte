@@ -201,7 +201,12 @@
 	</Card.Root>
 
 	<Card.Root class="right row-start-2 flex flex-col gap-3 rounded-md p-9 shadow-md">
-		<SchoolDashboardAssessmentStatsBars {chartData} {totalPointsPercentage} {totalAssessments} />
+		<SchoolDashboardAssessmentStatsBars
+			showTotal={isSuperAdmin}
+			{chartData}
+			{totalPointsPercentage}
+			{totalAssessments}
+		/>
 
 		<div class="buttons mt-4 flex items-center justify-between gap-2">
 			<Button
@@ -214,15 +219,11 @@
 				href={`${page.url.origin}/districts/${schoolWithAdmins.districtId}/schools/${schoolWithAdmins.id}/member-data`}
 				class="mb-4">Assessments</Button
 			>
-
-			<!-- //member-data -->
-			<!-- http://localhost:5173/districts/4/schools/14/results -->
-			<!-- http://localhost:5173/districts/4/schools/14/member-data -->
 		</div>
 	</Card.Root>
 </section>
 
-<!-- <pre>{JSON.stringify(page.url.pathname, null, 2)}</pre> -->
+<!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->
 <section class="max-w-7xl">
 	{@render children?.()}
 </section>

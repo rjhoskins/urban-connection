@@ -28,7 +28,9 @@
 		alt="city with school"
 		src="/img/urban-connection-logo.png"
 	/>
-	<h2 class="mb-12 text-[2rem] leading-[1] text-[#2C205A]">Welcome to Urban Connection Project</h2>
+	<h2 class="mb-12 text-[2rem] text-[#2C205A]">
+		Climate Effectiveness Progress Monitoring Assessment
+	</h2>
 	<form class=" flex flex-col gap-3" action="?/login" method="POST" use:enhance>
 		<!-- username -->
 		<Field {form} name="username">

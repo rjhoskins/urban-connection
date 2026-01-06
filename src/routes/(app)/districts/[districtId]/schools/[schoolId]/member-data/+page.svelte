@@ -101,11 +101,11 @@
 	{#if isGridView}
 		<div class="grid-cols-four-fluid grid gap-4">
 			{#each data.memberData as member, idx (member.id)}
-				<MemberAssessmentResultsGridCard {idx} {member} />
+				<MemberAssessmentResultsGridCard showScore={isSuperAdmin} {idx} {member} />
 			{/each}
 		</div>
 	{:else}
-		<MemberAssessmentResultsListTable {page} members={data.memberData} />
+		<MemberAssessmentResultsListTable showScore={isSuperAdmin} {page} members={data.memberData} />
 	{/if}
 
 	<p class="text-primary mt-auto pt-4 text-[13.33px]">

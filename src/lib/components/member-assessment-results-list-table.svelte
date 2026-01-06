@@ -3,12 +3,19 @@
 	import { cn } from '$lib/utils';
 	import MemberAssessmentResultsListTableRow from './member-assessment-results-list-table-row.svelte';
 
-	const tableHeaders = [
-		{ name: 'Name', class: '', sortBy: 'name' },
-		{ name: 'Completed ', sortBy: 'completed' }
-	];
-
-	let { members, page } = $props();
+	let { members, page, showScore = false } = $props();
+	let tableHeaders = $state(
+		showScore
+			? [
+					{ name: 'Name', class: '', sortBy: 'name' },
+					{ name: 'Completed ', sortBy: 'completed' },
+					{ name: 'Score', sortBy: 'score' }
+				]
+			: [
+					{ name: 'Name', class: '', sortBy: 'name' },
+					{ name: 'Completed ', sortBy: 'completed' }
+				]
+	);
 	let sortedMembers = $state(members.sort((a, b) => a.name.localeCompare(b.name)));
 </script>
 
@@ -24,7 +31,7 @@
 	</Table.Header>
 	<Table.Body>
 		{#each sortedMembers as member, idx (member.id)}
-			<MemberAssessmentResultsListTableRow {page} {member} {idx} />
+			<MemberAssessmentResultsListTableRow showScore {page} {member} {idx} />
 		{/each}
 	</Table.Body>
 </Table.Root>

@@ -4,7 +4,7 @@
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { getScoreBackgroundColor } from '$lib/utils';
 	import { onMount } from 'svelte';
-	let { member, idx, page } = $props();
+	let { member, idx, page, showScore = false } = $props();
 	const { id, name, status, completedAt, pointsTotal, questionsTotal } = member;
 	const progress = $derived.by(() => {
 		if (pointsTotal && questionsTotal) {
@@ -34,13 +34,15 @@
 			{formattedDate}
 		{/if}
 	</Table.Cell>
-	<!-- 	<Table.Cell class="text-right">
-	<div class={`w-fit text-right ${getScoreBackgroundColor(progress)}`}>
-			{#if progress}
-				{Math.round(progress)}%
-			{:else}
-				-
-			{/if}
-		</div>
-	</Table.Cell> -->
+	{#if showScore}
+		<Table.Cell class="text-right">
+			<div class={`w-fit text-right ${getScoreBackgroundColor(progress)}`}>
+				{#if progress}
+					{Math.round(progress)}%
+				{:else}
+					-
+				{/if}
+			</div>
+		</Table.Cell>
+	{/if}
 </Table.Row>
