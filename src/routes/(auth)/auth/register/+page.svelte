@@ -10,6 +10,10 @@
 	});
 </script>
 
+<svelte:head>
+	<title>Register</title>
+</svelte:head>
+
 <h1 class="my-6 text-center text-3xl capitalize">Register to create an account</h1>
 
 <!-- <pre class="">{JSON.stringify(data, null, 2)}</pre> -->

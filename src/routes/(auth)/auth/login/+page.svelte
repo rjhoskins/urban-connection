@@ -2,9 +2,14 @@
 	/** @type {{ data: import('./$types').PageData, form: import('./$types').ActionData }} */
 	import { enhance } from '$app/forms';
 	import LoginForm from '$lib/components/forms/login-form.svelte';
+	import { onMount } from 'svelte';
 
 	let { data } = $props();
 </script>
+
+<svelte:head>
+	<title>Login</title>
+</svelte:head>
 
 <section class="grid-cols-golden-cols grid h-screen overflow-hidden">
 	<div class="bg-primary col-start-2 grid place-content-center md:h-screen lg:col-start-1">
