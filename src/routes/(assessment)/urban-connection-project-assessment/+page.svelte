@@ -14,8 +14,6 @@
 	const modal = getModalStateContext();
 	import { onMount, tick } from 'svelte';
 
-	// http://localhost:5173/urban-connection-project-assessment?assessmentId=MrdTxI9byd
-
 	let { data } = $props();
 	let {
 		assessmentQuestions,

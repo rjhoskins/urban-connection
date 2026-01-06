@@ -61,7 +61,7 @@
 		</Button>
 
 		<Button
-			href="/"
+			href="/contact-us"
 			class="flex w-full justify-start gap-2 font-normal text-[#371E98]"
 			variant="secondary"
 		>

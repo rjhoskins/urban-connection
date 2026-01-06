@@ -18,7 +18,7 @@
 <nav class="flex items-center justify-between bg-white p-4">
 	<div class="max-w-theme-max flex w-full items-center justify-between">
 		<p class="text-2xl text-[#45464E] capitalize">
-			{pageTitle || 'Climate Effectiveness Progress Monitoring Assessment...'}
+			{pageTitle || 'Climate Effectiveness Progress Monitoring Assessment'}
 		</p>
 		<SignOutAvaterButton text={'Logout'} />
 	</div>
