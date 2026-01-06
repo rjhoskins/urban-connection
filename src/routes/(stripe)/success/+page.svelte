@@ -7,7 +7,6 @@
 <svelte:head>
 	<title>Payment Success</title>
 </svelte:head>
-</script>
 
 <h1>Hello Success</h1>
 <p>Thank you for your purchase!</p>

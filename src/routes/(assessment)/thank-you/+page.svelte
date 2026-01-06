@@ -15,7 +15,6 @@
 <svelte:head>
 	<title>Thank You</title>
 </svelte:head>
-</script>
 
 <section class="grid place-items-center">
 	<div class="mx-auto max-w-2xl">
