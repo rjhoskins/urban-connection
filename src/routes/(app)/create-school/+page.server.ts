@@ -155,6 +155,6 @@ export const actions: Actions = {
 			`${event.url.origin}/auth/register?adminInviteId=${adminInviteId}`
 		);
 
-		redirect(303, `/schools/invite?adminInviteId=${adminInviteId}`);
+		redirect(303, `/invite-admin?adminInviteId=${adminInviteId}`);
 	}
 };

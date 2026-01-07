@@ -37,7 +37,7 @@ Climate Effectiveness Progress Monitoring Assessment is a SvelteKit-based web ap
 
 ### API Routes
 
-- **`/api/send-admin-email-invite`** - Send admin invitation emails
+- **`/api/send-coadmin-invite`** - Send admin invitation emails
 - **`/api/create-assessment-invite`** - Generate assessment invite links
 - **`/api/stripe/*`** - Stripe payment integration endpoints
 

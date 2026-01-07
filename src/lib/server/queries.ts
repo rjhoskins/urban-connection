@@ -22,6 +22,7 @@ import type { PgEnum, PgTransaction } from 'drizzle-orm/pg-core';
 import db from './db';
 import type { AdminInvite, CreateUser, UserInviteHTMLEmailTemplateType } from '$lib/schema';
 import { logIfDev, transformAssessmentData } from '$lib/utils';
+import { admin } from 'googleapis/build/src/apis/admin';
 
 export async function simpleRegisterToBeDEPRICATED(
 	{
@@ -119,6 +120,27 @@ export async function updateUserWithPassword(
 	return updatedUser || null;
 }
 
+export async function updateAdminInviteAsSent(
+	{
+		inviteId
+	}: {
+		inviteId: string;
+	},
+	trx?: PgTransaction<PostgresJsQueryResultHKT, any, any>
+): Promise<{
+	id: string;
+}> {
+	const queryBuilder = trx ? trx.update(adminUserInvites) : db.update(adminUserInvites);
+	const [inviteRes] = await queryBuilder
+		.set({ isSent: true })
+		.where(eq(adminUserInvites.id, inviteId))
+		.returning({
+			id: adminUserInvites.id
+		});
+	logIfDev('updateAdminInviteAsSent inviteRes => ', inviteRes);
+	return inviteRes || null;
+}
+
 export async function updateAdminInviteWithInviteeAndMarkUsed(
 	{
 		userEmail,
@@ -188,15 +210,35 @@ const adminInviteReturningSelect = {
 	email: adminUserInvites.email
 };
 
-export const getUnusedAdminInviteById = async ({ inviteId }: { inviteId: string }) => {
-	const [res] = await db
-		.select({
-			...adminInviteReturningSelect,
-			schoolId: adminUserInvites.schoolId,
-			districtId: adminUserInvites.districtId
-		})
+export const getUnusedAdminInviteById = async (
+	{ inviteId }: { inviteId: string },
+	trx?: PgTransaction<PostgresJsQueryResultHKT, any, any>
+) => {
+	const retVals = {
+		...adminInviteReturningSelect,
+		schoolId: adminUserInvites.schoolId,
+		districtId: adminUserInvites.districtId
+	} as const;
+	const queryBuilder = trx ? trx.select(retVals) : db.select(retVals);
+	const [res] = await queryBuilder
 		.from(adminUserInvites)
 		.where(and(eq(adminUserInvites.id, inviteId), eq(adminUserInvites.isUsed, false)));
+	logIfDev('getUnusedAdminInviteById res => ', res);
+	return res || null;
+};
+export const getUnusedAdminInviteByEmail = async (
+	{ email }: { email: string },
+	trx?: PgTransaction<PostgresJsQueryResultHKT, any, any>
+) => {
+	const retVals = {
+		...adminInviteReturningSelect,
+		schoolId: adminUserInvites.schoolId,
+		districtId: adminUserInvites.districtId
+	} as const;
+	const queryBuilder = trx ? trx.select(retVals) : db.select(retVals);
+	const [res] = await queryBuilder
+		.from(adminUserInvites)
+		.where(and(eq(adminUserInvites.email, email), eq(adminUserInvites.isUsed, false)));
 	logIfDev('getUnusedAdminInviteById res => ', res);
 	return res || null;
 };
@@ -286,6 +328,45 @@ export async function updateHtmlTemplateData({
 	return htmlEmailRes || null;
 }
 
+export async function findUnusedAdminUserInviteByEmailAndSchoolId(
+	{
+		email,
+		schoolId
+	}: {
+		email: string;
+		schoolId: string;
+	},
+	trx?: PgTransaction<PostgresJsQueryResultHKT, any, any>
+): Promise<{
+	id: string;
+	inviteType: 'school' | 'district' | null;
+	schoolId: string | null;
+	districtId: string | null;
+}> {
+	const queryBuilder = trx
+		? trx.select({
+				id: adminUserInvites.id,
+				inviteType: adminUserInvites.inviteType,
+				schoolId: adminUserInvites.schoolId,
+				districtId: adminUserInvites.districtId
+			})
+		: db.select({
+				id: adminUserInvites.id,
+				inviteType: adminUserInvites.inviteType,
+				schoolId: adminUserInvites.schoolId,
+				districtId: adminUserInvites.districtId
+			});
+	const [result] = await queryBuilder
+		.from(adminUserInvites)
+		.where(
+			and(
+				eq(adminUserInvites.email, email),
+				eq(adminUserInvites.schoolId, schoolId),
+				eq(adminUserInvites.isUsed, false)
+			)
+		);
+	return result || null;
+}
 export async function createAdminUserInvite(
 	{
 		inviteData

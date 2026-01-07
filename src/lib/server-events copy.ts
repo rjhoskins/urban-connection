@@ -6,9 +6,7 @@ import {
 	findIfUserExistsById,
 	findUnusedAdminUserInviteByEmailAndSchoolId,
 	getLatestHtmlTemplateDataByType,
-	getSchoolDetailsById,
-	getUnusedAdminInviteByEmail,
-	updateAdminInviteAsSent
+	getSchoolDetailsById
 } from './server/queries';
 import { handleLogFlashReturnFormError } from './utils';
 import { inviteNewAdminOrCoAdminUserSchema } from './schema';
@@ -17,8 +15,6 @@ import { redirect, type RequestEvent } from '@sveltejs/kit';
 import type { PgTransaction } from 'drizzle-orm/pg-core';
 import type { PostgresJsQueryResultHKT } from 'drizzle-orm/postgres-js';
 import db from './server/db';
-import { get } from 'http';
-import { setFlash } from 'sveltekit-flash-message/server';
 
 export async function handleInviteCoAdminSubmitEvent(event: RequestEvent) {
 	if (!event.locals.user) return redirect(302, '/auth/login');
@@ -39,7 +35,7 @@ export async function handleInviteCoAdminSubmitEvent(event: RequestEvent) {
 			event
 		});
 	}
-	const schoolId = event.params.schoolId;
+	const adminInviteId = event.params.adminInviteId;
 
 	const existingUser = await findIfUserExistsById({ username: form.data.email as string });
 
@@ -148,12 +144,6 @@ export async function handleInviteCoAdminSubmitEvent(event: RequestEvent) {
 			const errorMessage = await res.text();
 			throw new Error(`Failed to send email: ${errorMessage}`);
 		}
-		const updateResult = await updateAdminInviteAsSent({
-			inviteId: result.existingAdminInvite.id
-		});
-		if (!updateResult.id) {
-			setFlash({ type: 'error', message: 'Failed to update invite as sent' }, event.cookies);
-		}
 	} catch (error) {
 		const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
 		const UnexpectedErrorMsg = 'Unexpected error: ' + errorMessage;
@@ -167,8 +157,6 @@ export async function handleInviteCoAdminSubmitEvent(event: RequestEvent) {
 	}
 	return { success: true, message: 'Invite sent successfully' };
 }
-
-//only an admin post-school create hence route location co-located w/ above due to overlap
 export async function handleInviteInitialAdminSubmitEvent(event: RequestEvent) {
 	if (!event.locals.user || event.locals.user.role !== 'super_admin')
 		return redirect(302, '/auth/login');
@@ -189,7 +177,6 @@ export async function handleInviteInitialAdminSubmitEvent(event: RequestEvent) {
 			event
 		});
 	}
-
 	console.log('handleInviteInitialAdminSubmitEvent form data => ', form.data);
 
 	const existingUser = await findIfUserExistsById({ username: form.data.email as string });
@@ -204,25 +191,54 @@ export async function handleInviteInitialAdminSubmitEvent(event: RequestEvent) {
 		});
 	}
 
-	let htmlTemplate = await getLatestHtmlTemplateDataByType();
 	try {
-		// probably don't need a transaction here since no db writes are being done
-		// but keeping for consistency
-		// and in case we want to add db writes later
-		// like logging the invite sent status etc.
+		htmlTemplate = await getLatestHtmlTemplateDataByType();
 		if (!htmlTemplate) throw new Error('Failed to get html template data');
 		const result = await db.transaction(
 			async (trx: PgTransaction<PostgresJsQueryResultHKT, any, any> | undefined) => {
-				const unusedAdminUserInvite = await getUnusedAdminInviteByEmail(
-					{ email: form.data.email as string },
+				const schoolRes = await getSchoolDetailsById(schoolId as string, trx);
+				if (!schoolRes.id) throw new Error('School not found or does not exist');
+
+				const newUser = await createNewUserWithDetails(
+					{
+						username: form.data.email,
+						name: form.data.name,
+						phone: form.data.phone || undefined
+					},
+					trx
+				);
+				if (!newUser) throw new Error('Failed to create user');
+
+				let existingAdminInvite = await findUnusedAdminUserInviteByEmailAndSchoolId(
+					{
+						email: form.data.email,
+						schoolId: schoolId as string
+					},
+					trx
+				);
+				if (!existingAdminInvite) throw new Error('Failed to find invite');
+
+				//associate user with school/district
+				let adminRes;
+
+				adminRes = await createSchoolAdmin(
+					{ userId: newUser.id, schoolId: existingAdminInvite.schoolId! },
 					trx
 				);
 
-				if (!unusedAdminUserInvite) throw new Error('Failed to find invite');
+				if (!adminRes) {
+					throw new Error('Failed to associate admin');
+				}
 
+				console.log('inviteRes ALL THE STUFFS => ', {
+					schoolRes,
+					newUser,
+					existingAdminInvite,
+					adminRes
+				});
 				// throw new Error('Testing transaction rollback');
 
-				return { unusedAdminUserInvite };
+				return { schoolRes, newUser, existingAdminInvite, adminRes };
 			}
 		);
 
@@ -244,20 +260,13 @@ export async function handleInviteInitialAdminSubmitEvent(event: RequestEvent) {
 			body: JSON.stringify({
 				to: form.data.email,
 				subject: 'You have been invited to join the platform',
-				inviteLink: `${event.url.origin}/auth/register?adminInviteId=${result.unusedAdminUserInvite.adminInviteId}`,
+				inviteLink: `${event.url.origin}/auth/register?adminInviteId=${result.existingAdminInvite.id}`,
 				htmlEmailContent: htmlTemplate.template
 			})
 		});
 		if (!res.ok) {
 			const errorMessage = await res.text();
 			throw new Error(`Failed to send email: ${errorMessage}`);
-		}
-
-		const updateResult = await updateAdminInviteAsSent({
-			inviteId: result.unusedAdminUserInvite.adminInviteId
-		});
-		if (!updateResult.id) {
-			setFlash({ type: 'error', message: 'Failed to update invite as sent' }, event.cookies);
 		}
 	} catch (error) {
 		const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
@@ -270,6 +279,5 @@ export async function handleInviteInitialAdminSubmitEvent(event: RequestEvent) {
 			event
 		});
 	}
-	setFlash({ type: 'success', message: 'Invite sent successfully' }, event.cookies);
-	redirect(302, '/');
+	return { success: true, message: 'Invite sent successfully' };
 }

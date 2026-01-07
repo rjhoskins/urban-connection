@@ -1,6 +1,6 @@
 import { superValidate } from 'sveltekit-superforms';
 import {
-	inviteNewCoAdminUserSchema,
+	inviteNewAdminOrCoAdminUserSchema,
 	schoolAdminUserInviteHTMLEmailTemplateSchema
 } from '$lib/schema';
 import { zod } from 'sveltekit-superforms/adapters';
@@ -28,7 +28,7 @@ export const load: PageServerLoad = async (event) => {
 		throw error(404, 'Invite not found or invalid');
 	}
 
-	const inviteForm = await superValidate(zod(inviteNewCoAdminUserSchema));
+	const inviteForm = await superValidate(zod(inviteNewAdminOrCoAdminUserSchema));
 	if (!inviteForm.valid) {
 		console.log('inviteForm.errors => ', inviteForm.errors);
 	}

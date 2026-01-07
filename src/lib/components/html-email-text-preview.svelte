@@ -28,11 +28,7 @@
 		<p>
 			{data.callToAction}
 			{#if unusedAdminUserInvite}
-				<a
-					class={[disableLink && 'pointer-events-none', 'text-blue-700 underline']}
-					href={`${window.location.origin}/auth/register?adminInviteId=${unusedAdminUserInvite.publicId}`}
-					>{data.registrationLinkText}</a
-				>
+				<span class={['text-blue-700 underline']}>{data.registrationLinkText}</span>
 			{/if}
 		</p>
 	</Card.Content>

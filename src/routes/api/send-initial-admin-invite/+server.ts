@@ -17,13 +17,13 @@ OAuth2Client.setCredentials({
 });
 
 // export const GET: RequestHandler = async () => {
-// 	console.log('GET /api/send-admin-email-invite==================> ');
-// 	return json({ message: 'GET /api/send-admin-email-invite', 'application/json': '' });
+// 	console.log('GET /api/send-initial-admin-invite==================> ');
+// 	return json({ message: 'GET /api/send-initial-admin-invite', 'application/json': '' });
 // };
 
 export const POST: RequestHandler = async (event) => {
 	const res = await event.request.json();
-	console.log('POST /api/send-admin-email-invite============> ', res);
+	console.log('POST /api/send-initial-admin-invite============> ', res);
 	try {
 		if (dev) {
 			await sendDevEmail({ ...res });

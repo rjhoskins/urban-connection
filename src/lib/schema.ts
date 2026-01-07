@@ -76,7 +76,7 @@ export const newUserTokenSchema = z.object({
 	inviteId: z.string(),
 	email: z.string().email({ message: 'invalid token' })
 });
-export const inviteNewCoAdminUserSchema = z.object({
+export const inviteNewAdminOrCoAdminUserSchema = z.object({
 	name: z.string(),
 	email: z.string().email({ message: 'invalid email' }),
 	phone: z.string().optional()

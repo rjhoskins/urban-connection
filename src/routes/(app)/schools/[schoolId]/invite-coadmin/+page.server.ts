@@ -1,4 +1,4 @@
-import { inviteNewCoAdminUserSchema } from '$lib/schema';
+import { inviteNewAdminOrCoAdminUserSchema } from '$lib/schema';
 import { handleInviteCoAdminSubmitEvent } from '$lib/server-events.js';
 import { getLatestHtmlTemplateDataByType } from '$lib/server/queries';
 import { fail, redirect } from '@sveltejs/kit';
@@ -10,7 +10,7 @@ export const load = async (event) => {
 	const user = event.locals.user;
 	if (!user) return fail(400, { message: 'User not authenticated' });
 
-	const form = await superValidate(zod(inviteNewCoAdminUserSchema));
+	const form = await superValidate(zod(inviteNewAdminOrCoAdminUserSchema));
 
 	return {
 		form,

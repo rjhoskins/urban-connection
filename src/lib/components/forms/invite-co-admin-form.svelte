@@ -15,12 +15,12 @@
 	import * as Dialog from '../ui/dialog';
 	import { Button } from '../ui/button';
 	import { goto, invalidateAll } from '$app/navigation';
-	import { inviteNewCoAdminUserSchema } from '$lib/schema';
+	import { inviteNewAdminOrCoAdminUserSchema } from '$lib/schema';
 
 	let { page, data } = $props();
 
 	const form = superForm(data.form, {
-		validators: zodClient(inviteNewCoAdminUserSchema),
+		validators: zodClient(inviteNewAdminOrCoAdminUserSchema),
 		onSubmit: () => {
 			console.log('onSubmit');
 		},

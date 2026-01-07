@@ -14,9 +14,15 @@ import { setFlash } from 'sveltekit-flash-message/server';
 import { INITIAL_HTML_DATA } from '$lib/server/constants.js';
 import { htmlEmailTemplates } from '$lib/server/db/schema/index.js';
 import { getUnusedAdminInviteById, getLatestHtmlTemplateDataByType } from '$lib/server/queries';
-import { handleInviteCoAdminSubmitEvent } from '$lib/server-events.js';
+import {
+	handleInviteCoAdminSubmitEvent,
+	handleInviteInitialAdminSubmitEvent
+} from '$lib/server-events.js';
 
 export const load: PageServerLoad = async (event) => {
+	if (!event.locals.user || event.locals.user.role !== 'super_admin') {
+		return redirect(302, '/auth/login');
+	}
 	console.log('INVITE +page.server.ts load ===================');
 	const adminInviteId = event.url.searchParams.get('adminInviteId');
 	console.log('adminInviteId => ', adminInviteId);
@@ -25,7 +31,11 @@ export const load: PageServerLoad = async (event) => {
 	}
 	const unusedAdminUserInvite = await getUnusedAdminInviteById({ inviteId: adminInviteId! });
 	if (!unusedAdminUserInvite) {
-		throw error(404, 'Invite not found or already used');
+		setFlash(
+			{ type: 'error', message: 'Initial Admin Invite not found or already used' },
+			event.cookies
+		);
+		throw error(404, 'Initial Admin Invite not found or already used');
 	}
 
 	// console.log('isUsed => ', isUsedRes?.isUsed);
@@ -50,8 +60,10 @@ export const load: PageServerLoad = async (event) => {
 	};
 };
 export const actions: Actions = {
-	invite: async (event) => handleInviteCoAdminSubmitEvent(event),
+	invite: async (event) => handleInviteInitialAdminSubmitEvent(event),
 	email: async (event) => {
+		if (!event.locals.user || event.locals.user.role !== 'super_admin')
+			return redirect(302, '/auth/login');
 		const form = await superValidate(
 			event.request,
 			zod(schoolAdminUserInviteHTMLEmailTemplateSchema)

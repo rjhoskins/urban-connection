@@ -5,7 +5,7 @@
 	import { Textarea } from '$lib/components/ui/textarea/index.js';
 
 	import * as Card from '$lib/components/ui/card';
-	import { inviteNewCoAdminUserSchema } from '$lib/schema.js';
+	import { inviteNewAdminOrCoAdminUserSchema } from '$lib/schema.js';
 	/** @type {{ data: import('./$types').PageData, form: import('./$types').ActionData }} */
 	import { Field, Control, Label, FieldErrors, Description } from 'formsnap';
 	import { superForm } from 'sveltekit-superforms';
@@ -14,13 +14,12 @@
 	import { dev } from '$app/environment';
 	import { LoaderCircle } from 'lucide-svelte';
 	import HtmlEmailTextPreview from '../html-email-text-preview.svelte';
-	import { onMount } from 'svelte';
 
 	let { page, data, unusedAdminUserInvite, canEditForm } = $props();
 	const { name, email, phone } = unusedAdminUserInvite;
 	const form = superForm(data.inviteForm, {
 		dataType: 'json',
-		validators: zodClient(inviteNewCoAdminUserSchema)
+		validators: zodClient(inviteNewAdminOrCoAdminUserSchema)
 	});
 	const { form: formData, enhance, message, delayed } = form;
 
@@ -39,7 +38,7 @@
 	/>
 {/if}
 
-<form class="flex flex-col gap-3" method="POST" action="?/invite" use:enhance>
+<form class="sizes flex flex-col gap-3" method="POST" action="?/invite" use:enhance>
 	<!-- name -->
 	<Form.Field class="hidden space-y-0" {form} name="name">
 		<Form.Control>

@@ -1,7 +1,7 @@
 /** @type {import('./$types').PageServerLoad} */
 /** @type {import('./$types').Actions} */
 import { superValidate } from 'sveltekit-superforms/server';
-import { inviteNewCoAdminUserSchema } from '$lib/schema';
+import { inviteNewAdminOrCoAdminUserSchema } from '$lib/schema';
 import { zod } from 'sveltekit-superforms/adapters';
 import { error, fail } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';
@@ -15,7 +15,7 @@ export const load = async (event) => {
 	const user = event.locals.user;
 	if (!user) return fail(400, { message: 'User not authenticated' });
 
-	const form = await superValidate(zod(inviteNewCoAdminUserSchema));
+	const form = await superValidate(zod(inviteNewAdminOrCoAdminUserSchema));
 
 	return { form, schoolAdminHtmlTemplate: await getLatestHtmlTemplateDataByType() };
 };
