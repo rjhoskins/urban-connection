@@ -9,7 +9,12 @@ export const db = drizzle(client, {
 	casing: 'snake_case'
 });
 
-import { RUBRIC_DATA, INITIAL_DISTRICTS, INITIAL_HTML_DATA } from '$lib/constants';
+import {
+	RUBRIC_DATA,
+	INITIAL_DISTRICTS,
+	INITIAL_HTML_DATA,
+	INITIAL_USERS
+} from '$lib/server/constants';
 import {
 	assessmentDomains,
 	assessmentQuestions,
@@ -18,7 +23,6 @@ import {
 	htmlEmailTemplates,
 	users
 } from './schema';
-import { simpleRegisterToBeDEPRICATED } from '../queries';
 
 async function seed() {
 	// Clear existing data
@@ -30,7 +34,7 @@ async function seed() {
 	await db.delete(assessmentDomains);
 
 	console.log('🌱 Starting seed...');
-	await createUCSuperUser();
+	await createInitialUsers();
 	await createInitialDistrict();
 	await createInitialHTMLTemplate();
 
@@ -43,6 +47,7 @@ async function seed() {
 		for (let j = 0; j < data[i].subDomains.length; j++) {
 			for (let k = 0; k < data[i].subDomains[j].descriptors.length; k++) {
 				const possibleDomain = await createDomainIfNotExists(data[i].name);
+				console.log('POSSIBLE DOMAIN', possibleDomain);
 				if (!possibleDomain?.id) {
 					console.error(`❌ Domain exists: ${data[i].name}`);
 				} else {
@@ -127,17 +132,21 @@ async function createQuestionIfNotExists({
 		.returning({ id: assessmentQuestions.id });
 	return question;
 }
-async function createUCSuperUser() {
-	const passwordHash = await hash('123456', {
-		memoryCost: 19456,
-		timeCost: 2,
-		outputLen: 32,
-		parallelism: 1
-	});
-	await simpleRegisterToBeDEPRICATED({
-		username: 'uc-super-user',
-		passwordHash
-	});
+async function createInitialUsers() {
+	for (const user of INITIAL_USERS) {
+		const passwordHash = await hash(user.password, {
+			memoryCost: 19456,
+			timeCost: 2,
+			outputLen: 32,
+			parallelism: 1
+		});
+		await db.insert(users).values({
+			username: user.username,
+			passwordHash,
+			role: user.role as 'super_admin' | 'district_admin' | 'school_admin' | null | undefined
+		});
+	}
+	console.log('✅ createInitialUsers Seed completed!');
 }
 async function createInitialDistrict() {
 	for (const districtName of INITIAL_DISTRICTS) {
@@ -145,10 +154,12 @@ async function createInitialDistrict() {
 			name: districtName
 		});
 	}
+	console.log('✅ createInitialDistrict Seed completed!');
 }
 async function createInitialHTMLTemplate() {
 	await db.insert(htmlEmailTemplates).values({
 		type: 'admin_invite',
 		template: INITIAL_HTML_DATA
 	});
+	console.log('✅ createInitialHTMLTemplate Seed completed!');
 }

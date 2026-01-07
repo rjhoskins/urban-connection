@@ -1,5 +1,5 @@
 import { handleLogFlashReturnFormError, logIfDev } from '$lib/utils.js';
-import { demographicsQuestionsData } from '$lib/constants.js';
+import { demographicsQuestionsData } from '$lib/server/constants.js';
 import {
 	createAssessment,
 	createDemographicsData,

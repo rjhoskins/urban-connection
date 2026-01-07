@@ -11,7 +11,7 @@ import { db } from '$lib/server/db';
 import { redirect } from '@sveltejs/kit';
 import { handleLogFlashReturnFormError } from '$lib/utils';
 import { setFlash } from 'sveltekit-flash-message/server';
-import { INITIAL_HTML_DATA } from '$lib/constants.js';
+import { INITIAL_HTML_DATA } from '$lib/server/constants.js';
 import { htmlEmailTemplates } from '$lib/server/db/schema/index.js';
 import { getUnusedAdminInviteById, getLatestHtmlTemplateDataByType } from '$lib/server/queries';
 import { handleInviteCoAdminSubmitEvent } from '$lib/server-events.js';

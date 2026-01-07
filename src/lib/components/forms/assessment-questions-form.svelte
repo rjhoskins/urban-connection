@@ -4,7 +4,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import Card from '$lib/components/ui/card/card.svelte';
 	import type { ActionResult } from '@sveltejs/kit';
-	import { ZERO_BASED_ALPHABET_NUMBERING } from '$lib/constants';
+	import { ZERO_BASED_ALPHABET_NUMBERING } from '$lib/public-data/constants-public';
 	import Input from '../ui/input/input.svelte';
 	import toast from 'svelte-french-toast';
 	import { getGlobalsContext } from '$lib/store/globals-state.svelte';

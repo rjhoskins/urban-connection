@@ -4,7 +4,7 @@
 	import Card from '$lib/components/ui/card/card.svelte';
 	import { onMount } from 'svelte';
 	import { getModalStateContext } from '$lib/modal-state.svelte';
-	import { videoIdMap } from '$lib/constants';
+	import { videoIdMap } from '$lib/public-data/constants-public';
 	const modal = getModalStateContext();
 
 	onMount(() => {

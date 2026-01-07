@@ -1,6 +1,5 @@
 <script lang="ts">
 	import DemographicsForm from '$lib/components/forms/demographics-form.svelte';
-	import { videoIdMap } from '$lib/constants';
 	import { getModalStateContext } from '$lib/modal-state.svelte';
 
 	import { onMount } from 'svelte';

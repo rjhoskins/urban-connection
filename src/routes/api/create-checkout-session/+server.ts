@@ -1,6 +1,6 @@
 import Stripe from 'stripe';
 import { dev } from '$app/environment';
-import { TEST_STRIPE_PRODUCTS, PROD_STRIPE_PRODUCTS } from '$lib/constants';
+import { TEST_STRIPE_PRODUCTS, PROD_STRIPE_PRODUCTS } from '$lib/server/constants';
 import { STRIPE_SECRET_KEY, STRIPE_SECRET_TEST_KEY } from '$env/static/private';
 import { PUBLIC_FRONTEND_URL_SANDBOX, PUBLIC_FRONTEND_URL_PROD } from '$env/static/public';
 import { error, json, redirect, type RequestHandler } from '@sveltejs/kit';

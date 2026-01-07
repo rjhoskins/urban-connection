@@ -3,7 +3,7 @@
 	import * as Card from '$lib/components/ui/card';
 	import GenericInviteForm from '$lib/components/forms/generic-invite-form.svelte';
 	import HtmlEmailTextPreview from '$lib/components/html-email-text-preview.svelte';
-	import { TEMPLATE_TITLES } from '$lib/constants.js';
+	import { TEMPLATE_TITLES } from '$lib/public-data/constants-public';
 	import { onMount } from 'svelte';
 	import { getGlobalsContext } from '$lib/store/globals-state.svelte';
 	const globals = getGlobalsContext();

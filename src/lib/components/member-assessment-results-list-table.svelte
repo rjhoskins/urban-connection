@@ -31,7 +31,7 @@
 	</Table.Header>
 	<Table.Body>
 		{#each sortedMembers as member, idx (member.id)}
-			<MemberAssessmentResultsListTableRow showScore {page} {member} {idx} />
+			<MemberAssessmentResultsListTableRow {page} {member} {idx} />
 		{/each}
 	</Table.Body>
 </Table.Root>

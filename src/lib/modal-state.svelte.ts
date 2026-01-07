@@ -1,5 +1,5 @@
 import { getContext, setContext, tick } from 'svelte';
-import { videoIdMap } from './constants';
+import { videoIdMap } from '$lib/public-data/constants-public';
 
 enum ModalMode {
 	AUTO,
@@ -47,7 +47,6 @@ export class ModalsStateClass implements ModalsState {
 	ytModalIsOpen = $state(false);
 	ytIsManualVid = $state(false);
 	manualSetVideoId = $state('');
-	assessmentParticipantEmail = $state<string | undefined>(undefined);
 
 	constructor(context?: Partial<ModalsState>) {}
 

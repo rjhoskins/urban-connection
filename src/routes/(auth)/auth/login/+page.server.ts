@@ -8,7 +8,7 @@ import type { Actions, PageServerLoad } from './$types';
 import { message, superValidate } from 'sveltekit-superforms/server';
 import { zod } from 'sveltekit-superforms/adapters';
 import { createNewUserOrLoginSchema } from '$lib/schema';
-import { SERVER_ERROR_MESSAGES } from '$lib/constants';
+import { SERVER_ERROR_MESSAGES } from '$lib/server/constants';
 import { setFlash } from 'sveltekit-flash-message/server';
 import { simpleRegisterToBeDEPRICATED, findIfActiveUserExists } from '$lib/server/queries';
 

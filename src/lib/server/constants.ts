@@ -6,13 +6,6 @@ export const SERVER_ERROR_MESSAGES = {
 	'500': 'Server error'
 };
 
-export const ASSESSMENT_PROGRESS_IMG_MAP = new Map([
-	//key: domain name, value: image path
-	['Cultural Awareness', '/img/cultural-awareness-progress.png'],
-	['Systems', '/img/systems-progress.png'],
-	['Relationships', '/img/relationships-progress.png'],
-	['Rigorous & Accessible Content', '/img/community-progress.png']
-]);
 export const INITIAL_HTML_DATA = {
 	greeting: 'Dear Administrator,',
 	definition:
@@ -104,38 +97,38 @@ export const demographicsQuestionsData = {
 };
 export const RUBRIC_DATA = [
 	{
-		name: 'Cultural Awareness',
+		name: 'Societal Awareness',
 		totalPoints: 24,
 		subDomains: [
 			{
-				name: 'Cultural Awareness',
-				type: 'sub',
+				name: 'Awareness',
+				points: 5,
 				description:
-					'The school demonstrates intentionality in an effort to become/remain culturally aware, and use that understanding to guide decisions, foster relationships, and create an inclusive environment for students, families, and the community.',
+					'The school demonstrates intentionality in an effort to become/remain aware of the community being served, and use that understanding to guide decisions, foster relationships, and create an inclusive environment for students, families, and the community.',
 				descriptors: [
 					{
-						id: 'Cultural_Awareness_1',
+						id: 'Awareness_1',
 						text: 'Training is provided regularly for the school to remain culturally aware of the community being served and the society (at large)',
 						value: null
 					},
 					{
-						id: 'Cultural_Awareness_2',
+						id: 'Awareness_2',
 						text: 'There is a consistent effort for families from all cultural backgrounds (race, ethnicity, gender, religion, ability, disability, etc.) to feel welcomed and respected',
 						value: null
 					},
 					{
-						id: 'Cultural_Awareness_3',
-						text: 'The school celebrates cultural diversity through events, displays, and traditions',
+						id: 'Awareness_3',
+						text: 'The school highlights a variety of student backgrounds and traditions through events and visual displays',
 						value: null
 					},
 					{
-						id: 'Cultural_Awareness_4',
-						text: 'Students feel comfortable expressing their cultural identities without fear of judgment',
+						id: 'Awareness_4',
+						text: 'The school fosters an atmosphere where students can talk about their traditions and heritage openly',
 						value: null
 					},
 					{
-						id: 'Cultural_Awareness_5',
-						text: 'Families and community members are regularly assessmented (at least semi-annually) to understand their experiences and perceptions of cultural inclusivity at the school',
+						id: 'Awareness_5',
+						text: 'Families and community members are regularly surveyed (at least semi-annually) to understand their experiences and perceptions of the school',
 						value: null
 					}
 				]
@@ -177,7 +170,7 @@ export const RUBRIC_DATA = [
 				name: 'Representation',
 				points: 5,
 				description:
-					"The school purposefully incorporates representations of the students' ethnicities, genders, relevant interests, personal experiences, etc.",
+					"The school intentionally includes materials and activities that reflect students' backgrounds, interests, and lived experiences.",
 				descriptors: [
 					{
 						id: 'Representation_1',
@@ -186,7 +179,7 @@ export const RUBRIC_DATA = [
 					},
 					{
 						id: 'Representation_2',
-						text: 'Library books (fiction and nonfiction) represent the school demographic (interests, race, gender, ethnicity, etc.)',
+						text: "The school/classroom library includes a wide range of books that reflect students' interests and backgrounds",
 						value: null
 					},
 					{
@@ -196,7 +189,7 @@ export const RUBRIC_DATA = [
 					},
 					{
 						id: 'Representation_4',
-						text: 'Curriculum choices are inclusive of school demographic',
+						text: "The curriculum incorporates content relevant to students' backgrounds and communities",
 						value: null
 					},
 					{
@@ -277,7 +270,7 @@ export const RUBRIC_DATA = [
 				name: 'Systemic Expectations',
 				points: 6,
 				description:
-					"The school's system establishes inclusive language and clear expectations involving all stakeholders. System-wide expectations for behavior, academics, and citizenship are clearly defined, consistently enforced, and visibly reinforced in classrooms and common areas, promoting a culture of accountability and high standards.",
+					"The school's system establishes respectful communication and clear expectations involving all stakeholders. System-wide expectations for behavior, academics, and citizenship are clearly defined, consistently enforced, and visibly reinforced in classrooms and common areas, promoting a culture of accountability and high standards.",
 				descriptors: [
 					{
 						id: 'Systemic_Expectations_1',
@@ -296,7 +289,7 @@ export const RUBRIC_DATA = [
 					},
 					{
 						id: 'Systemic_Expectations_4',
-						text: 'Expectations are expressed Daily',
+						text: 'Expectations are expressed daily',
 						value: null
 					},
 					{
@@ -362,7 +355,7 @@ export const RUBRIC_DATA = [
 				descriptors: [
 					{
 						id: 'Restorative_Practices_1',
-						text: 'Staff receive ongoing professional development in restorative practices, conflict resolution, and effective communication strategies',
+						text: 'Staff receives ongoing professional development in restorative practices, conflict resolution, and effective communication strategies',
 						value: null
 					},
 					{
@@ -372,7 +365,7 @@ export const RUBRIC_DATA = [
 					},
 					{
 						id: 'Restorative_Practices_3',
-						text: 'Every classroom has a separate restorative area for students to utilize when necessary',
+						text: 'Every classroom has a separate restorative area for students to utilize, when necessary',
 						value: null
 					},
 					{
@@ -396,7 +389,7 @@ export const RUBRIC_DATA = [
 				name: 'Positive Reinforcements',
 				points: 7,
 				description:
-					'Effective use of positive reinforcements at both the classroom and administrative levels encourage student engagement and success. This reinforcement can include incentive programs, student praise and recognition strategies, all contributing to a supportive and encouraging school culture.',
+					'Effective use of positive reinforcements at both the classroom and administrative levels encourages student engagement and success. This reinforcement can include incentive programs, student praise and recognition strategies, all contributing to a supportive and encouraging school culture. The program, process or reward sequence is visible. Students are aware of the system and incentive established when expectations are met/surpassed.',
 				descriptors: [
 					{
 						id: 'Positive_Reinforcements_1',
@@ -425,7 +418,7 @@ export const RUBRIC_DATA = [
 					},
 					{
 						id: 'Positive_Reinforcements_6',
-						text: 'There is a criteria established for students who do not qualify for major incentives to still earn some form of recognition',
+						text: 'There is a criterion established for students who do not qualify for major incentives to still earn some form of recognition',
 						value: null
 					},
 					{
@@ -530,7 +523,7 @@ export const RUBRIC_DATA = [
 				descriptors: [
 					{
 						id: 'Knowledge_of_Students_1',
-						text: 'Student assessment data is utilized to learn more about students interests, strengths, and challenges, both academically and non-academically, and files are regularly updated',
+						text: 'Student survey data is utilized to learn more about students interests, strengths, and challenges, both academically and non-academically, and files are regularly updated',
 						value: null
 					},
 					{
@@ -582,7 +575,7 @@ export const RUBRIC_DATA = [
 				name: 'Student-to-Student',
 				points: 4,
 				description:
-					"There's a standard for student conversations to use appropriate language that encourages a positive and healthy culture. This standard of language uplifts, constructively criticizes when necessary and is inclusive.",
+					"There's a standard for student conversations to use appropriate language that encourages a positive and healthy culture. This standard of language uplifts, constructively criticizes when necessary and is welcoming.",
 				descriptors: [
 					{
 						id: 'Student-to-Student_1',
@@ -607,34 +600,34 @@ export const RUBRIC_DATA = [
 				]
 			},
 			{
-				name: 'Caregiver Connection',
+				name: 'Parent/Guardian Connection',
 				points: 5,
 				description:
 					'A strong caregiver connection is made a priority at the school-wide and classroom level in order to promote attendance, citizenship and academic performance. Many systems are put in place to ensure the opportunity for relationship building from school personnel to caregiver.',
 				descriptors: [
 					{
-						id: 'Caregiver_Connection_1',
-						text: 'Initial contact and communication medium preferences are established with every caregiver (homeroom) within the first month of school by individual teachers',
+						id: 'Parent_Guardian_Connection_1',
+						text: 'Initial contact and communication medium preferences are established with every parent/guardian (homeroom) within the first month of school by individual teachers',
 						value: null
 					},
 					{
-						id: 'Caregiver_Connection_2',
-						text: "Caregiver contracts are created and maintained with clear expectations for all stakeholders (i.e. desired caregiver involvement in the students' attendance, behavior, academics, etc.)",
+						id: 'Parent_Guardian_Connection_2',
+						text: "Parent/guardian contracts are created and maintained with clear expectations for all stakeholders (i.e. desired caregiver involvement in the students' attendance, behavior, academics, etc.)",
 						value: null
 					},
 					{
-						id: 'Caregiver_Connection_3',
-						text: '1 positive call is required to the Caregiver(s) for each consequential call, and is monitored on a regular basis for all teachers & administrators',
+						id: 'Parent_Guardian_Connection_3',
+						text: '1 positive call is required to the Parent/Guardian for each consequential call, and is monitored on a regular basis for all teachers & administrators',
 						value: null
 					},
 					{
-						id: 'Caregiver_Connection_4',
-						text: 'Opportunities for caregivers to be present on campus (classes, events, parent volunteers, etc.) are available on a monthly basis, and encouraged regularly through some form of contact (teacher or school-wide)',
+						id: 'Parent_Guardian_Connection_4',
+						text: 'Opportunities for Parents/Guardians to be present on campus (classes, events, parent volunteers, etc.) are available on a monthly basis, and encouraged regularly through some form of contact (teacher or school-wide)',
 						value: null
 					},
 					{
-						id: 'Caregiver_Connection_5',
-						text: 'Caregivers and teachers conference about student performance on a quarterly/trimester basis',
+						id: 'Parent_Guardian_Connection_5',
+						text: 'Parents/Guardians and teachers conference about student performance on a quarterly/trimester basis',
 						value: null
 					}
 				]
@@ -681,7 +674,7 @@ export const RUBRIC_DATA = [
 				descriptors: [
 					{
 						id: 'Real-Time_Assessments_1',
-						text: 'Real-Time Assessments align with logical skill chunking (e.g., for determining unknown word meanings: first identifying context clues, then using background knowledge, and finally determining the meaning)',
+						text: 'Real-Time Assessments align with logical skill progressions (e.g., using context clues, then background knowledge, to determine word meanings)',
 						value: null
 					},
 					{
@@ -786,39 +779,6 @@ export const RUBRIC_DATA = [
 	}
 ];
 
-export const ZERO_BASED_ALPHABET_NUMBERING = {
-	0: 'A',
-	1: 'B',
-	2: 'C',
-	3: 'D',
-	4: 'E',
-	5: 'F',
-	6: 'G',
-	7: 'H',
-	8: 'I',
-	9: 'J',
-	10: 'K',
-	11: 'L',
-	12: 'M',
-	13: 'N',
-	14: 'O',
-	15: 'P',
-	16: 'Q',
-	17: 'R',
-	18: 'S',
-	19: 'T',
-	20: 'U',
-	21: 'V',
-	22: 'W',
-	23: 'X',
-	24: 'Y',
-	25: 'Z'
-};
-
-export const TEMPLATE_TITLES = {
-	admin_invite: 'Admin Invite',
-	assessment_invite: 'Assessment Invite'
-};
 export const TEST_STRIPE_PRODUCTS = [
 	{
 		priceId: 'price_1RukA0AAfGnMCvIQ6BJJcl0O',
@@ -836,19 +796,15 @@ export const PROD_STRIPE_PRODUCTS = [
 	}
 ];
 
-export const videoIdMap = new Map<string, string>([
-	['modal-demographics', '-KfJ47_1_bE'],
-	['modal-instructions-preload', '5lFxJFX_cOU'],
-	['modal-instructions-btn', '-cWz4OFpqaQ'],
-	['onPage-subDomain-awarenessIntro', 'SircNVvTSwI'],
-	['onPage-domain-societalAwareness', 'Jc6y2TcuJVE'],
-	['onPage-domain-buildingRelationships', 'Tn5Vu46bR0A'],
-	['onPage-domain-systems', '8FVPl0yMSr0'],
-	['onPage-domain-rigorousAndAccessibleContent', 'WOctmINui08'],
-	['modal-domain-mentorship', '1X7OipkrgaU'],
-	['modal-domain-representation', 'qx9_jgIerkg'],
-	['modal-domain-summaryInstructions', 'P4Zuc2uqxdg'],
-	['modal-closing', 'YCcGbZoqUXg']
-]);
-
 export const INITIAL_DISTRICTS = ['District One'];
+export const INITIAL_USERS = [
+	{ username: 'dc-super-user', password: '123456', role: 'super_admin', name: 'DREAMCREDIBLE' },
+	{
+		username: 'robertjhoskinz',
+		password: 'pb#cHu#;yY2ckx!',
+		role: 'super_admin',
+		name: 'Best Dev Inc.'
+	},
+	{ username: 'uc-super-user', password: '123456', role: 'super_admin', name: 'UCP' },
+	{ username: 'theone@me.com', password: '123456', role: 'district_admin', name: 'The One' }
+];

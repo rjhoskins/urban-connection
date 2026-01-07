@@ -1,4 +1,4 @@
-import { demographicsQuestionsData } from '$lib/constants.js';
+import { demographicsQuestionsData } from '$lib/server/constants.js';
 import { AssessmentTokenInviteSchema } from '$lib/schema';
 import {
 	addQuestionsData,

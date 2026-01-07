@@ -4,7 +4,7 @@
 	import Input from '../components/ui/input/input.svelte';
 	import { getModalStateContext } from '$lib/modal-state.svelte';
 	import { logIfDev } from '$lib/utils';
-	import { videoIdMap } from '$lib/constants';
+	import { videoIdMap } from '$lib/public-data/constants-public';
 	import { applyAction, enhance } from '$app/forms';
 	import { toast } from 'svelte-french-toast';
 	import { goto } from '$app/navigation';

@@ -5,10 +5,9 @@
 	import AssessmentQuestionsForm from '$lib/components/forms/assessment-questions-form.svelte';
 
 	import Card from '$lib/components/ui/card/card.svelte';
-	import { ASSESSMENT_PROGRESS_IMG_MAP, videoIdMap } from '$lib/constants';
+	import { ASSESSMENT_PROGRESS_IMG_MAP, videoIdMap } from '$lib/public-data/constants-public';
 	import { getModalStateContext } from '$lib/modal-state.svelte';
 	import { logIfDev } from '$lib/utils.js';
-	import { is, type max } from 'drizzle-orm';
 
 	import { Video } from 'lucide-svelte';
 	const modal = getModalStateContext();
@@ -33,10 +32,10 @@
 		return totalQuestions;
 	});
 	// svelte-ignore state_referenced_locally
-	const domains = assessmentQuestions.map((domain) => {
+	const domains = assessmentQuestions.map((domain, index) => {
 		return {
 			name: domain.name,
-			imgUrl: ASSESSMENT_PROGRESS_IMG_MAP.get(domain.name) || ''
+			imgUrl: ASSESSMENT_PROGRESS_IMG_MAP.get(index) || ''
 			// status: 'not-started'
 		};
 	});
