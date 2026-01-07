@@ -64,7 +64,8 @@ async function sendProdEmail({
 	);
 
 	try {
-		const accessToken = await googleOAuth2Client.getAccessToken();
+		// This automatically refreshes if needed
+		const { token } = await googleOAuth2Client.getAccessToken();
 		const mailOptions = {
 			from: `Climate Effectiveness Progress Monitoring Assessment <no-reply@theurbanconnectionproject.org>`,
 			to: ['robertjhoskins@gmail.com', 'thomas.wilkins@dreamcredible.com', `${to}`],
