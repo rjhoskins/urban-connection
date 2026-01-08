@@ -82,7 +82,7 @@ async function sendProdEmail({
 				clientId: env.GOOGLE_OAUTH_CLIENT_ID,
 				clientSecret: env.GOOGLE_OAUTH_CLIENT_SECRET,
 				refreshToken: env.GOOGLE_OAUTH_REFRESH_TOKEN,
-				accessToken: accessToken
+				accessToken: token
 			}
 		});
 		const result = await transporter.sendMail(mailOptions);
