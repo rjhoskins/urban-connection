@@ -78,7 +78,7 @@ async function sendProdEmail({
 			service: 'gmail',
 			auth: {
 				type: 'OAuth2',
-				user: 'no-reply@theurbanconnectionproject.org',
+				user: 'apptest@dreamcredible.com',
 				clientId: env.GOOGLE_OAUTH_CLIENT_ID,
 				clientSecret: env.GOOGLE_OAUTH_CLIENT_SECRET,
 				refreshToken: env.GOOGLE_OAUTH_REFRESH_TOKEN,
