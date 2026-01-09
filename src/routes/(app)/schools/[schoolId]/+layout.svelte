@@ -21,7 +21,7 @@
 	const { stripeProducts, schoolWithAdmins, memberData } = data;
 	const products = $state(stripeProducts || []);
 
-	let pageTitle = $state(`${schoolWithAdmins.name} | Dashboard`);
+	let pageTitle = $state(`${data.schoolWithAdmins?.name} | Dashboard`);
 	onMount(() => {
 		globals.setPageName(pageTitle);
 		console.log('Layout data:', data);
@@ -141,19 +141,18 @@
 <svelte:head>
 	<title>{pageTitle}</title>
 	<meta property="og:title" content={pageTitle} />
-	<meta property="og:description" content={`Manage ${schoolWithAdmins.name} School`} />
 	<meta property="og:image" content="/img/urban-connection-logo.png" />
 	<meta property="og:url" content={page.url.href} />
 	<link rel="icon" href="/img/urban-connection-logo.png" type="image/png" />
 </svelte:head>
 
-<!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->
-<h1 class="sr-only">Manage {schoolWithAdmins.name} School</h1>
+<pre>{JSON.stringify(data, null, 2)}</pre>
+<h1 class="sr-only">Manage {data?.schoolWithAdmins?.name} School</h1>
 <section class=" grid max-w-7xl auto-rows-[1fr_auto] grid-cols-2 gap-5">
 	<div class="top mb-11 flex justify-between">
 		<div class="left space-y-3">
 			<div class="grid-rows-auto grid grid-cols-2 gap-8 font-bold text-[#525252]">
-				{#each schoolWithAdmins.admins as admin (admin.id)}
+				{#each data?.schoolWithAdmins?.admins as admin (admin.id)}
 					<AdminContactDetailsCard {admin} />
 				{/each}
 			</div>
@@ -161,10 +160,10 @@
 			{#if browser}
 				<div class="btns flex flex-wrap gap-5">
 					<Button
-						href={`${window.location.origin}/schools/${schoolWithAdmins.id}/invite-coadmin`}
+						href={`${window.location.origin}/schools/${data?.schoolWithAdmins?.id}/invite-coadmin`}
 						class="">Add School Admin</Button
 					>
-					{#if schoolWithAdmins.isPaid}
+					{#if data?.schoolWithAdmins?.isPaid}
 						<Button onclick={copyAsssessmentLink}>Copy Assessment Invite Link</Button>
 					{:else}
 						{#each products as product}
@@ -173,7 +172,7 @@
 									handlePurchase({
 										key: product.key ?? null,
 										userId: data.user?.id,
-										schoolId: schoolWithAdmins.id
+										schoolId: data?.schoolWithAdmins?.id
 									})}>Purchase {product?.name}</Button
 							>
 						{/each}
@@ -194,12 +193,12 @@
 			<div class="buttons mt-4 flex items-center justify-between gap-2">
 				<Button
 					variant={`${!page.url.pathname.includes('results') ? 'secondary' : 'default'}`}
-					href={`${window.location.origin}/schools/${schoolWithAdmins.id}/results`}
+					href={`${window.location.origin}/schools/${data?.schoolWithAdmins?.id}/results`}
 					class="mb-4">Assessment Totals</Button
 				>
 				<Button
 					variant={`${!page.url.pathname.includes('member-data') ? 'secondary' : 'default'}`}
-					href={`${window.location.origin}/schools/${schoolWithAdmins.id}/member-data`}
+					href={`${window.location.origin}/schools/${data?.schoolWithAdmins?.id}/member-data`}
 					class="mb-4">Assessments</Button
 				>
 			</div>
