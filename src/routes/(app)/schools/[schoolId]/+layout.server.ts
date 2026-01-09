@@ -55,7 +55,9 @@ export const load = async (event) => {
 	const [stripeProducts, schoolWithAdmins, memberData] = await Promise.all([
 		(async () => {
 			const t0 = performance.now();
-			const result = await stripe.products.list({ limit: 2, active: true });
+			const result = await stripe.products.list({
+				expand: ['data.default_price']
+			});
 
 			console.log(`Stripe products fetch took ${performance.now() - t0}ms`);
 			return result;
@@ -83,3 +85,11 @@ export const load = async (event) => {
 		memberData
 	};
 };
+async function getProductsByLookupKey(lookupKey: string) {
+	// First, find all prices with this lookup key
+	const prices = await stripe.prices.list({
+		lookup_keys: [lookupKey],
+		active: true,
+		expand: ['data.product']
+	});
+}
