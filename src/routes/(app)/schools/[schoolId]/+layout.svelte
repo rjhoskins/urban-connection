@@ -21,8 +21,8 @@
 	const { stripeProducts, schoolWithAdmins, memberData } = data;
 	const products = $state(stripeProducts || []);
 
-	let pageTitle = $state(`${data.schoolWithAdmins?.name} | Dashboard`);
-	onMount(() => {
+	let pageTitle = $state(`${data.schoolWithAdmins?.name ?? ''} | Dashboard`);
+	$effect(() => {
 		globals.setPageName(pageTitle);
 		console.log('Layout data:', data);
 	});
