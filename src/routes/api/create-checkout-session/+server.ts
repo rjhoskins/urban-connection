@@ -34,7 +34,7 @@ export const POST: RequestHandler = async (event) => {
 		success_url,
 		metadata: {
 			schoolId,
-			userId
+			userId: event.locals.user?.id || 'anonymous'
 		},
 		cancel_url: cancel_url.toString()
 	});
