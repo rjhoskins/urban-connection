@@ -14,16 +14,20 @@ export const POST: RequestHandler = async (event) => {
 	const body = await request.json();
 
 	const { data } = body;
-	console.log('Doing something with Stripe data........:', data);
+	console.log(
+		'Doing something with Stripe data........:',
+		data.object.status,
+		data.object.metadata.schoolId
+	);
 	if (data.object.status === 'complete') {
 		try {
 			const result = await updateSchoolStripeData({
-				schoolId: parseInt(data.object.metadata.schoolId, 10),
-				stripePaymentId: data.object.id,
+				schoolId: data.object.metadata.schoolId,
+				stripePaymentId: data?.object.id,
 				stripeData: JSON.stringify({
-					stripePaymentId: data.object.id,
+					stripePaymentId: data?.object.id,
 					schoolId: data.object.metadata.schoolId,
-					userId: data.object.metadata.userId,
+					userId: event.locals.user?.id,
 					paymentDate: new Date(data.object.created * 1000).toISOString()
 				})
 			});
