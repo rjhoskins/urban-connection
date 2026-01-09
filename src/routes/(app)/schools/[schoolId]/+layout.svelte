@@ -134,7 +134,7 @@
 			})
 		});
 		const { url } = await response.json();
-		window.location.href = currUrl;
+		window.location.href = url;
 	}
 </script>
 
