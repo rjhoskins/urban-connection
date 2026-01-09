@@ -26,7 +26,8 @@ export const POST: RequestHandler = async (event) => {
 		success_url: string;
 	};
 	console.log('Creating checkout session......................', {
-		price: isLive ? PRICE_KEY_MAP[key].live : PRICE_KEY_MAP[key].test, // price id => do key lookup based on key on prod vs test (from constants based on Stripe setup)
+		// price: PRICE_KEY_MAP[`${key}`].test, // price id => do key lookup based on key on prod vs test (from constants based on Stripe setup)
+		price: isLive ? PRICE_KEY_MAP[`${key}`].live : PRICE_KEY_MAP[`${key}`].test, // price id => do key lookup based on key on prod vs test (from constants based on Stripe setup)
 		userId,
 		schoolId,
 		success_url
@@ -35,7 +36,7 @@ export const POST: RequestHandler = async (event) => {
 		line_items: [
 			{
 				//allow for multiple products but only buy one at a time
-				price: isLive ? PRICE_KEY_MAP[key].live : PRICE_KEY_MAP[key].test,
+				price: PRICE_KEY_MAP[`${key}`].test,
 				quantity: 1
 			}
 		],
