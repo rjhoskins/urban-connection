@@ -172,7 +172,7 @@
 	<link rel="icon" href="/img/urban-connection-logo.png" type="image/png" />
 </svelte:head>
 
-<pre>{JSON.stringify(data, null, 2)}</pre>
+<!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->
 <h1 class="sr-only">Manage {data?.schoolWithAdmins?.name} School</h1>
 <section class=" grid max-w-7xl auto-rows-[1fr_auto] grid-cols-2 gap-5">
 	<div class="top mb-11 flex justify-between">
