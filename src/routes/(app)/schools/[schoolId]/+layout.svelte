@@ -18,26 +18,25 @@
 	import { browser } from '$app/environment';
 
 	let { data, children }: { data: LayoutData; children: Snippet } = $props();
-	const { stripeProducts, schoolWithAdmins, memberData } = data;
+	const { stripeProducts = [], schoolWithAdmins = null, memberData = [], user = null } = data ?? {};
 	const products = $state(stripeProducts || []);
+	const validProducts = $state(products.filter((product) => product.lookupKey) || []);
 
-	let pageTitle = $state(`${data.schoolWithAdmins?.name ?? ''} | Dashboard`);
+	let pageTitle = $state(`${data?.schoolWithAdmins?.name ?? ''} | Dashboard`);
 	$effect(() => {
 		globals.setPageName(pageTitle);
 		console.log('Layout data:', data);
 	});
 	// price_1Rz21gAAfGnMCvIQR4vLKG6G
 
-	const totalAssessments = memberData.length;
-	const assessmentsNotStarted = memberData.filter(
-		(assessment) => assessment.status === 'sent'
-	).length;
-	const assessmentsStarted = memberData.filter(
-		(assessment) => assessment.status === 'started'
-	).length;
-	const assessmentsCompleted = memberData.filter(
-		(assessment) => assessment.status === 'completed'
-	).length;
+	const memberList = Array.isArray(memberData) ? memberData : [];
+	const totalAssessments = memberList.length || 0;
+	const assessmentsNotStarted =
+		memberList.filter((assessment) => assessment.status === 'sent').length || 0;
+	const assessmentsStarted =
+		memberList.filter((assessment) => assessment.status === 'started').length || 0;
+	const assessmentsCompleted =
+		memberList.filter((assessment) => assessment.status === 'completed').length || 0;
 	const assessmentsNotStartedPercentage = assessmentsNotStarted
 		? (assessmentsNotStarted / totalAssessments) * 100
 		: 0;
@@ -48,15 +47,16 @@
 		? (assessmentsCompleted / totalAssessments) * 100
 		: 0;
 
-	const totalPoints = memberData.reduce(
-		(acc: any, member: { pointsTotal: any }) => acc + member.pointsTotal,
+	const totalPoints = memberList.reduce(
+		(acc: number, member: { pointsTotal?: number | null }) => acc + (member.pointsTotal ?? 0),
 		0
 	);
-	const totaPossiblePoints = memberData.reduce(
-		(acc: any, member: { questionsTotal: any }) => acc + member.questionsTotal,
+	const totaPossiblePoints = memberList.reduce(
+		(acc: number, member: { questionsTotal?: number | null }) => acc + (member.questionsTotal ?? 0),
 		0
 	);
-	const totalPointsPercentage = Math.round((totalPoints / totaPossiblePoints) * 100) || 0;
+	const totalPointsPercentage =
+		totaPossiblePoints > 0 ? Math.round((totalPoints / totaPossiblePoints) * 100) : 0;
 
 	const chartData = [
 		{
@@ -75,17 +75,29 @@
 
 	async function copyAsssessmentLink() {
 		let resData;
+		const schoolId = data?.schoolWithAdmins?.id;
+		const createdBy = data?.user?.id;
+
+		if (!schoolId || !createdBy) {
+			toast.error('Missing required data to create assessment link.');
+			return;
+		}
 		const res = await fetch('/api/create-assessment-invite', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({
-				schoolId: data.schoolWithAdmins.id,
-				createdBy: data.user?.id
+				schoolId,
+				createdBy
 			})
 		});
-		resData = await res.json();
+		try {
+			resData = await res.json();
+		} catch (e) {
+			toast.error('Unexpected server response while creating assessment link.');
+			return;
+		}
 
 		console.log('Assessment invite created: ', resData);
 		// todo: move to server
@@ -95,7 +107,8 @@
 			);
 			return;
 		}
-		const assessmentLink = `${page.url.origin}/assessment-welcome?assessmentInviteId=${resData.data.id}`;
+		const origin = browser ? window.location.origin : page.url.origin;
+		const assessmentLink = `${origin}/assessment-welcome?assessmentInviteId=${resData?.data?.id}`;
 
 		if (browser) {
 			navigator.clipboard.writeText(assessmentLink).then(
@@ -110,31 +123,44 @@
 	}
 
 	async function handlePurchase({
-		key,
+		lookupKey,
 		userId,
 		schoolId
 	}: {
-		key: string | null | undefined;
+		lookupKey: string | null | undefined;
 		userId: string | null | undefined;
 		schoolId: number | null | undefined;
 	}) {
+		console.log('Initiating purchase with', { lookupKey, userId, schoolId });
+		if (!lookupKey || !userId || !schoolId) {
+			toast.error('Missing purchase details. Please try again later.');
+			return;
+		}
 		const currUrl = window.location.href;
 		console.log('Current URL:', currUrl);
-		console.log('Purchase button clicked', { key, userId, schoolId, currUrl });
+		console.log('Purchase button clicked', { lookupKey, userId, schoolId, currUrl });
 		const response = await fetch('/api/create-checkout-session', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({
-				price: key,
+				lookupKey,
 				userId,
 				schoolId,
 				success_url: currUrl
 			})
 		});
-		const { url } = await response.json();
-		window.location.href = url;
+		try {
+			const { url } = await response.json();
+			if (!url) {
+				toast.error('Checkout session could not be created.');
+				return;
+			}
+			window.location.href = url;
+		} catch (e) {
+			toast.error('Unexpected server response while creating checkout session.');
+		}
 	}
 </script>
 
@@ -170,7 +196,7 @@
 							<Button
 								onclick={() =>
 									handlePurchase({
-										key: product.key ?? null,
+										lookupKey: product.lookupKey ?? null,
 										userId: data.user?.id,
 										schoolId: data?.schoolWithAdmins?.id
 									})}>Purchase {product?.name}</Button

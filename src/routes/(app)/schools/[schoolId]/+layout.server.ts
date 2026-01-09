@@ -58,16 +58,21 @@ export const load = async (event) => {
 			const result = await stripe.products.list({
 				expand: ['data.default_price']
 			});
-			const safeProducts = result.data.map((product) => {
-				return {
-					name: product.name,
-					description: product.description,
-					key:
-						typeof product.default_price === 'object'
-							? product.default_price?.lookup_key
-							: undefined
-				};
-			});
+			const safeProducts = result.data
+				.filter((product) => product.active) // Only active products
+				.map((product) => {
+					const defaultPrice =
+						typeof product.default_price === 'object' ? product.default_price : null;
+
+					return {
+						name: product.name,
+						description: product.description,
+						lookupKey: defaultPrice?.lookup_key || null,
+						priceId: defaultPrice?.id || null,
+						active: product.active,
+						metadata: product.metadata || {}
+					};
+				});
 
 			console.log(`===stripe products===:`, safeProducts);
 
