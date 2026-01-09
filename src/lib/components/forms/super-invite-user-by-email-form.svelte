@@ -38,7 +38,7 @@
 	/>
 {/if}
 
-<form class="sizes flex flex-col gap-3" method="POST" action="?/invite" use:enhance>
+<form class="flex flex-col gap-3" method="POST" action="?/invite" use:enhance>
 	<!-- name -->
 	<Form.Field class="hidden space-y-0" {form} name="name">
 		<Form.Control>

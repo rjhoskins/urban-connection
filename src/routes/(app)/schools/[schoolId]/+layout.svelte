@@ -20,8 +20,6 @@
 	let { data, children }: { data: LayoutData; children: Snippet } = $props();
 	const { stripeProducts, schoolWithAdmins, memberData } = data;
 	const products = $state(stripeProducts || []);
-	let numMembersShown = $state(data.memberData.length);
-	let isGridView = $state(true);
 
 	let pageTitle = $state(`${schoolWithAdmins.name} | Dashboard`);
 	onMount(() => {
@@ -121,6 +119,7 @@
 		schoolId: number | null | undefined;
 	}) {
 		const currUrl = window.location.href;
+		console.log('Current URL:', currUrl);
 		console.log('Purchase button clicked', { key, userId, schoolId, currUrl });
 		const response = await fetch('/api/create-checkout-session', {
 			method: 'POST',
@@ -135,13 +134,12 @@
 			})
 		});
 		const { url } = await response.json();
-		window.location.href = url;
+		window.location.href = currUrl;
 	}
 </script>
 
 <svelte:head>
 	<title>{pageTitle}</title>
-	<meta name="description" content={`Manage ${schoolWithAdmins.name} School`} />
 	<meta property="og:title" content={pageTitle} />
 	<meta property="og:description" content={`Manage ${schoolWithAdmins.name} School`} />
 	<meta property="og:image" content="/img/urban-connection-logo.png" />
@@ -149,7 +147,7 @@
 	<link rel="icon" href="/img/urban-connection-logo.png" type="image/png" />
 </svelte:head>
 
-<!-- <pre>{JSON.stringify(data, null, 2)}</pre> -->
+<pre>{JSON.stringify(data, null, 2)}</pre>
 <h1 class="sr-only">Manage {schoolWithAdmins.name} School</h1>
 <section class=" grid max-w-7xl auto-rows-[1fr_auto] grid-cols-2 gap-5">
 	<div class="top mb-11 flex justify-between">
@@ -169,14 +167,14 @@
 					{#if schoolWithAdmins.isPaid}
 						<Button onclick={copyAsssessmentLink}>Copy Assessment Invite Link</Button>
 					{:else}
-						{#each products as { key, name }}
+						{#each products as product}
 							<Button
 								onclick={() =>
 									handlePurchase({
-										key: key ?? null,
+										key: product.key ?? null,
 										userId: data.user?.id,
 										schoolId: schoolWithAdmins.id
-									})}>Purchase {name}</Button
+									})}>Purchase {product?.name}</Button
 							>
 						{/each}
 					{/if}
