@@ -112,23 +112,23 @@
 	}
 
 	async function handlePurchase({
-		priceId,
+		key,
 		userId,
 		schoolId
 	}: {
-		priceId: string | Stripe.Price | null | undefined;
+		key: string | null | undefined;
 		userId: string | null | undefined;
 		schoolId: number | null | undefined;
 	}) {
 		const currUrl = window.location.href;
-		console.log('Purchase button clicked', { priceId, userId, schoolId, currUrl });
+		console.log('Purchase button clicked', { key, userId, schoolId, currUrl });
 		const response = await fetch('/api/create-checkout-session', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({
-				price: priceId,
+				price: key,
 				userId,
 				schoolId,
 				success_url: currUrl
@@ -169,11 +169,11 @@
 					{#if schoolWithAdmins.isPaid}
 						<Button onclick={copyAsssessmentLink}>Copy Assessment Invite Link</Button>
 					{:else}
-						{#each products as { default_price, name }}
+						{#each products as { key, name }}
 							<Button
 								onclick={() =>
 									handlePurchase({
-										priceId: default_price,
+										key: key ?? null,
 										userId: data.user?.id,
 										schoolId: schoolWithAdmins.id
 									})}>Purchase {name}</Button

@@ -796,6 +796,14 @@ export const PROD_STRIPE_PRODUCTS = [
 	}
 ];
 
+// uses price IDs from Stripe dashboard, maps to default_price in stripe products data
+export const PRICE_KEY_MAP = {
+	assessment: {
+		test: 'price_1RukA0AAfGnMCvIQ6BJJcl0O',
+		live: 'price_1RsrX8AAfGnMCvIQALisbsda'
+	}
+};
+
 export const INITIAL_DISTRICTS = ['District One'];
 export const INITIAL_USERS = [
 	{ username: 'dc-super-user', password: '123456', role: 'super_admin', name: 'DREAMCREDIBLE' },

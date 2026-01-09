@@ -5,19 +5,21 @@ import { STRIPE_SECRET_KEY, STRIPE_SECRET_TEST_KEY } from '$env/static/private';
 import { PUBLIC_FRONTEND_URL_SANDBOX, PUBLIC_FRONTEND_URL_PROD } from '$env/static/public';
 import { error, json, redirect, type RequestHandler } from '@sveltejs/kit';
 const baseUrl = dev ? PUBLIC_FRONTEND_URL_SANDBOX : PUBLIC_FRONTEND_URL_PROD;
-const secretKey = dev ? STRIPE_SECRET_TEST_KEY : STRIPE_SECRET_KEY;
-const ngrokUrl = 'https://872700b78225.ngrok-free.app';
+const stripeProdMode = dev ? 'dev' : 'prod'; // causing issues in prod?
+const secretKey = STRIPE_SECRET_KEY;
 
 const product = TEST_STRIPE_PRODUCTS[0]; // testing...
 
 const cancel_url = new URL('/cancel', baseUrl);
 
 const stripe = new Stripe(secretKey as string);
+console.log('Stripe initialized with key:', secretKey?.substring(0, 8) + '...');
+console.log('Creating checkout session with stripeProdMode', stripeProdMode);
 
 export const POST: RequestHandler = async (event) => {
-	const { price, userId, schoolId, success_url } = await event.request.json();
+	const { key, userId, schoolId, success_url } = await event.request.json();
 	console.log('Creating checkout session......................', {
-		price,
+		price: PRICE_KEY_MAP[key], // price id => do key lookup based on key on prod vs test (from constants based on Stripe setup)
 		userId,
 		schoolId,
 		success_url
@@ -26,7 +28,7 @@ export const POST: RequestHandler = async (event) => {
 		line_items: [
 			{
 				//allow for multiple products but only buy one at a time
-				price,
+				price: PRICE_KEY_MAP[key],
 				quantity: 1
 			}
 		],

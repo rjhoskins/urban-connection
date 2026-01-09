@@ -58,9 +58,21 @@ export const load = async (event) => {
 			const result = await stripe.products.list({
 				expand: ['data.default_price']
 			});
+			const safeProducts = result.data.map((product) => {
+				return {
+					name: product.name,
+					description: product.description,
+					key:
+						typeof product.default_price === 'object'
+							? product.default_price?.lookup_key
+							: undefined
+				};
+			});
+
+			console.log(`===stripe products===:`, safeProducts);
 
 			console.log(`Stripe products fetch took ${performance.now() - t0}ms`);
-			return result;
+			return safeProducts;
 		})(),
 		(async () => {
 			const t0 = performance.now();

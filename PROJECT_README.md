@@ -323,7 +323,7 @@ Each subdomain contains 3-7 descriptors (yes/no questions)
 
 - Customizable HTML email templates
 - Template preview system
-- WYSIWYG editing for admin invites
+- Semi-editable admin invites HTML content
 - Separate templates for different user types
 
 ### Data Visualization

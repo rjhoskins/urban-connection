@@ -35,7 +35,7 @@ async function seed() {
 
 	console.log('🌱 Starting seed...');
 	await createInitialUsers();
-	await createInitialDistrict();
+	await createInitialDistricts();
 	await createInitialHTMLTemplate();
 
 	const data = RUBRIC_DATA;
@@ -148,7 +148,7 @@ async function createInitialUsers() {
 	}
 	console.log('✅ createInitialUsers Seed completed!');
 }
-async function createInitialDistrict() {
+async function createInitialDistricts() {
 	for (const districtName of INITIAL_DISTRICTS) {
 		await db.insert(districts).values({
 			name: districtName
