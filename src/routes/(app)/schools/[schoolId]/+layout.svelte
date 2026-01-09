@@ -19,7 +19,7 @@
 
 	let { data, children }: { data: LayoutData; children: Snippet } = $props();
 	const { stripeProducts, schoolWithAdmins, memberData } = data;
-	const products = $state(stripeProducts.data);
+	const products = $state(stripeProducts || []);
 	let numMembersShown = $state(data.memberData.length);
 	let isGridView = $state(true);
 
