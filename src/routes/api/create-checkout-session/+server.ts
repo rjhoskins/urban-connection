@@ -61,7 +61,8 @@ export const POST: RequestHandler = async (event) => {
 				schoolId,
 				userId: event.locals.user?.id || 'anonymous'
 			},
-			cancel_url: cancel_url.toString()
+			cancel_url: cancel_url.toString(),
+			allow_promotion_codes: true
 		});
 		console.log('Checkout session created:', session);
 		return json({ url: session.url });
