@@ -9,12 +9,8 @@ export const db = drizzle(client, {
 	casing: 'snake_case'
 });
 
-import {
-	RUBRIC_DATA,
-	INITIAL_DISTRICTS,
-	INITIAL_HTML_DATA,
-	INITIAL_USERS
-} from '$lib/server/constants';
+import { RUBRIC_DATA, INITIAL_HTML_DATA, INITIAL_USERS } from '$lib/server/constants';
+import { INITIAL_STATES_WITH_DISTRICTS } from '$lib/data/states';
 import {
 	assessmentDomains,
 	assessmentQuestions,
@@ -84,15 +80,15 @@ async function seed() {
 	console.log('✅ Seed completed!');
 }
 
-seed()
-	.catch((error) => {
-		console.error('❌ Seed failed!');
-		console.error(error);
-		process.exit(1);
-	})
-	.finally(() => {
-		process.exit(0);
-	});
+// seed()
+// 	.catch((error) => {
+// 		console.error('❌ Seed failed!');
+// 		console.error(error);
+// 		process.exit(1);
+// 	})
+// 	.finally(() => {
+// 		process.exit(0);
+// 	});
 
 async function createDomainIfNotExists(name: string) {
 	const [domain] = await db
@@ -149,7 +145,7 @@ async function createInitialUsers() {
 	console.log('✅ createInitialUsers Seed completed!');
 }
 async function createInitialDistricts() {
-	for (const districtName of INITIAL_DISTRICTS) {
+	for (const districtName of INITIAL_STATES_WITH_DISTRICTS) {
 		await db.insert(districts).values({
 			name: districtName
 		});
@@ -163,3 +159,23 @@ async function createInitialHTMLTemplate() {
 	});
 	console.log('✅ createInitialHTMLTemplate Seed completed!');
 }
+
+async function addSeedDistricts() {
+	for (const districtName of INITIAL_STATES_WITH_DISTRICTS) {
+		await db.insert(districts).values({
+			name: districtName
+		});
+	}
+	console.log('✅ createInitialDistrict Seed completed!');
+}
+
+addSeedDistricts()
+	.catch((error) => {
+		console.error('❌ Seed failed!');
+		console.error(error);
+		process.exit(1);
+	})
+	.finally(() => {
+		console.log('✅ Seed completed!');
+		process.exit(0);
+	});

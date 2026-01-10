@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import { page } from '$app/state';
 	import AssessmentDomainProgressCard from '$lib/components/assessment-domain-progress-card.svelte';
 	import AssessmentQuestionsForm from '$lib/components/forms/assessment-questions-form.svelte';
 
@@ -11,7 +10,7 @@
 
 	import { Video } from 'lucide-svelte';
 	const modal = getModalStateContext();
-	import { onMount, tick } from 'svelte';
+	import { onMount } from 'svelte';
 
 	let { data } = $props();
 	let {
@@ -227,7 +226,7 @@
 	}
 
 	function openInstructionsModal() {
-		modal.handleManualVideoSelect('modal-instructions-btn');
+		modal.handleManualVideoSelect(videoIdMap.get('modal-instructions-btn')!);
 	}
 
 	onMount(async () => {
