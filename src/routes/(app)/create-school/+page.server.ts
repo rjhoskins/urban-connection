@@ -27,8 +27,7 @@ export const load: PageServerLoad = async ({ locals, parent }) => {
 
 	return {
 		districts: await getDistricts(),
-		form,
-		pageTitle: parentData.pageTitle
+		form
 	};
 };
 export const actions: Actions = {

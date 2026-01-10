@@ -818,7 +818,11 @@ export async function getLoggedInSuperAdminsDistrict() {
 			schools: {
 				columns: { id: true, name: true }
 			}
-		}
+		},
+		where: (districts, { exists, eq }) =>
+			exists(
+				db.select({ id: schools.id }).from(schools).where(eq(schools.districtId, districts.id))
+			)
 	});
 
 	if (dev) console.log('getLoggedInSuperAdminsDistrict res => ', res);
